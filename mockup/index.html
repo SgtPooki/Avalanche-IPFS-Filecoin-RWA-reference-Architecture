@@ -309,12 +309,12 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
   <section class="screen landing" data-screen="0" data-view="landing">
     <div class="hero">
       <div>
-      <div class="eyebrow">Reference template · Avalanche + IPFS + Filecoin</div>
+      <div class="eyebrow">Reference template · built on Avalanche · IPFS · Filecoin</div>
       <h1>Records your token can vouch for</h1>
       <p class="sub">Anchor every deed, survey, and tax record to the asset on Avalanche. Filecoin proves they are still there. Anyone can check. Fork the template to add it to your own issuer stack.</p>
       <div class="ctas">
         <button class="btn primary" data-go="1">Walk through the demo</button>
-        <button class="btn">Fork the template</button>
+        <a class="btn" href="https://github.com/SgtPooki/anchorline" style="text-decoration:none">Fork the template</a>
       </div>
       <p class="fine">Synthetic data only. Runs on Avalanche Fuji and Filecoin Calibration testnets.</p>
       </div>
@@ -350,6 +350,16 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
     </div>
 
     <div class="land-sec">
+      <h2>A second pass at a 2025 idea</h2>
+      <p class="lede">Ava Labs and the Filecoin Foundation announced a cross-chain data bridge in May 2025. It relayed a one-time storage attestation through a bridge and a pinning service. This template keeps the idea and changes three things.</p>
+      <div class="ledger">
+        <div class="row"><div class="what">Continuous proofs</div><div class="gap">Storage providers prove possession on a schedule. The verifier reads that schedule, not a single attestation from deal time.</div></div>
+        <div class="row"><div class="what">A versioned manifest</div><div class="gap">Each record set is one CID with an append-only history on chain. Updates add a version. Tampering fails.</div></div>
+        <div class="row"><div class="what">No relayer in the trust path</div><div class="gap">The verifier reads Avalanche and Filecoin directly.</div></div>
+      </div>
+    </div>
+
+    <div class="land-sec">
       <h2>Change one line in a deed and verification fails</h2>
       <p class="lede">Same filename, different owner line, different fingerprint. The registry never pointed at the second file, so it fails.</p>
       <div class="teaser">
@@ -363,7 +373,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       <div class="split">
         <div>
           <h2>Built for issuers already on Avalanche</h2>
-          <p class="lede" style="margin-bottom:12px">Keep your token contract. Add one registry call per version. The template ships a five-file synthetic property, a Fuji registry contract, and a verify screen that reads in about 30 seconds.</p>
+          <p class="lede" style="margin-bottom:12px">Keep your token contract and keep your registry. Add one call per version. The issuer stays the record of authority. The chain adds an audit anyone can run, and the records and their proofs stay available when the issuer's own systems are down.</p>
           <div class="ctas" style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" data-go="1">Walk through the demo</button><button class="btn ghost" data-go="5">Skip to Verify</button></div>
         </div>
         <div class="notfor"><strong>Not for confidential records.</strong> This template stores public data. Sensitive documents need encryption and key management before storage.</div>
@@ -714,7 +724,8 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
     <li><b>Category first.</b> Headline names the category (verifiable offchain records), the value, and the who (Avalanche RWA issuers) before any feature.</li>
     <li><b>Order follows the sales narrative:</b> problem, what issuers do today including do-nothing, what a fix looks like, tamper proof, then the offer.</li>
     <li><b>Identity: Anchor line.</b> One rule from Avalanche red through the record into Filecoin blue. The record card is the hero object. Colors: Avalanche #E84142, IPFS #69C4CD (ipfs-css aqua, #378085 on light), Filecoin #0090FF, verified #1FBF75, failed #F5A524. Schibsted Grotesk, IBM Plex Sans, IBM Plex Mono.</li>
-    <li><span class="q">Q</span>"Fork the template" needs the real repo URL once SgtPooki/placeholder-project-name exists.</li>
+    <li><b>Positioning from the prior-art research.</b> Cite the May 2025 Avalanche and Filecoin bridge first, then the three additions. Never claim to be first. "Built on Avalanche" wording only, no logos.</li>
+    <li><b>"Fork the template"</b> points at github.com/SgtPooki/anchorline.</li>
     <li><span class="q">Q</span>Is a partner logo row (Avalanche, Filecoin) wanted here, or does that need clearance first?</li>
   </ul></div>
   <div class="n" data-n="1"><ul>
