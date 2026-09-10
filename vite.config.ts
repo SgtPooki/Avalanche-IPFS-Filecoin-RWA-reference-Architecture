@@ -31,7 +31,18 @@ export default defineConfig({
         test: {
           name: 'node',
           include: ['src/**/*.test.ts', 'scripts/**/*.test.ts'],
-          exclude: ['**/*.files.test.ts', '**/node_modules/**'],
+          exclude: ['**/*.files.test.ts', '**/*.profile.test.ts', '**/node_modules/**'],
+          environment: 'node',
+        },
+      },
+      {
+        // Reads filecoin-pin's Node entry, which does not exist in a browser
+        // build. Not a browser test and not run in the browser project.
+        extends: true,
+        test: {
+          name: 'profile',
+          include: ['**/*.profile.test.ts'],
+          exclude: ['**/node_modules/**'],
           environment: 'node',
         },
       },

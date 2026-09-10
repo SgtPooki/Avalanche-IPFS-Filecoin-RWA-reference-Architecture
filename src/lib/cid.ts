@@ -16,7 +16,17 @@ import type { AddOptions } from '@helia/unixfs'
 import { unixfs } from '@helia/unixfs'
 import { MemoryBlockstore } from 'blockstore-core/memory'
 
-/** IPIP-499 profile: 1 MiB chunks, raw leaves, CIDv1, 1024-link DAG width. */
+/**
+ * IPIP-499 profile: 1 MiB chunks, raw leaves, CIDv1, 1024-link DAG width.
+ *
+ * filecoin-pin exports this same constant, but only from its Node entry:
+ * `filecoin-pin/core/unixfs` resolves to `browser.js` under the browser
+ * condition, and that file re-exports the CAR builders without
+ * `importer-options.js`. Importing it here would pull a Node-only path into
+ * the browser bundle, so the value is repeated instead.
+ *
+ * `cid.profile.test.ts` asserts the two are equal, so the copy cannot drift.
+ */
 export const UNIXFS_PROFILE = 'unixfs-v1-2025' as const
 
 export const importerOptions: AddOptions = { profile: UNIXFS_PROFILE }
