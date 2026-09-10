@@ -8,15 +8,13 @@ Status: contract deployed, mockup approved, app in progress. See `docs/build-pla
 
 An issuer registers a property asset on Avalanche Fuji, uploads its records (deed, parcel record, tax assessment, survey), gets an IPFS CID per file, stores the files on Filecoin, and anchors a manifest CID to the asset. Anyone can then read the pointer from Avalanche, fetch the records, re-hash them, and check that Filecoin is still proving storage. A modified deed fails. A legitimate update publishes a new version and keeps the old one verifiable.
 
-## Where this comes from
+## Building on the Avalanche and Filecoin bridge
 
-Ava Labs and the Filecoin Foundation announced an Avalanche and Filecoin cross-chain data bridge in May 2025. It relayed a one-time storage attestation to Avalanche through a bridge and depended on a pinning service. That code is no longer maintained. This template keeps the idea and changes three things:
+Ava Labs and the Filecoin Foundation first connected the two networks in May 2025 with a cross-chain data bridge that let an Avalanche contract confirm a Filecoin storage deal. anchorline takes the next step for asset records:
 
-- Continuous proofs. Storage providers prove possession on a schedule, and the verifier reads that schedule, instead of trusting one attestation at deal time.
-- A versioned manifest. Each record set is one CID with an append-only history on chain. Updates add a version. Tampering fails verification.
-- No relayer in the trust path. The verifier reads Avalanche and Filecoin directly.
-
-The full comparison, with sources, is in `docs/research/avalanche-prior-art.md`.
+- Storage providers keep proving possession on a schedule, and the record shows when the last proof happened and when the next one is due.
+- Each record set is one CID with an append-only version history on Avalanche. Updates add a version. A changed file fails verification.
+- Verification reads Avalanche and Filecoin directly, with no extra service between them.
 
 ## Who keeps the record
 
@@ -26,7 +24,6 @@ The issuer stays the record of authority. For a county, that means the county st
 
 - `mockup/` is the click-through of all eight screens and the identity boards. Open `mockup/index.html` in a browser. The buttons advance the flow.
 - `contracts/` is the registry contract, deployed on Fuji, plus an optional ERC-721 mix-in for issuers who already have a token. See `contracts/README.md`.
-- `docs/research/` holds the standards review and the prior-art review.
 - `docs/build-plan.md` is the build order and the conventions.
 
 ## Networks
@@ -35,4 +32,4 @@ Avalanche Fuji (chain id 43113) and Filecoin Calibration. The contract is plain 
 
 ## Trademarks
 
-AVAX and Avalanche are marks of Ava Labs. This project is built on Avalanche and does not claim endorsement by or affiliation with Ava Labs. Filecoin and IPFS marks belong to their respective foundations.
+AVAX and Avalanche are trademarks of Ava Labs, Inc. anchorline is built on Avalanche. Filecoin and IPFS are trademarks of their respective foundations.
