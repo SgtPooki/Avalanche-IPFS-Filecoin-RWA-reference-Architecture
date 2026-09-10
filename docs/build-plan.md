@@ -16,7 +16,8 @@ From the PRD, in the order they unblock each other:
 
 - Contract: `AssetRecordRegistry` is deployed on Fuji at `0x7fdfdb7F166A3dEE947A5533e20B8E5Ce8c80863`. Forks reuse it. Assets are namespaced by sender. `setManifest` registers on first use. The optional ERC-721 mix-in in `contracts/src/adapters/` is the integration path for issuers with a token; it is not the demo path.
 - One upload per record file through filecoin-pin (`createCarFromFile`, `checkUploadReadiness`, `executeUpload`). Each record gets its own IPFS root CID and Filecoin piece CID.
-- Manifest is canonical JSON: sorted keys, `schemaVersion`, no incidental timestamps. Per record: `type`, `filename`, `cid`, `pieceCid`, `sha256`, `size`, `mimeType`. Top level: `assetId`, `version`, `records`, `storage` with `network`, `dataSetId`, `providerId`. The manifest is uploaded last, as its own piece.
+- Manifest is canonical JSON: sorted keys, `schemaVersion`, no incidental timestamps. Per record: `type`, `filename`, `cid`, `pieceCid`, `sha256`, `size`, `mimeType`. Top level: `assetId`, `records`, `storage` with `network`, `dataSetId`, `providerId`. The manifest is uploaded last, as its own piece.
+- The manifest carries no version number. `setManifest` appends one on every call, so a number inside the document could disagree with the chain: two issuers anchoring at once would each write a manifest claiming v1 and the second would land as v2. The registry assigns versions; the manifest describes one set of records. `schemaVersion` is the shape of the document and is a different thing.
 - Anchor writes `manifestCid`, `manifestPieceCid`, and `dataSetId`. The verifier needs nothing else to find proof state.
 - Verify reads two chains. Fuji RPC for the registry; Filecoin Calibration through the Synapse SDK for `StorageContext.pieceStatus({ pieceCid })`, which returns `dataSetLastProven`, `dataSetNextProofDue`, and `isProofOverdue`. Show "last proof N min ago" and "next proof due in N h." Never claim a per-file proof.
 - Retrieval: `synapse.storage.download({ pieceCid })` plus CAR extraction is primary. A public gateway link is secondary and only shown after `executeUpload` reports IPNI validation.
@@ -32,9 +33,10 @@ From the PRD, in the order they unblock each other:
 
 Anchor line. Tokens and fonts are in `mockup/index.html` and `mockup/branding/final-anchor-line.html`.
 
-- Avalanche `#E84142`, IPFS `#69C4CD` (`#378085` for text on light), Filecoin `#0090FF`, verified `#1FBF75`, failed `#F5A524`, stage black `#080909`, record `#F5F6F8`.
+- Light is the default and it does not follow the operating system, so the recording looks the same whatever the machine is set to. Page `#F5F6F8`, surface `#FFFFFF`, ink `#0F1216`, with the accents held back: Avalanche `#B32A2B`, Filecoin `#0062B8`, IPFS `#378085`, verified `#178F5A`, failed `#B8760F`. Dark is `data-theme="dark"`: stage `#080909`, and the accents at full strength, Avalanche `#E84142`, Filecoin `#0090FF`, IPFS `#69C4CD`, verified `#1FBF75`, failed `#F5A524`.
+- The brand colors are `#E84142`, `#0090FF`, and `#69C4CD` in both themes for rules and fills. Only text and icons shift to the darker inks on light, where the full-strength values do not carry enough contrast.
 - Schibsted Grotesk for headings, IBM Plex Sans for body, IBM Plex Mono for identifiers.
-- One vertical rule from Avalanche red through a neutral segment into Filecoin blue is the mark. The property record card is the hero object. Avalanche red is for Avalanche write actions only. Failure is amber, never red.
+- One vertical rule from Avalanche red through a neutral segment into Filecoin blue is the mark. The property record card is the hero object. Avalanche red is for Avalanche write actions only, which rules it out for explanatory callouts: beside a failed verdict a red panel reads as the bad part. Those are neutral. Failure is amber, never red.
 - No Avalanche or Filecoin logos. No brand imagery. "Built on Avalanche" wording only.
 
 ## Writing rules
@@ -61,6 +63,11 @@ Positioning: credit the May 2025 Avalanche and Filecoin bridge as the first conn
 ## Not in scope
 
 A Balcony clone, a token standard, KYC, payments beyond storage funding, encryption, private data, a wallet-connect flow, an indexer, a hosted deployment, mainnet claims.
+
+## Changed since the plan
+
+- Light by default, from team feedback on 2026-09-10 that the black and neon boards read wrong and the county-clerk treatment reads right. The mockup already carried the light tokens; the change was which one is the default.
+- No `version` in the manifest, from peer review. The registry owns version numbering.
 
 ## Open questions
 

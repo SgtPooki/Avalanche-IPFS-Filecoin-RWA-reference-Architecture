@@ -10,6 +10,13 @@
  * Same inputs, same bytes, same CID, on any machine. The bytes below are also
  * exactly what the app shows on the anchor screen, so the JSON on screen is
  * the JSON that was hashed.
+ *
+ * There is no version number in here. `AssetRecordRegistry` already appends a
+ * version on every `setManifest`, and a number inside the manifest could
+ * disagree with it: two issuers anchoring at once would each write a manifest
+ * claiming v1, and the second would land as v2. The chain assigns versions and
+ * the manifest describes one set of records. `schemaVersion` is a different
+ * thing, and it is the shape of this document.
  */
 
 export const MANIFEST_SCHEMA_VERSION = 1
@@ -45,7 +52,6 @@ export interface Manifest {
   records: ManifestRecord[]
   schemaVersion: number
   storage: ManifestStorage
-  version: number
 }
 
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json }
@@ -173,7 +179,6 @@ export function parseManifest(source: string | Uint8Array): Manifest {
     records: parsed,
     schemaVersion,
     storage: parseStorage(root.storage),
-    version: field(root, 'version', 'number', 'manifest'),
   }
 }
 

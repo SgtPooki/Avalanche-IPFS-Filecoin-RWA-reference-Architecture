@@ -39,7 +39,6 @@ function demoManifest(): Manifest {
     ],
     schemaVersion: MANIFEST_SCHEMA_VERSION,
     storage: { dataSetId: 1842, network: 'filecoin-calibration', providerId: 12 },
-    version: 1,
   }
 }
 
@@ -48,7 +47,7 @@ describe('canonicalize', () => {
     const text = canonicalize(demoManifest())
     const topLevel = text.match(/^ {2}"(\w+)"/gm)?.map((line) => line.trim())
 
-    expect(topLevel).toEqual(['"assetId"', '"records"', '"schemaVersion"', '"storage"', '"version"'])
+    expect(topLevel).toEqual(['"assetId"', '"records"', '"schemaVersion"', '"storage"'])
     expect(text).toContain('"dataSetId": 1842')
     expect(text.indexOf('"dataSetId"')).toBeLessThan(text.indexOf('"network"'))
     expect(text.indexOf('"cid"')).toBeLessThan(text.indexOf('"filename"'))
@@ -58,7 +57,6 @@ describe('canonicalize', () => {
     const manifest = demoManifest()
     const shuffled = JSON.parse(
       JSON.stringify({
-        version: manifest.version,
         storage: { providerId: 12, network: 'filecoin-calibration', dataSetId: 1842 },
         schemaVersion: manifest.schemaVersion,
         records: manifest.records.map((record) => ({
@@ -182,11 +180,17 @@ describe('parseManifest on the edges', () => {
     expect(parseManifest(canonicalize(manifest)).records[0]?.size).toBe(0)
   })
 
-  it('keeps version 1 distinct from the schema version', () => {
-    const parsed = parseManifest(canonicalize({ ...demoManifest(), version: 7 }))
+  it('carries no version of its own, because the registry assigns that', () => {
+    const parsed = parseManifest(canonicalize(demoManifest()))
 
-    expect(parsed.version).toBe(7)
+    expect(parsed).not.toHaveProperty('version')
     expect(parsed.schemaVersion).toBe(MANIFEST_SCHEMA_VERSION)
+  })
+
+  it('ignores a version field left over from an older writer', () => {
+    const withVersion = { ...JSON.parse(canonicalize(demoManifest())), version: 7 }
+
+    expect(parseManifest(JSON.stringify(withVersion))).not.toHaveProperty('version')
   })
 })
 

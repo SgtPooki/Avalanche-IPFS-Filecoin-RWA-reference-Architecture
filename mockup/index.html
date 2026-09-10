@@ -2,13 +2,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 :root{
-  --bg:#080909; --surface:#161A1E; --surface-2:#1E242B; --line:#2A3037; --line-strong:#3A4250;
-  --text:#FFFFFF; --muted:#B9C0C9; --faint:#8C95A1;
-  --rec:#F5F6F8; --rec-ink:#0F1216; --rec-ink-2:#4B5563; --rec-rule:#DDE1E6;
-  --ava:#E84142; --fil:#0090FF; --ipfs:#69C4CD; --ava-ink:#FF6B6C; --fil-ink:#3DA9FF; --ipfs-ink:#69C4CD; --ok:#1FBF75; --warn:#F5A524; --bad:#F5A524;
-  --ok-bg:rgba(31,191,117,.12); --bad-bg:rgba(245,165,36,.12); --warn-bg:rgba(245,165,36,.12);
-  --ava-bg:rgba(232,65,66,.14); --fil-bg:rgba(0,144,255,.14); --ipfs-bg:rgba(105,196,205,.14);
-  --shadow:0 1px 2px rgba(0,0,0,.4),0 14px 40px rgba(0,0,0,.45);
+  --bg:#F5F6F8; --surface:#FFFFFF; --surface-2:#EEF1F4; --line:#DDE1E6; --line-strong:#B9C0C9;
+  --text:#0F1216; --muted:#4B5563; --faint:#707B8F;
+  --rec:#FFFFFF; --rec-ink:#0F1216; --rec-ink-2:#4B5563; --rec-rule:#DDE1E6;
+  --ava:#E84142; --fil:#0090FF; --ipfs:#69C4CD; --ava-ink:#B32A2B; --fil-ink:#0062B8; --ipfs-ink:#378085; --ok:#178F5A; --warn:#B8760F; --bad:#B8760F;
+  --ok-bg:rgba(23,143,90,.10); --bad-bg:rgba(184,118,15,.10); --warn-bg:rgba(184,118,15,.10);
+  --ava-bg:rgba(232,65,66,.10); --fil-bg:rgba(0,144,255,.10); --ipfs-bg:rgba(105,196,205,.18);
+  --shadow:0 1px 2px rgba(16,21,32,.06),0 8px 24px rgba(16,21,32,.08);
   --display:"Schibsted Grotesk",system-ui,sans-serif;
   --body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -16,26 +16,16 @@
   --anchor:linear-gradient(180deg,var(--ava) 0 26%,var(--line-strong) 26% 74%,var(--fil) 74% 100%);
   --anchor-light:linear-gradient(180deg,var(--ava) 0 26%,var(--rec-rule) 26% 74%,var(--fil) 74% 100%);
 }
-@media (prefers-color-scheme: light){
-  :root:not([data-theme="dark"]){
-    --bg:#F5F6F8; --surface:#FFFFFF; --surface-2:#EEF1F4; --line:#DDE1E6; --line-strong:#B9C0C9;
-    --text:#0F1216; --muted:#4B5563; --faint:#707B8F;
-    --ava-ink:#B32A2B; --fil-ink:#0062B8; --ipfs-ink:#378085;
-    --ok:#178F5A; --warn:#B8760F; --bad:#B8760F;
-    --ok-bg:rgba(23,143,90,.10); --bad-bg:rgba(184,118,15,.10); --warn-bg:rgba(184,118,15,.10);
-    --ava-bg:rgba(232,65,66,.10); --fil-bg:rgba(0,144,255,.10); --ipfs-bg:rgba(105,196,205,.18);
-    --shadow:0 1px 2px rgba(16,21,32,.06),0 8px 24px rgba(16,21,32,.08);
-    --anchor:linear-gradient(180deg,var(--ava) 0 26%,var(--line-strong) 26% 74%,var(--fil) 74% 100%);
-  }
-}
-:root[data-theme="light"]{
-  --bg:#F5F6F8; --surface:#FFFFFF; --surface-2:#EEF1F4; --line:#DDE1E6; --line-strong:#B9C0C9;
-  --text:#0F1216; --muted:#4B5563; --faint:#707B8F;
-  --ava-ink:#B32A2B; --fil-ink:#0062B8; --ipfs-ink:#378085;
-  --ok:#178F5A; --warn:#B8760F; --bad:#B8760F;
-  --ok-bg:rgba(23,143,90,.10); --bad-bg:rgba(184,118,15,.10); --warn-bg:rgba(184,118,15,.10);
-  --ava-bg:rgba(232,65,66,.10); --fil-bg:rgba(0,144,255,.10); --ipfs-bg:rgba(105,196,205,.18);
-  --shadow:0 1px 2px rgba(16,21,32,.06),0 8px 24px rgba(16,21,32,.08);
+/* Dark is opt-in, not the system default. The demo is recorded on a projector
+   and the county-clerk read is the one the audience should get. */
+:root[data-theme="dark"]{
+  --bg:#080909; --surface:#161A1E; --surface-2:#1E242B; --line:#2A3037; --line-strong:#3A4250;
+  --text:#FFFFFF; --muted:#B9C0C9; --faint:#8C95A1;
+  --rec:#F5F6F8; --rec-ink:#0F1216; --rec-ink-2:#4B5563; --rec-rule:#DDE1E6;
+  --ava:#E84142; --fil:#0090FF; --ipfs:#69C4CD; --ava-ink:#FF6B6C; --fil-ink:#3DA9FF; --ipfs-ink:#69C4CD; --ok:#1FBF75; --warn:#F5A524; --bad:#F5A524;
+  --ok-bg:rgba(31,191,117,.12); --bad-bg:rgba(245,165,36,.12); --warn-bg:rgba(245,165,36,.12);
+  --ava-bg:rgba(232,65,66,.14); --fil-bg:rgba(0,144,255,.14); --ipfs-bg:rgba(105,196,205,.14);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 14px 40px rgba(0,0,0,.45);
   --anchor:linear-gradient(180deg,var(--ava) 0 26%,var(--line-strong) 26% 74%,var(--fil) 74% 100%);
 }
 *{box-sizing:border-box}
@@ -132,7 +122,10 @@ tr:last-child td{border-bottom:0}
 
 .callout{border-left:3px solid var(--fil);background:var(--fil-bg);padding:12px 16px;border-radius:0 var(--r) var(--r) 0;font-size:14px}
 .callout strong{font-weight:600}
-.callout.ava{border-left-color:var(--ava);background:var(--ava-bg)}
+/* Explanatory notes are neutral. Avalanche red is reserved for Avalanche write
+   actions, and beside a FAILED verdict a red panel reads as "this is the bad
+   part" when the note is only telling you what a legitimate update looks like. */
+.callout.neutral{border-left-color:var(--line-strong);background:var(--surface-2)}
 
 .checks{display:grid;gap:6px}
 .check{display:flex;align-items:center;gap:10px;font-size:13px}
@@ -154,7 +147,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
 .verdict.ok .sum span::before{color:var(--ok)}
 .verdict.bad .sum span.x::before{content:"✕ ";color:var(--bad)}
 
-.pre{max-width:100%;font-family:var(--mono);font-size:13px;line-height:1.55;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;overflow-x:auto;white-space:pre;color:var(--text);margin:0}
+.pre{max-width:100%;font-family:var(--mono);font-size:13px;line-height:1.55;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;overflow:auto;max-height:520px;white-space:pre;color:var(--text);margin:0}
 .pre .k{color:var(--muted)} .pre .s{color:var(--fil-ink)} .pre .n{color:var(--warn)}
 
 .steps{display:grid;gap:0}
@@ -284,6 +277,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
   </div>
   <div class="mocktools">
     <button id="notesToggle" aria-pressed="true">Design notes</button>
+    <button id="themeToggle" aria-pressed="false">Dark</button>
     <button id="prevBtn">← Prev</button>
     <button id="nextBtn">Next →</button>
   </div>
@@ -363,9 +357,9 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       <h2>Change one line in a deed and verification fails</h2>
       <p class="lede">Same filename, different owner line, different fingerprint. The registry never pointed at the second file, so it fails.</p>
       <div class="teaser">
-        <div class="box"><div class="lab">Deed on record</div><div class="cid">bafybeihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku</div><div class="line">Owner: Example Property LLC</div></div>
+        <div class="box"><div class="lab">Deed on record</div><div class="cid">bafkreidh5qsi5z6uo2thzvynr27ioajoviafqiveunrielhugyj65l6rzu</div><div class="line">Owner: Example Property LLC</div></div>
         <div class="neq">≠</div>
-        <div class="box bad"><div class="lab">Deed you were handed</div><div class="cid">bafybeic7kwr5oi2ewaib3wmzgmxbsxnd3y2dtafp7hjoe2dg3cknptavwi</div><div class="line">Owner: Different Property LLC</div></div>
+        <div class="box bad"><div class="lab">Deed you were handed</div><div class="cid">bafkreiausintabvl4n4hvgv2jdmazvy35bg26gku2ufu2bosxhrd7dzxqi</div><div class="line">Owner: Different Property LLC</div></div>
       </div>
     </div>
 
@@ -436,11 +430,11 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       <table>
         <thead><tr><th>Document</th><th>Type</th><th>Fingerprint (IPFS CID)</th><th>Filecoin</th></tr></thead>
         <tbody>
-          <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">property.json</div><div class="meta">1.2 KB</div></div></div></td><td>property_metadata</td><td><span class="cid short">bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi</span></td><td><span class="pill ok"><span class="dot"></span>Proving</span></td></tr>
-          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">deed.pdf</div><div class="meta">184 KB</div></div></div></td><td>deed</td><td><span class="cid short">bafybeihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku</span></td><td><span class="pill ok"><span class="dot"></span>Proving</span></td></tr>
-          <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">parcel.json</div><div class="meta">3.4 KB</div></div></div></td><td>parcel_record</td><td><span class="cid short">bafybeif2ewg7nzsx5lnsjyu4qdtx4gvpqjqvyoxt3dywbcz2nkddp3ppfe</span></td><td><span class="pill ok"><span class="dot"></span>Proving</span></td></tr>
-          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">tax-assessment-2025.pdf</div><div class="meta">96 KB</div></div></div></td><td>tax_assessment</td><td><span class="cid short">bafybeiczsscdsbs7ffqz55asqdf3smv6klcw3gofszvwlyarci47bgf354</span></td><td><span class="pill warn"><span class="dot"></span>Committing onchain</span></td></tr>
-          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">survey.pdf</div><div class="meta">2.1 MB</div></div></div></td><td>survey</td><td><span class="cid short">bafybeibxdpc3xfgzawzkv5zljwi4ns3a4mqvfdgdc6xgtbwmcp2zn5jhpm</span></td><td><span class="pill neutral"><span class="dot" style="background:var(--faint)"></span>Uploading 71%</span></td></tr>
+          <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">property.json</div><div class="meta">1.2 KB</div></div></div></td><td>property_metadata</td><td><span class="cid short">bafkreig64pgrtedyfsy3gricwjaq2qnsj24bujn45gaj65yewiugwmwn64</span></td><td><span class="pill ok"><span class="dot"></span>Proving</span></td></tr>
+          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">deed.pdf</div><div class="meta">184 KB</div></div></div></td><td>deed</td><td><span class="cid short">bafkreidh5qsi5z6uo2thzvynr27ioajoviafqiveunrielhugyj65l6rzu</span></td><td><span class="pill ok"><span class="dot"></span>Proving</span></td></tr>
+          <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">parcel.json</div><div class="meta">3.4 KB</div></div></div></td><td>parcel_record</td><td><span class="cid short">bafkreiejmexovymgvlxps3hpq6ez3ac5sjridcypurprugtsseggslaqiq</span></td><td><span class="pill ok"><span class="dot"></span>Proving</span></td></tr>
+          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">tax-assessment-2025.pdf</div><div class="meta">96 KB</div></div></div></td><td>tax_assessment</td><td><span class="cid short">bafkreiek7fjuel7opibeayam6cfnww54pmyaez2cetk2i3rbpkcsjydkke</span></td><td><span class="pill warn"><span class="dot"></span>Committing onchain</span></td></tr>
+          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">survey.pdf</div><div class="meta">2.1 MB</div></div></div></td><td>survey</td><td><span class="cid short">bafkreid3kwdoyxzy6i4kxlzp4q3rgs5f7qbseoiely3rbdad6o6ixob2mi</span></td><td><span class="pill neutral"><span class="dot" style="background:var(--faint)"></span>Uploading 71%</span></td></tr>
         </tbody>
       </table>
       </div>
@@ -463,40 +457,60 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
     </div>
     <div class="grid wide">
       <div class="panel aline">
-        <div class="panel-title"><h3>manifest.json · version 1</h3><span class="cid dim">bafybeia3q…u7pe</span></div>
+        <div class="panel-title"><h3>manifest.json</h3><span class="cid dim">bafybeia3q…u7pe</span></div>
 <pre class="pre">{
   <span class="k">"assetId"</span>: <span class="s">"BAL-PROP-001"</span>,
-  <span class="k">"version"</span>: <span class="n">1</span>,
-  <span class="k">"createdAt"</span>: <span class="s">"2026-01-10T15:04:00Z"</span>,
   <span class="k">"records"</span>: [
     {
-      <span class="k">"type"</span>: <span class="s">"deed"</span>,
+      <span class="k">"cid"</span>: <span class="s">"bafkreig64pg…wn64"</span>,
+      <span class="k">"filename"</span>: <span class="s">"property.json"</span>,
+      <span class="k">"mimeType"</span>: <span class="s">"application/json"</span>,
+      <span class="k">"pieceCid"</span>: <span class="s">"bafkzcibca…"</span>,
+      <span class="k">"sha256"</span>: <span class="s">"dee3cd199078…"</span>,
+      <span class="k">"size"</span>: <span class="n">501</span>,
+      <span class="k">"type"</span>: <span class="s">"property_metadata"</span>
+    },
+    {
+      <span class="k">"cid"</span>: <span class="s">"bafkreidh5qs…6rzu"</span>,
       <span class="k">"filename"</span>: <span class="s">"deed.pdf"</span>,
-      <span class="k">"cid"</span>: <span class="s">"bafybeihdwd…vyku"</span>,
-      <span class="k">"pieceCid"</span>: <span class="s">"bafkzcibca…"</span>
+      <span class="k">"mimeType"</span>: <span class="s">"application/pdf"</span>,
+      <span class="k">"pieceCid"</span>: <span class="s">"bafkzcibcb…"</span>,
+      <span class="k">"sha256"</span>: <span class="s">"67ec248ee7d4…"</span>,
+      <span class="k">"size"</span>: <span class="n">2816</span>,
+      <span class="k">"type"</span>: <span class="s">"deed"</span>
     },
     {
-      <span class="k">"type"</span>: <span class="s">"parcel_record"</span>,
+      <span class="k">"cid"</span>: <span class="s">"bafkreiejmex…aqiq"</span>,
       <span class="k">"filename"</span>: <span class="s">"parcel.json"</span>,
-      <span class="k">"cid"</span>: <span class="s">"bafybeif2ew…ppfe"</span>,
-      <span class="k">"pieceCid"</span>: <span class="s">"bafkzcibcb…"</span>
+      <span class="k">"mimeType"</span>: <span class="s">"application/json"</span>,
+      <span class="k">"pieceCid"</span>: <span class="s">"bafkzcibcc…"</span>,
+      <span class="k">"sha256"</span>: <span class="s">"89612eeae186…"</span>,
+      <span class="k">"size"</span>: <span class="n">1188</span>,
+      <span class="k">"type"</span>: <span class="s">"parcel_record"</span>
     },
     {
-      <span class="k">"type"</span>: <span class="s">"tax_assessment"</span>,
+      <span class="k">"cid"</span>: <span class="s">"bafkreiek7fj…dkke"</span>,
       <span class="k">"filename"</span>: <span class="s">"tax-assessment-2025.pdf"</span>,
-      <span class="k">"cid"</span>: <span class="s">"bafybeiczss…f354"</span>,
-      <span class="k">"pieceCid"</span>: <span class="s">"bafkzcibcc…"</span>
+      <span class="k">"mimeType"</span>: <span class="s">"application/pdf"</span>,
+      <span class="k">"pieceCid"</span>: <span class="s">"bafkzcibcd…"</span>,
+      <span class="k">"sha256"</span>: <span class="s">"8af953422fee…"</span>,
+      <span class="k">"size"</span>: <span class="n">2131</span>,
+      <span class="k">"type"</span>: <span class="s">"tax_assessment"</span>
     },
     {
-      <span class="k">"type"</span>: <span class="s">"survey"</span>,
+      <span class="k">"cid"</span>: <span class="s">"bafkreid3kwd…b2mi"</span>,
       <span class="k">"filename"</span>: <span class="s">"survey.pdf"</span>,
-      <span class="k">"cid"</span>: <span class="s">"bafybeibxdp…jhpm"</span>,
-      <span class="k">"pieceCid"</span>: <span class="s">"bafkzcibcd…"</span>
+      <span class="k">"mimeType"</span>: <span class="s">"application/pdf"</span>,
+      <span class="k">"pieceCid"</span>: <span class="s">"bafkzcibce…"</span>,
+      <span class="k">"sha256"</span>: <span class="s">"7b5586ec5f38…"</span>,
+      <span class="k">"size"</span>: <span class="n">2496</span>,
+      <span class="k">"type"</span>: <span class="s">"survey"</span>
     }
   ],
+  <span class="k">"schemaVersion"</span>: <span class="n">1</span>,
   <span class="k">"storage"</span>: {
-    <span class="k">"network"</span>: <span class="s">"filecoin-calibration"</span>,
     <span class="k">"dataSetId"</span>: <span class="n">1842</span>,
+    <span class="k">"network"</span>: <span class="s">"filecoin-calibration"</span>,
     <span class="k">"providerId"</span>: <span class="n">12</span>
   }
 }</pre>
@@ -515,7 +529,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
             <div class="check ok"><span class="ic">✓</span>That the bytes are still being stored<span class="who fil">FILECOIN</span></div>
           </div>
         </div>
-        <div class="callout ava"><strong>Two identifiers, on purpose.</strong> The IPFS CID is the fingerprint people reference. The Filecoin storage ID (piece CID) is what the proof system tracks. The manifest carries both so a verifier needs nothing else.</div>
+        <div class="callout neutral"><strong>Two identifiers, on purpose.</strong> The IPFS CID is the fingerprint people reference. The Filecoin storage ID (piece CID) is what the proof system tracks. The manifest carries both so a verifier needs nothing else.</div>
       </div>
     </div>
   </section>
@@ -561,10 +575,10 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       <table>
         <thead><tr><th>Document</th><th>Fingerprint</th><th>Integrity</th><th>Retrievable</th><th>Stored</th><th>Last proof</th></tr></thead>
         <tbody>
-          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">deed.pdf</div><div class="meta">184 KB · unchanged since v1</div></div></div></td><td><span class="cid short">bafybeihdwdcefgh</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
-          <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">parcel.json</div><div class="meta">3.4 KB</div></div></div></td><td><span class="cid short">bafybeif2ewg7nzs</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
-          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">tax-assessment-2026.pdf</div><div class="meta">101 KB · replaced 2025 in v2</div></div></div></td><td><span class="cid short">bafybeigq3lqmxwn</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
-          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">survey.pdf</div><div class="meta">2.1 MB</div></div></div></td><td><span class="cid short">bafybeibxdpc3xfg</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
+          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">deed.pdf</div><div class="meta">184 KB · unchanged since v1</div></div></div></td><td><span class="cid short">bafkreidh5qsi5z6</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
+          <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">parcel.json</div><div class="meta">3.4 KB</div></div></div></td><td><span class="cid short">bafkreiejmexovym</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
+          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">tax-assessment-2026.pdf</div><div class="meta">101 KB · replaced 2025 in v2</div></div></div></td><td><span class="cid short">bafkreiexhmrobe6</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
+          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">survey.pdf</div><div class="meta">2.1 MB</div></div></div></td><td><span class="cid short">bafkreid3kwdoyxz</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
         </tbody>
       </table>
       </div>
@@ -641,13 +655,13 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
           <div class="compare">
             <div class="box">
               <div class="lab">Anchored on Avalanche · deed.pdf</div>
-              <div class="cid">bafybeihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku</div>
+              <div class="cid">bafkreidh5qsi5z6uo2thzvynr27ioajoviafqiveunrielhugyj65l6rzu</div>
               <div class="diff">Owner: Example Property LLC</div>
             </div>
             <div class="neq">≠</div>
             <div class="box" style="border-color:color-mix(in srgb,var(--bad) 60%,transparent)">
               <div class="lab" style="color:var(--bad)">Your file · deed.pdf</div>
-              <div class="cid">bafybeic7kwr5oi2ewaib3wmzgmxbsxnd3y2dtafp7hjoe2dg3cknptavwi</div>
+              <div class="cid">bafkreiausintabvl4n4hvgv2jdmazvy35bg26gku2ufu2bosxhrd7dzxqi</div>
               <div class="diff"><span class="del">Owner: Example Property LLC</span><br><span class="add">Owner: Different Property LLC</span></div>
             </div>
           </div>
@@ -659,7 +673,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
           <div class="drop"><strong>deed.pdf</strong><br>184 KB · dropped 2s ago<br><span style="font-size:12px">Hashed in your browser. Never uploaded.</span></div>
           <div class="actions"><button class="btn ghost">Check another file</button></div>
         </div>
-        <div class="callout ava"><strong>This is tampering, not an update.</strong> A legitimate change publishes a new version and records it on Avalanche. See how that looks in <a href="#" data-go="7">version history</a>.</div>
+        <div class="callout neutral"><strong>This is tampering, not an update.</strong> A legitimate change publishes a new version and records it on Avalanche. See how that looks in <a href="#" data-go="7">version history</a>.</div>
       </div>
     </div>
   </section>
@@ -723,7 +737,8 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
   <div class="n" data-n="0"><ul>
     <li><b>Category first.</b> Headline names the category (verifiable offchain records), the value, and the who (Avalanche RWA issuers) before any feature.</li>
     <li><b>Order follows the sales narrative:</b> problem, what issuers do today including do-nothing, what a fix looks like, tamper proof, then the offer.</li>
-    <li><b>Identity: Anchor line.</b> One rule from Avalanche red through the record into Filecoin blue. The record card is the hero object. Colors: Avalanche #E84142, IPFS #69C4CD (ipfs-css aqua, #378085 on light), Filecoin #0090FF, verified #1FBF75, failed #F5A524. Schibsted Grotesk, IBM Plex Sans, IBM Plex Mono.</li>
+    <li><b>Identity: Anchor line.</b> One rule from Avalanche red through the record into Filecoin blue. The record card is the hero object. Schibsted Grotesk, IBM Plex Sans, IBM Plex Mono.</li>
+    <li><b>Light by default, and it ignores the system setting.</b> Team feedback on the boards preferred the county-clerk read over the black and neon ones. Accents are held back on light: Avalanche #B32A2B, Filecoin #0062B8, IPFS #378085, verified #178F5A, failed #B8760F. Dark is still there under <code>data-theme="dark"</code> at full strength.</li>
     <li><b>Positioning from the prior-art research.</b> Credit the May 2025 Avalanche and Filecoin bridge, then the three additions. Never claim to be first. Do not grade the earlier work here. "Built on Avalanche" wording only, no logos.</li>
     <li><b>"Fork the template"</b> points at github.com/SgtPooki/anchorline.</li>
     <li><span class="q">Q</span>Is a partner logo row (Avalanche, Filecoin) wanted here, or does that need clearance first?</li>
@@ -740,8 +755,8 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
     <li><span class="q">Q</span>Show piece CIDs in this table too, or keep them in the manifest only?</li>
   </ul></div>
   <div class="n" data-n="3"><ul>
-    <li><b>Manifest is a first-class object.</b> Shown raw on purpose. Balcony engineers will want to see the schema, not a summary.</li>
-    <li><b>Anchor writes four things:</b> manifest CID, its piece CID, data set ID, version. That makes a verifier self-sufficient from the Avalanche record.</li>
+    <li><b>Manifest is a first-class object.</b> Shown raw on purpose, in the canonical form the bytes are hashed in: keys sorted at every depth, and the real CIDs of the committed dataset. Engineers will want the schema, not a summary.</li>
+    <li><b>Anchor writes three things:</b> manifest CID, its piece CID, and data set ID. The registry appends the version itself, which is why the manifest does not carry one; a number inside the document could disagree with the chain. That makes a verifier self-sufficient from the Avalanche record.</li>
     <li><span class="q">Q</span>Is showing the "Who vouches for what" panel here too early, or is this exactly where the story lands?</li>
   </ul></div>
   <div class="n" data-n="4"><ul>
@@ -833,6 +848,14 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
   });
   document.getElementById('prevBtn').addEventListener('click', function(){ go(cur-1,false); });
   document.getElementById('nextBtn').addEventListener('click', function(){ go(cur+1,false); });
+  var tt = document.getElementById('themeToggle');
+  tt.addEventListener('click', function(){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+    tt.setAttribute('aria-pressed', dark ? 'false' : 'true');
+    tt.textContent = dark ? 'Dark' : 'Light';
+  });
+
   var notes = document.getElementById('notes'), nt = document.getElementById('notesToggle');
   nt.addEventListener('click', function(){
     var on = nt.getAttribute('aria-pressed') === 'true';
