@@ -1,4 +1,41 @@
 <title>Verifiable RWA Records</title>
+<!--
+  Telemetry: which buttons people actually press.
+
+  GoatCounter, chosen because it is open source, stores no personal data, and
+  sets no cookies. Two things about this page make the default setup wrong:
+
+  1. All eight screens live in this one file and navigation never changes the
+     URL, so the automatic pageview would collapse every screen into one path.
+     no_onload turns that off and go() counts each screen by hand.
+  2. The page is served from <cid>.ipfs.inbrowser.link, a new hostname on every
+     publish. Paths are written here rather than read off the URL, so the data
+     does not split when the CID changes.
+
+  The script is pinned to v5 with subresource integrity. A newer count.js adds
+  per-click no_session, which would count repeat presses instead of collapsing
+  them to one per visit; an unpinned script from a third-party host is not
+  worth that.
+
+  Blocked visitors send nothing at all, and this audience blocks more than most.
+  Read the numbers as weights between buttons, never as a count of people.
+  Everything below is behind a guard so the page behaves identically when
+  count.js never loads.
+
+  Settings ride on the script tag rather than a separate inline script. An
+  inline `window.goatcounter = {...}` assignment replaces the whole object, and
+  the ordering against an async script is a hazard the attribute form does not
+  have.
+
+  The subdomain in data-goatcounter is the GoatCounter account. Until that
+  account exists the requests go nowhere, which is harmless.
+-->
+<script data-goatcounter="https://anchorline.goatcounter.com/count"
+        data-goatcounter-settings='{"no_onload": true}'
+        async src="https://gc.zgo.at/count.v5.js"
+        crossorigin="anonymous"
+        integrity="sha384-atnOLvQb9t+jTSipvd75X2yginT4PjVbqDdlJAmxMm+wYElFmeR6EmLP5bYeoRVQ"></script>
+
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 :root{
@@ -315,8 +352,8 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       <h1>Records your token can vouch for</h1>
       <p class="sub">Anchor every deed, survey, and tax record to the asset on Avalanche. Filecoin proves they are still there. Anyone can check. Fork the template to add it to your own issuer stack.</p>
       <div class="ctas">
-        <button class="btn primary" data-go="1">Walk through the demo</button>
-        <a class="btn" href="https://github.com/SgtPooki/anchorline" style="text-decoration:none">Fork the template</a>
+        <button class="btn primary" data-go="1" data-goatcounter-click="cta-walk-through-demo">Walk through the demo</button>
+        <a class="btn" href="https://github.com/SgtPooki/anchorline" style="text-decoration:none" data-goatcounter-click="cta-fork-template">Fork the template</a>
       </div>
       <p class="fine">Synthetic data only. Runs on Avalanche Fuji and Filecoin Calibration testnets.</p>
       </div>
@@ -416,7 +453,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
         <div>
           <h2>Built for issuers already on Avalanche</h2>
           <p class="lede" style="margin-bottom:12px">Keep your token contract and keep your registry. Add one call per version. The issuer stays the record of authority. The chain adds an audit anyone can run, and the records and their proofs stay available when the issuer's own systems are down.</p>
-          <div class="ctas" style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" data-go="1">Walk through the demo</button><button class="btn ghost" data-go="5">Skip to Verify</button></div>
+          <div class="ctas" style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" data-go="1" data-goatcounter-click="cta-walk-through-demo">Walk through the demo</button><button class="btn ghost" data-go="5" data-goatcounter-click="nav-skip-to-verify">Skip to Verify</button></div>
         </div>
         <div class="notfor"><strong>Not for confidential records.</strong> This template stores public data. Sensitive documents need encryption and key management before storage.</div>
       </div>
@@ -445,7 +482,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
           <div class="field"><label for="f-issuer">Issuer</label><input id="f-issuer" value="Demo RWA Issuer"></div>
         </div>
         <div class="actions">
-          <button class="btn ava" data-go="2">Register on Avalanche</button>
+          <button class="btn ava" data-go="2" data-goatcounter-click="issuer-register-asset">Register on Avalanche</button>
           <span class="hint" style="color:var(--faint);font-size:12px">Signs one Fuji transaction · ~2s</span>
         </div>
       </div>
@@ -487,9 +524,9 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       </table>
       </div>
       <div class="actions">
-        <button class="btn ghost">+ Add document</button>
+        <button class="btn ghost" data-goatcounter-click="issuer-add-document">+ Add document</button>
         <span style="flex:1"></span>
-        <button class="btn primary" data-go="3">Build manifest</button>
+        <button class="btn primary" data-go="3" data-goatcounter-click="issuer-build-manifest">Build manifest</button>
       </div>
     </div>
   </section>
@@ -566,7 +603,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
           <div class="step done"><span class="bullet">✓</span><div><div class="t">Manifest stored on Filecoin</div><div class="d">Storage ID 1842 · provider 12 · <span class="mono">bafkzcibce…</span></div></div></div>
           <div class="step active"><span class="bullet">2</span><div><div class="t">Write the manifest CID to Avalanche</div><div class="d">Manifest CID plus its Filecoin storage ID · one Fuji transaction</div></div></div>
         </div>
-        <div class="actions"><button class="btn ava" data-go="4">Anchor to Avalanche</button></div>
+        <div class="actions"><button class="btn ava" data-go="4" data-goatcounter-click="issuer-anchor-manifest">Anchor to Avalanche</button></div>
       </div>
       <div style="display:grid;gap:16px;align-content:start">
         <div class="panel sub">
@@ -592,7 +629,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <span class="pill ok"><span class="dot"></span>All records verified 4 min ago</span>
-        <button class="btn" data-go="5">Verify now</button>
+        <button class="btn" data-go="5" data-goatcounter-click="verify-run">Verify now</button>
       </div>
     </div>
     <div class="grid two" style="margin-bottom:16px">
@@ -672,12 +709,12 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
             <div class="tile fil"><span class="n">3</span><span class="t">Storage proof posted 38 min ago</span><span class="who">Filecoin</span></div>
             <div class="tile ok"><span class="n">4</span><span class="t">All 4 records re-hashed and matched</span><span class="who">Match</span></div>
           </div>
-          <div class="actions"><button class="btn" data-go="5">Re-run</button><span style="font-size:12px;color:var(--faint)">Took 6.2s</span></div>
+          <div class="actions"><button class="btn" data-go="5" data-goatcounter-click="verify-rerun">Re-run</button><span style="font-size:12px;color:var(--faint)">Took 6.2s</span></div>
         </div>
         <div class="panel sub">
           <div class="panel-title"><h3>Have a document you were handed?</h3></div>
           <p style="color:var(--muted);font-size:13px;margin-bottom:10px">Check whether a file someone sent you is the one anchored to this asset.</p>
-          <button class="btn primary" data-go="6">Check a document</button>
+          <button class="btn primary" data-go="6" data-goatcounter-click="tamper-open-check">Check a document</button>
         </div>
       </div>
     </div>
@@ -719,7 +756,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       <div style="display:grid;gap:16px;align-content:start">
         <div class="panel">
           <div class="drop"><strong>deed.pdf</strong><br>184 KB · dropped 2s ago<br><span style="font-size:12px">Hashed in your browser. Never uploaded.</span></div>
-          <div class="actions"><button class="btn ghost">Check another file</button></div>
+          <div class="actions"><button class="btn ghost" data-goatcounter-click="tamper-check-another">Check another file</button></div>
         </div>
         <div class="callout neutral"><strong>This is tampering, not an update.</strong> A legitimate change publishes a new version and records it on Avalanche. See how that looks in <a href="#" data-go="7">version history</a>.</div>
       </div>
@@ -734,7 +771,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
         <h1>123 Main Street · record history</h1>
         <p class="lede">Every version is a manifest CID written to Avalanche. Old versions stay independently verifiable. Nothing is overwritten.</p>
       </div>
-      <button class="btn ava" data-go="2">Publish new version</button>
+      <button class="btn ava" data-go="2" data-goatcounter-click="issuer-publish-new-version">Publish new version</button>
     </div>
     <div class="grid wide">
       <div class="panel">
@@ -748,7 +785,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
               <li class="changed">tax-assessment-2026.pdf</li>
               <li>survey.pdf</li>
             </ul>
-            <div class="actions" style="margin-top:8px"><button class="btn ghost" data-go="5" style="padding:4px 10px;font-size:12px">Verify v2</button></div>
+            <div class="actions" style="margin-top:8px"><button class="btn ghost" data-go="5" style="padding:4px 10px;font-size:12px" data-goatcounter-click="history-verify-v2">Verify v2</button></div>
           </div>
           <div class="ver">
             <div class="head"><span class="v">Version 1</span><span class="when">Jan 10, 2026 · tx 0x91ab…7d3e</span></div>
@@ -759,7 +796,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
               <li>tax-assessment-2025.pdf</li>
               <li>survey.pdf</li>
             </ul>
-            <div class="actions" style="margin-top:8px"><button class="btn ghost" style="padding:4px 10px;font-size:12px">Verify v1</button></div>
+            <div class="actions" style="margin-top:8px"><button class="btn ghost" style="padding:4px 10px;font-size:12px" data-goatcounter-click="history-verify-v1">Verify v1</button></div>
           </div>
         </div>
       </div>
@@ -848,8 +885,25 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
     b.addEventListener('click',function(){ go(s.n,false); });
     b.dataset.n = s.n; flow.appendChild(b);
   });
+  // Screen paths, so the eight views show up separately in analytics. Read as
+  // relative weights: anyone blocking the script contributes nothing.
+  //
+  // counterReady gates this. go() runs once during setup, before count.js has
+  // arrived, and the waiter below counts whatever screen we landed on. Without
+  // the gate the first screen is counted twice, once by each.
+  var counterReady = false;
+
+  function countScreen(n){
+    var gc = window.goatcounter;
+    if (!counterReady || !gc || typeof gc.count !== 'function') return;
+    var s = screens[n];
+    if (!s) return;
+    gc.count({ path: '/screen/' + n + '-' + s.label.toLowerCase().replace(/ /g, '-'), title: s.label });
+  }
+
   function go(n, fromCta){
     n = Math.max(0, Math.min(7, n));
+    var changed = cur !== n;
     cur = n;
     document.querySelectorAll('.screen').forEach(function(el){
       if (+el.dataset.screen === n) el.setAttribute('data-active',''); else el.removeAttribute('data-active');
@@ -869,6 +923,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
     if (fromCta && txs[n]) txmoment(txs[n]);
     try { localStorage.setItem('rwa-mock-screen', String(n)); } catch(e){}
     document.getElementById('app').scrollIntoView({block:'start',behavior:'auto'});
+    if (changed) countScreen(n);
   }
   var veil = document.getElementById('veil');
   function txmoment(tx){
@@ -915,5 +970,19 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
   });
   var start = 0; try { var st = localStorage.getItem('rwa-mock-screen'); if (st !== null) start = +st; } catch(e){}
   go(start,false);
+
+  // The landing screen has to be counted separately. count.js is async, so on
+  // first paint it is usually not there yet, and go() above may not see a
+  // change anyway when localStorage restores the screen cur already holds.
+  // Wait for the script for a few seconds, then give up quietly: a blocked
+  // visitor never resolves this and that is a normal outcome, not an error.
+  (function waitForCounter(triesLeft){
+    if (window.goatcounter && typeof window.goatcounter.count === 'function') {
+      counterReady = true;
+      countScreen(cur);
+      return;
+    }
+    if (triesLeft > 0) setTimeout(function(){ waitForCounter(triesLeft - 1); }, 300);
+  })(10);
 })();
 </script>

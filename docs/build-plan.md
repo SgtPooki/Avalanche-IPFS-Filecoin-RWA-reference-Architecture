@@ -64,6 +64,24 @@ Positioning: credit the May 2025 Avalanche and Filecoin bridge as the first conn
 
 A Balcony clone, a token standard, KYC, payments beyond storage funding, encryption, private data, a wallet-connect flow, an indexer, a hosted deployment, mainnet claims.
 
+## Telemetry
+
+GoatCounter, on the mockup and later on the app. It is open source, sets no
+cookies, and stores nothing personal. Buttons carry `data-goatcounter-click`
+with a name that says what the button means. The eight screens live in one file
+and navigation never changes the URL, so `no_onload` is set and each screen is
+counted by hand as `/screen/<n>-<name>`.
+
+The account subdomain in `data-goatcounter` is `anchorline`. That account has to
+be created by a person at goatcounter.com before anything is recorded; until
+then the requests go nowhere, which breaks nothing.
+
+Read the numbers as relative weights between buttons, never as a count of
+people. `gc.zgo.at` is on common blocklists, this audience blocks more than
+most, and a blocked visitor sends nothing at all. The page has to behave
+identically when the script never loads, so nothing calls into
+`window.goatcounter` without checking it is there.
+
 ## Changed since the plan
 
 - Light by default, from team feedback on 2026-09-10 that the black and neon boards read wrong and the county-clerk treatment reads right. The mockup already carried the light tokens; the change was which one is the default.
