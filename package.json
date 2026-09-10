@@ -12,7 +12,8 @@
     "test:browser": "vitest run --project browser",
     "dataset": "tsx scripts/generate-dataset.ts",
     "test:unit": "vitest run --project node --project browser",
-    "test:files": "vitest run --project files"
+    "test:files": "vitest run --project files",
+    "spike:calibration": "tsx --env-file=.env scripts/spike-calibration.ts"
   },
   "dependencies": {
     "@filoz/synapse-sdk": "^2.0.0",
@@ -20,6 +21,7 @@
     "blockstore-core": "^6.1.3",
     "filecoin-pin": "^2.0.1",
     "multiformats": "^14.0.0",
+    "pino": "^10.3.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "viem": "^2.55.16"
