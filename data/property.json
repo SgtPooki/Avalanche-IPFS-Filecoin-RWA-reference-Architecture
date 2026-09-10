@@ -1,0 +1,17 @@
+{
+  "address": {
+    "city": "Fairview",
+    "state": "Example State",
+    "street": "123 Main Street"
+  },
+  "assetId": "BAL-PROP-001",
+  "assetType": "real_estate",
+  "assessorParcelNumber": "07-14-226-0031",
+  "disclaimer": "Synthetic document. Generated for the anchorline template. Not a record of any real property.",
+  "issuer": {
+    "name": "Fairview County Recorder",
+    "role": "record_of_authority"
+  },
+  "ownerOfRecord": "Example Property LLC",
+  "recordedInstrument": "2019-0041827"
+}

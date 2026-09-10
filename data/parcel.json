@@ -1,0 +1,53 @@
+{
+  "acreage": 0.28,
+  "assessorParcelNumber": "07-14-226-0031",
+  "boundary": {
+    "calls": [
+      {
+        "bearing": "N 89-42-15 E",
+        "distanceFeet": 120.04
+      },
+      {
+        "bearing": "S 00-17-45 E",
+        "distanceFeet": 101.62
+      },
+      {
+        "bearing": "S 89-42-15 W",
+        "distanceFeet": 120.04
+      },
+      {
+        "bearing": "N 00-17-45 W",
+        "distanceFeet": 101.62
+      }
+    ],
+    "pointOfBeginning": "Northwest corner of Lot 31, Block 226",
+    "units": "feet"
+  },
+  "improvements": {
+    "bathrooms": 2,
+    "bedrooms": 3,
+    "livingAreaSquareFeet": 1864,
+    "stories": 2,
+    "yearBuilt": 1962
+  },
+  "jurisdiction": {
+    "county": "Fairview County",
+    "state": "Example State"
+  },
+  "legalDescription": "Lot 31, Block 226, FAIRVIEW HEIGHTS SUBDIVISION, Plat Book 14, Page 7, public records of Fairview County, Example State",
+  "lot": 31,
+  "plat": {
+    "book": 14,
+    "name": "Fairview Heights Subdivision",
+    "page": 7
+  },
+  "situs": {
+    "city": "Fairview",
+    "state": "Example State",
+    "street": "123 Main Street"
+  },
+  "zoning": {
+    "code": "R-1",
+    "description": "Single family residential"
+  }
+}
