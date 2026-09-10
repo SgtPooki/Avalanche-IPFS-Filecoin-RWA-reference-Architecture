@@ -17,6 +17,10 @@ export default defineConfig({
       '@': path.resolve(dirname, './src'),
     },
   },
+  optimizeDeps: {
+    // Vitest reloads mid-run when it discovers these late.
+    include: ['blockstore-core', '@helia/unixfs', '@ipld/car'],
+  },
   test: {
     projects: [
       {

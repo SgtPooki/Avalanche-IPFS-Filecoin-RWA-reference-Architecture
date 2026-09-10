@@ -14,7 +14,8 @@
 
 import type { AddOptions } from '@helia/unixfs'
 import { unixfs } from '@helia/unixfs'
-import { MemoryBlockstore } from 'blockstore-core/memory'
+import { BaseBlockstore } from 'blockstore-core'
+import type { CID } from 'multiformats/cid'
 
 /**
  * IPIP-499 profile: 1 MiB chunks, raw leaves, CIDv1, 1024-link DAG width.
@@ -26,6 +27,7 @@ import { MemoryBlockstore } from 'blockstore-core/memory'
  * the browser bundle, so the value is repeated instead.
  *
  * `cid.profile.test.ts` asserts the two are equal, so the copy cannot drift.
+ * Tracked upstream at https://github.com/filecoin-project/filecoin-pin/issues/717.
  */
 export const UNIXFS_PROFILE = 'unixfs-v1-2025' as const
 
@@ -52,10 +54,35 @@ async function* toByteStream(source: FileBytes): AsyncIterable<Uint8Array> {
 }
 
 /**
+ * A blockstore that throws every block away.
+ *
+ * The importer only needs somewhere to put blocks; the CID falls out of
+ * hashing them on the way past. Keeping them would mean holding the whole DAG
+ * in memory, and the tamper check runs on whatever file a visitor drags in.
+ *
+ * `get` throws rather than returning empty bytes. If a future importer version
+ * starts reading blocks back, that has to be a loud failure and not a wrong
+ * CID.
+ */
+class DiscardingBlockstore extends BaseBlockstore {
+  put(key: CID): CID {
+    return key
+  }
+
+  has(): boolean {
+    return false
+  }
+
+  get(key: CID): never {
+    throw new Error(`computeFileCid does not keep blocks, and something asked for ${key.toString()}`)
+  }
+}
+
+/**
  * Compute the UnixFS CID of a file's bytes without producing a CAR.
  *
- * Blocks go to a throwaway in-memory blockstore, so nothing is uploaded and
- * nothing is kept. This is what the tamper check runs on a dropped file.
+ * Nothing is uploaded and nothing is kept. This is what the tamper check runs
+ * on a dropped file, and what the upload screen shows before a record is sent.
  *
  * Returns the base32 CIDv1 string, which is what the manifest stores and what
  * every comparison in the verifier is made against. Several copies of
@@ -63,7 +90,7 @@ async function* toByteStream(source: FileBytes): AsyncIterable<Uint8Array> {
  * all of them.
  */
 export async function computeFileCid(source: FileBytes): Promise<string> {
-  const fs = unixfs({ blockstore: new MemoryBlockstore() })
+  const fs = unixfs({ blockstore: new DiscardingBlockstore() })
   const cid = await fs.addByteStream(toByteStream(source), importerOptions)
   return cid.toString()
 }

@@ -93,10 +93,12 @@ function asObject(value: unknown, where: string): Record<string, unknown> {
   return value as Record<string, unknown>
 }
 
+const SHA256_HEX = /^[0-9a-f]{64}$/
+
 function parseRecord(value: unknown, index: number): ManifestRecord {
   const where = `records[${index}]`
   const source = asObject(value, where)
-  return {
+  const record: ManifestRecord = {
     cid: field(source, 'cid', 'string', where),
     filename: field(source, 'filename', 'string', where),
     mimeType: field(source, 'mimeType', 'string', where),
@@ -105,6 +107,19 @@ function parseRecord(value: unknown, index: number): ManifestRecord {
     size: field(source, 'size', 'number', where),
     type: field(source, 'type', 'string', where),
   }
+
+  // A record the verifier cannot check is worse than one it refuses, because
+  // the refusal is visible and the unusable hash reads as a pass.
+  if (!SHA256_HEX.test(record.sha256)) {
+    throw new ManifestError(`${where}.sha256 must be 64 lowercase hex characters, got "${record.sha256}"`)
+  }
+  if (!Number.isInteger(record.size) || record.size < 0) {
+    throw new ManifestError(`${where}.size must be a whole number of bytes, got ${record.size}`)
+  }
+  if (record.cid === '') throw new ManifestError(`${where}.cid must not be empty`)
+  if (record.pieceCid === '') throw new ManifestError(`${where}.pieceCid must not be empty`)
+
+  return record
 }
 
 function parseStorage(value: unknown): ManifestStorage {
@@ -141,9 +156,21 @@ export function parseManifest(source: string | Uint8Array): Manifest {
   const records = root.records
   if (!Array.isArray(records)) throw new ManifestError('manifest.records must be an array')
 
+  const parsed = records.map(parseRecord)
+
+  // `recordByCid` returns the first match, so two records under one CID would
+  // make the verifier's answer depend on order. Refuse instead.
+  const seen = new Set<string>()
+  for (const record of parsed) {
+    if (seen.has(record.cid)) {
+      throw new ManifestError(`manifest lists ${record.cid} more than once, as ${record.filename}`)
+    }
+    seen.add(record.cid)
+  }
+
   return {
     assetId: field(root, 'assetId', 'string', 'manifest'),
-    records: records.map(parseRecord),
+    records: parsed,
     schemaVersion,
     storage: parseStorage(root.storage),
     version: field(root, 'version', 'number', 'manifest'),

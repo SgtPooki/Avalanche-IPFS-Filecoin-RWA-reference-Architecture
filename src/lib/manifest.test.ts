@@ -10,13 +10,21 @@ import {
   recordByCid,
 } from './manifest.js'
 
-function demoRecord(slug: string, filename: string, mimeType: string, size: number, type: string): ManifestRecord {
+/** `digest` is one hex character repeated, so each record has a distinct valid sha256. */
+function demoRecord(
+  slug: string,
+  filename: string,
+  mimeType: string,
+  size: number,
+  type: string,
+  digest: string
+): ManifestRecord {
   return {
     cid: `bafkrei${slug}bytes`,
     filename,
     mimeType,
     pieceCid: `bafkzcibca${slug}`,
-    sha256: slug[0]!.repeat(64),
+    sha256: digest.repeat(64),
     size,
     type,
   }
@@ -26,8 +34,8 @@ function demoManifest(): Manifest {
   return {
     assetId: 'BAL-PROP-001',
     records: [
-      demoRecord('deed', 'deed.pdf', 'application/pdf', 188416, 'deed'),
-      demoRecord('parcel', 'parcel.json', 'application/json', 3481, 'parcel_record'),
+      demoRecord('deed', 'deed.pdf', 'application/pdf', 188416, 'deed', 'a'),
+      demoRecord('parcel', 'parcel.json', 'application/json', 3481, 'parcel_record', 'b'),
     ],
     schemaVersion: MANIFEST_SCHEMA_VERSION,
     storage: { dataSetId: 1842, network: 'filecoin-calibration', providerId: 12 },
@@ -121,6 +129,37 @@ describe('parseManifest', () => {
       /records must be an array/,
     ],
     ['a missing assetId', (m: Manifest) => void delete (m as Partial<Manifest>).assetId, /assetId must be a string/],
+    [
+      'a sha256 that is not 64 hex characters',
+      (m: Manifest) => void (m.records[0]!.sha256 = 'abc123'),
+      /records\[0\]\.sha256 must be 64 lowercase hex characters/,
+    ],
+    [
+      'a sha256 in uppercase, which would not compare equal to a computed digest',
+      (m: Manifest) => void (m.records[0]!.sha256 = 'A'.repeat(64)),
+      /records\[0\]\.sha256 must be 64 lowercase hex characters/,
+    ],
+    [
+      'a negative size',
+      (m: Manifest) => void (m.records[0]!.size = -1),
+      /records\[0\]\.size must be a whole number of bytes, got -1/,
+    ],
+    [
+      'a fractional size',
+      (m: Manifest) => void (m.records[0]!.size = 12.5),
+      /records\[0\]\.size must be a whole number of bytes, got 12\.5/,
+    ],
+    ['an empty cid', (m: Manifest) => void (m.records[0]!.cid = ''), /records\[0\]\.cid must not be empty/],
+    [
+      'an empty pieceCid',
+      (m: Manifest) => void (m.records[0]!.pieceCid = ''),
+      /records\[0\]\.pieceCid must not be empty/,
+    ],
+    [
+      'the same cid listed twice, which would make recordByCid depend on order',
+      (m: Manifest) => void (m.records[1]!.cid = m.records[0]!.cid),
+      /lists bafkreideedbytes more than once, as parcel\.json/,
+    ],
   ])('rejects %s', (_what, breakIt, message) => {
     const broken = JSON.parse(canonicalize(demoManifest())) as Manifest
     breakIt(broken)
