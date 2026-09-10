@@ -162,6 +162,11 @@ tr:last-child td{border-bottom:0}
 /* Explanatory notes are neutral. Avalanche red is reserved for Avalanche write
    actions, and beside a FAILED verdict a red panel reads as "this is the bad
    part" when the note is only telling you what a legitimate update looks like. */
+.role{padding:10px 0;border-bottom:1px solid var(--line)}
+.role:last-child{border-bottom:0}
+.role .rname{font-weight:600;font-size:13px;display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.role .rval{font-family:var(--mono);font-size:12px;color:var(--text)}
+.role .rcan{color:var(--muted);font-size:12px;margin-top:3px}
 .callout.neutral{border-left-color:var(--line-strong);background:var(--surface-2)}
 
 .checks{display:grid;gap:6px}
@@ -339,7 +344,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
     <div class="nets">
       <span class="pill ava"><span class="dot"></span>Avalanche Fuji</span>
       <span class="pill fil"><span class="dot"></span>Filecoin Calibration</span>
-      <span class="wallet">0x7a3F…9c21</span>
+      <span class="wallet">0x44f0…3759</span>
     </div>
   </div>
 
@@ -360,7 +365,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       <div class="rec">
         <div class="row"><span class="k">Property record</span><span class="rtag ava"><i></i>Avalanche · BAL-PROP-001</span></div>
         <h3>123 Main Street</h3>
-        <div class="sub">Bergen County, NJ · Parcel DEMO-123456 · Version 2</div>
+        <div class="sub">Fairview County, Example State · Parcel 07-14-226-0031 · Version 2</div>
         <div class="tri"><i class="a"></i><i class="b"></i><i class="c"></i></div>
         <div class="row" style="margin-top:12px"><span class="k">Record set fingerprint</span><span class="rtag ipfs"><i></i>IPFS</span></div>
         <div class="cid">bafybeia3qgtjcq3tmvc2jlpc5a3ez2ujvxrvyhmqwj4uwq2evp6k5cu7pe</div>
@@ -474,12 +479,12 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
         <div class="field"><label for="f-asset">Asset ID</label><input id="f-asset" value="BAL-PROP-001"><span class="hint">Namespaced to your wallet on the registry, so forks never collide.</span></div>
         <div class="grid two">
           <div class="field"><label for="f-type">Asset type</label><select id="f-type"><option>real-estate</option><option>vehicle</option><option>equipment</option></select></div>
-          <div class="field"><label for="f-parcel">Parcel ID</label><input id="f-parcel" value="DEMO-123456"></div>
+          <div class="field"><label for="f-parcel">Parcel ID</label><input id="f-parcel" value="07-14-226-0031"></div>
         </div>
         <div class="field"><label for="f-addr">Address</label><input id="f-addr" value="123 Main Street"></div>
         <div class="grid two">
-          <div class="field"><label for="f-jur">Jurisdiction</label><input id="f-jur" value="Bergen County, NJ"></div>
-          <div class="field"><label for="f-issuer">Issuer</label><input id="f-issuer" value="Demo RWA Issuer"></div>
+          <div class="field"><label for="f-jur">Jurisdiction</label><input id="f-jur" value="Fairview County, Example State"></div>
+          <div class="field"><label for="f-issuer">Issuer</label><input id="f-issuer" value="Fairview County Recorder"></div>
         </div>
         <div class="actions">
           <button class="btn ava" data-go="2" data-goatcounter-click="issuer-register-asset">Register on Avalanche</button>
@@ -601,7 +606,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
 }</pre>
         <div class="steps" style="margin-top:14px">
           <div class="step done"><span class="bullet">✓</span><div><div class="t">Manifest stored on Filecoin</div><div class="d">Storage ID 1842 · provider 12 · <span class="mono">bafkzcibce…</span></div></div></div>
-          <div class="step active"><span class="bullet">2</span><div><div class="t">Write the manifest CID to Avalanche</div><div class="d">Manifest CID plus its Filecoin storage ID · one Fuji transaction</div></div></div>
+          <div class="step active"><span class="bullet">2</span><div><div class="t">Write the manifest CID to Avalanche</div><div class="d">Manifest CID plus its Filecoin storage ID · one Fuji transaction, usually confirmed in a couple of seconds</div></div></div>
         </div>
         <div class="actions"><button class="btn ava" data-go="4" data-goatcounter-click="issuer-anchor-manifest">Anchor to Avalanche</button></div>
       </div>
@@ -625,7 +630,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       <div>
         <div class="eyebrow">Asset · real-estate</div>
         <h1>123 Main Street</h1>
-        <p class="lede">Bergen County, NJ · Parcel DEMO-123456 · Issued by Demo RWA Issuer</p>
+        <p class="lede">Fairview County, Example State · Parcel 07-14-226-0031 · Issued by Fairview County Recorder</p>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <span class="pill ok"><span class="dot"></span>All records verified 4 min ago</span>
@@ -634,12 +639,22 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
     </div>
     <div class="grid two" style="margin-bottom:16px">
       <div class="panel" style="border-top:3px solid var(--ava)">
-        <div class="panel-title"><h3>Onchain asset</h3><span class="pill ava"><span class="dot"></span>Avalanche Fuji</span></div>
-        <dl class="kv">
+        <div class="panel-title"><h3>Onchain record</h3><span class="pill ava"><span class="dot"></span>Avalanche Fuji</span></div>
+        <div class="role">
+          <div class="rname"><span>Record set</span><span class="rval">bafybeia3q…u7pe</span></div>
+          <div class="rcan">The CID of the manifest listing every document. This is the whole of what Avalanche stores about the records, and it is what a verifier starts from.</div>
+        </div>
+        <div class="role">
+          <div class="rname"><span>Publisher</span><span class="rval">0x44f0…3759</span></div>
+          <div class="rcan">The account this asset is filed under. Only it can anchor a new version, and no other account can write to this asset id.</div>
+        </div>
+        <div class="role">
+          <div class="rname"><span>Registry</span><span class="rval">0x4Bc1…e8F0</span></div>
+          <div class="rcan">The contract holding the pointer and the version history. <a href="#" onclick="return false">Snowtrace ↗</a></div>
+        </div>
+        <dl class="kv" style="margin-top:10px">
           <dt>Asset ID</dt><dd class="mono">BAL-PROP-001</dd>
-          <dt>Contract</dt><dd class="mono">0x4Bc1…e8F0 <a href="#" onclick="return false">Snowtrace ↗</a></dd>
-          <dt>Owner</dt><dd class="mono">0x7a3F…9c21</dd>
-          <dt>Manifest CID</dt><dd class="mono">bafybeia3q…u7pe <span class="pill neutral" style="margin-left:6px">v2</span></dd>
+          <dt>Version</dt><dd>2 of 2 <span class="mono" style="color:var(--faint)">· assigned by the registry</span></dd>
           <dt>Anchored</dt><dd>Apr 15, 2026 · tx <span class="mono">0xd04c…21be</span></dd>
         </dl>
       </div>
@@ -648,7 +663,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
         <dl class="kv">
           <dt>Storage ID</dt><dd><span class="mono">1842</span> <a href="#" onclick="return false">Storage proofs ↗</a></dd>
           <dt>Provider</dt><dd>Provider 12 · <span class="mono">pdp.provider-12.example</span></dd>
-          <dt>Files</dt><dd>5 of 5 committed onchain</dd>
+          <dt>Pieces</dt><dd>6 of 6 committed onchain <span class="mono" style="color:var(--faint)">· 5 records and the manifest</span></dd>
           <dt>Last proof</dt><dd>38 min ago <span class="mono" style="color:var(--faint)">· epoch 2,913,477</span></dd>
           <dt>Next proof due</dt><dd>in about 23 h <span class="pill ok" style="padding:1px 7px;margin-left:4px"><span class="dot"></span>on schedule</span></dd>
         </dl>
@@ -658,12 +673,13 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       <div class="panel-title"><h3>Records · version 2</h3><button class="btn ghost" data-go="7" style="padding:4px 10px;font-size:12px">History</button></div>
       <div class="tbl-wrap">
       <table>
-        <thead><tr><th>Document</th><th>Fingerprint</th><th>Integrity</th><th>Retrievable</th><th>Stored</th><th>Last proof</th></tr></thead>
+        <thead><tr><th>Document</th><th>Type</th><th>Fingerprint</th><th>Integrity</th><th>Retrievable</th><th>Stored</th><th>Last proof</th></tr></thead>
         <tbody>
-          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">deed.pdf</div><div class="meta">184 KB · unchanged since v1</div></div></div></td><td><span class="cid short">bafkreidh5qsi5z6</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
-          <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">parcel.json</div><div class="meta">3.4 KB</div></div></div></td><td><span class="cid short">bafkreiejmexovym</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
-          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">tax-assessment-2026.pdf</div><div class="meta">101 KB · replaced 2025 in v2</div></div></div></td><td><span class="cid short">bafkreiexhmrobe6</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
-          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">survey.pdf</div><div class="meta">2.1 MB</div></div></div></td><td><span class="cid short">bafkreid3kwdoyxz</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
+          <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">property.json</div><div class="meta">501 B</div></div></div></td><td><span class="mono" style="font-size:11px;color:var(--muted)">property_metadata</span></td><td><span class="cid short">bafkreig64pgrted</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
+          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">deed.pdf</div><div class="meta">2.8 KB · unchanged since v1</div></div></div></td><td><span class="mono" style="font-size:11px;color:var(--muted)">deed</span></td><td><span class="cid short">bafkreidh5qsi5z6</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
+          <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">parcel.json</div><div class="meta">1.2 KB</div></div></div></td><td><span class="mono" style="font-size:11px;color:var(--muted)">parcel_record</span></td><td><span class="cid short">bafkreiejmexovym</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
+          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">tax-assessment-2026.pdf</div><div class="meta">2.1 KB · replaced 2025 in v2</div></div></div></td><td><span class="mono" style="font-size:11px;color:var(--muted)">tax_assessment</span></td><td><span class="cid short">bafkreiexhmrobe6</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
+          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">survey.pdf</div><div class="meta">2.4 KB</div></div></div></td><td><span class="mono" style="font-size:11px;color:var(--muted)">survey</span></td><td><span class="cid short">bafkreid3kwdoyxz</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
         </tbody>
       </table>
       </div>

@@ -82,6 +82,26 @@ most, and a blocked visitor sends nothing at all. The page has to behave
 identically when the script never loads, so nothing calls into
 `window.goatcounter` without checking it is there.
 
+## Asset page, after ENS
+
+Review asked for a look at how ENS exposes records, owners, and content hash.
+Notes are in the gitignored research folder. What was taken:
+
+- Roles are named and each carries one line on what it can do. The asset page
+  names three: record set, publisher, registry. The publisher line says only
+  that account can anchor a new version, which is the "issuer stays the record
+  of authority" claim made concrete.
+- The manifest CID is a first-class labelled row rather than one field among
+  contract addresses. It is the same object as an ENS content hash: a pointer
+  from a name on one chain to content addressed on another.
+- Records are grouped and their type is named in the table, not just implied by
+  the filename.
+- The write step states the expected wait.
+
+Not taken: ENS separates Owner from Manager as two onchain roles.
+`AssetRecordRegistry` has one, the sender the asset is namespaced under, and the
+contract is fixed. The UI says there is one role rather than inventing a second.
+
 ## Changed since the plan
 
 - Light by default, from team feedback on 2026-09-10 that the black and neon boards read wrong and the county-clerk treatment reads right. The mockup already carried the light tokens; the change was which one is the default.
