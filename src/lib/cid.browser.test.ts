@@ -23,33 +23,7 @@ import { CarReader } from '@ipld/car'
 import { createCarFromFile } from 'filecoin-pin'
 import { describe, expect, it } from 'vitest'
 import { computeFileCid } from './cid.js'
-
-const MiB = 1024 * 1024
-
-/**
- * Deterministic pseudo-random bytes from an xorshift32 stream.
- *
- * The stream must not repeat at the 1 MiB chunk size. An earlier version of
- * this generator did, which made every full chunk of a multi-chunk file
- * identical, so the blockstore deduplicated them and the multi-chunk cases
- * never exercised a real multi-leaf DAG. `carHoldsEveryByte` guards that now.
- */
-function bytesOfLength(length: number): Uint8Array {
-  const bytes = new Uint8Array(length)
-  let state = 0x9e3779b9
-  for (let i = 0; i < length; i++) {
-    state ^= state << 13
-    state ^= state >>> 17
-    state ^= state << 5
-    bytes[i] = state & 0xff
-  }
-  return bytes
-}
-
-/** `Uint8Array<ArrayBufferLike>` does not satisfy `BlobPart` under this tsconfig. */
-function fileOf(bytes: Uint8Array, name: string): File {
-  return new File([bytes as unknown as BlobPart], name)
-}
+import { bytesOfLength, fileOf, MiB } from './test-bytes.js'
 
 const BASE32_ALPHABET = 'abcdefghijklmnopqrstuvwxyz234567'
 
