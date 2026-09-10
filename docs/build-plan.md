@@ -47,7 +47,7 @@ python3 ~/.claude/skills/writing-core/scripts/writingcheck.py writing-docs <file
 
 Commit messages are subject and body only. No trailers, no tool attribution.
 
-Positioning: credit the May 2025 Avalanche and Filecoin bridge as the first connection between the networks, then say what this adds. Do not claim to be first, and do not grade the earlier work; the research notes in the private workspace hold the detail. The issuer stays the record of authority. Name ransomware survivability once. Do not describe Balcony's storage architecture; they have not published one.
+Positioning: credit the May 2025 Avalanche and Filecoin bridge as the first connection between the networks, then say what this adds. Do not claim to be first, and do not grade the earlier work; the notes in the gitignored `.research/` folder hold the detail. The issuer stays the record of authority. Name ransomware survivability once. Do not describe Balcony's storage architecture; they have not published one.
 
 ## Order of work
 
