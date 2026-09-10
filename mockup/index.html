@@ -244,6 +244,14 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
 .land-sec h2{margin-bottom:6px}
 .land-sec .lede{margin-bottom:18px}
 .three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.where{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+.where .side{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--surface);border-top:3px solid var(--line-strong)}
+.where .side.ava{border-top-color:var(--ava)} .where .side.fil{border-top-color:var(--fil)}
+.where .side h4{font-family:var(--display);font-weight:700;font-size:15px;margin:8px 0 2px}
+.where .side .size{font-size:12px;color:var(--faint);font-family:var(--mono)}
+.where .side ul{margin:10px 0 0;padding-left:18px;display:grid;gap:5px;font-size:13px;color:var(--muted)}
+.where .side ul code{color:var(--text)}
+.where-note{margin-top:12px;font-size:13px;color:var(--muted)}
 @media (max-width:900px){.three{grid-template-columns:1fr}}
 .pillar{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--surface);display:grid;gap:8px;align-content:start;border-top:3px solid var(--line-strong)}
 .pillar.ava{border-top-color:var(--ava)} .pillar.fil{border-top-color:var(--fil)} .pillar.ipfs{border-top-color:var(--ipfs)}
@@ -334,10 +342,50 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
     </div>
 
     <div class="land-sec">
+      <h2>What lives where</h2>
+      <p class="lede">Avalanche stores a pointer. Filecoin stores the documents. Nothing else crosses between them.</p>
+      <div class="where">
+        <div class="side ava">
+          <span class="pill ava"><span class="dot"></span>Avalanche Fuji</span>
+          <h4>A pointer, per asset</h4>
+          <div class="size">a few hundred bytes, onchain</div>
+          <ul>
+            <li>the asset id, <code>BAL-PROP-001</code></li>
+            <li>the CID of the current manifest</li>
+            <li>that manifest's Filecoin piece CID and data set id</li>
+            <li>one appended entry per version, never overwritten</li>
+          </ul>
+        </div>
+        <div class="side fil">
+          <span class="pill fil"><span class="dot"></span>Filecoin Calibration</span>
+          <h4>The documents themselves</h4>
+          <div class="size">every file, addressed by its IPFS CID</div>
+          <ul>
+            <li><code>manifest.json</code>, which lists every record by CID</li>
+            <li><code>deed.pdf</code>, <code>parcel.json</code>, <code>survey.pdf</code>, the tax assessments</li>
+            <li>stored as pieces that providers keep proving they still hold</li>
+          </ul>
+        </div>
+      </div>
+      <p class="where-note">No document bytes are written to Avalanche, and no Avalanche state is written to Filecoin. The only thing shared is the CID.</p>
+    </div>
+
+    <div class="land-sec">
+      <h2>What a verifier actually checks</h2>
+      <p class="lede">Four claims, in order. Each is checked against a different system, and a failure of any one fails the record.</p>
+      <div class="ledger">
+        <div class="row"><div class="what">Avalanche points at this manifest</div><div class="gap">Read the manifest CID off the registry for the asset. This is the issuer's claim, and it is the only thing they signed.</div></div>
+        <div class="row"><div class="what">The manifest is the one it points at</div><div class="gap">Fetch it, hash the bytes, and check the CID comes out the same. A manifest that hashes differently is not the anchored one.</div></div>
+        <div class="row"><div class="what">Every record is the one the manifest lists</div><div class="gap">Fetch each file, hash it, compare to the CID in the manifest. A changed deed produces a different CID and fails here.</div></div>
+        <div class="row"><div class="what">Filecoin still holds them</div><div class="gap">Read the proof state for the data set. It says when possession was last proven and when the next proof is due.</div></div>
+      </div>
+    </div>
+
+    <div class="land-sec">
       <h2>No single point of trust</h2>
       <p class="lede">Three questions, each answered by a different system. None of them has to trust the others.</p>
       <div class="three">
-        <div class="pillar ava"><span class="pill ava"><span class="dot"></span>Avalanche</span><div class="ask">Which record set belongs to this asset?</div><div class="ans">The registry stores the manifest reference on the asset. One transaction per version.</div></div>
+        <div class="pillar ava"><span class="pill ava"><span class="dot"></span>Avalanche</span><div class="ask">Which record set belongs to this asset?</div><div class="ans">The registry stores the manifest CID on the asset. One transaction per version.</div></div>
         <div class="pillar ipfs"><span class="pill ipfs"><span class="dot"></span>IPFS</span><div class="ask">What does that record set contain?</div><div class="ans">Each file's CID is a fingerprint of its bytes. Change one character and the CID changes.</div></div>
         <div class="pillar fil"><span class="pill fil"><span class="dot"></span>Filecoin</span><div class="ask">Are the files still stored?</div><div class="ans">Storage providers post proofs of possession on a schedule anyone can check.</div></div>
       </div>
@@ -423,7 +471,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       </div>
       <span class="pill ok"><span class="dot"></span>BAL-PROP-001 registered · tx 0x91ab…7d3e</span>
     </div>
-    <div class="callout" style="margin-bottom:16px;border-left-color:var(--ipfs)"><strong>CID = fingerprint of the bytes.</strong> Change one character in a document and its CID changes. The CID is what the manifest and Avalanche will reference, never a URL.</div>
+    <div class="callout" style="margin-bottom:16px;border-left-color:var(--ipfs)"><strong>CID = fingerprint of the bytes.</strong> Change one character in a document and its CID changes. The CID is what the manifest and Avalanche point at, never a URL.</div>
     <div class="panel">
       <div class="drop" style="margin-bottom:14px;padding:16px"><strong>Drop records here</strong> or choose files · PDF, JSON, JPG · fingerprinted in your browser before upload</div>
       <div class="tbl-wrap">
@@ -516,7 +564,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
 }</pre>
         <div class="steps" style="margin-top:14px">
           <div class="step done"><span class="bullet">✓</span><div><div class="t">Manifest stored on Filecoin</div><div class="d">Storage ID 1842 · provider 12 · <span class="mono">bafkzcibce…</span></div></div></div>
-          <div class="step active"><span class="bullet">2</span><div><div class="t">Write manifest reference to Avalanche</div><div class="d">Manifest CID plus its Filecoin storage ID · one Fuji transaction</div></div></div>
+          <div class="step active"><span class="bullet">2</span><div><div class="t">Write the manifest CID to Avalanche</div><div class="d">Manifest CID plus its Filecoin storage ID · one Fuji transaction</div></div></div>
         </div>
         <div class="actions"><button class="btn ava" data-go="4">Anchor to Avalanche</button></div>
       </div>
@@ -529,7 +577,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
             <div class="check ok"><span class="ic">✓</span>That the bytes are still being stored<span class="who fil">FILECOIN</span></div>
           </div>
         </div>
-        <div class="callout neutral"><strong>Two identifiers, on purpose.</strong> The IPFS CID is the fingerprint people reference. The Filecoin storage ID (piece CID) is what the proof system tracks. The manifest carries both so a verifier needs nothing else.</div>
+        <div class="callout neutral"><strong>Two identifiers, on purpose.</strong> The IPFS CID is the fingerprint people quote. The Filecoin storage ID (piece CID) is what the proof system tracks. The manifest carries both so a verifier needs nothing else.</div>
       </div>
     </div>
   </section>
@@ -598,7 +646,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       <div style="display:grid;gap:16px">
         <div class="verdict ok">
           <div class="big">VERIFIED</div>
-          <div class="sum"><span>Onchain reference</span><span>Content integrity</span><span>Data available</span><span>Filecoin storage</span></div>
+          <div class="sum"><span>Anchored on Avalanche</span><span>Content integrity</span><span>Data available</span><span>Filecoin storage</span></div>
         </div>
         <div class="panel">
           <div class="panel-title"><h3>Per record</h3><span class="cid dim">manifest bafybeia3q…u7pe · v2</span></div>
@@ -648,7 +696,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       <div style="display:grid;gap:16px">
         <div class="verdict bad">
           <div class="big">FAILED</div>
-          <div class="sum"><span>Onchain reference</span><span class="x">Content integrity</span><span>Data available</span><span>Filecoin storage</span></div>
+          <div class="sum"><span>Anchored on Avalanche</span><span class="x">Content integrity</span><span>Data available</span><span>Filecoin storage</span></div>
         </div>
         <div class="panel">
           <p style="margin-bottom:12px"><strong>The document you provided does not match the deed recorded for BAL-PROP-001.</strong> Its fingerprint appears in no version of this asset's manifest.</p>
@@ -719,8 +767,8 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
         <div class="panel sub">
           <div class="panel-title"><h3>Tampering vs update</h3></div>
           <dl class="kv">
-            <dt style="color:var(--bad)">Tampering</dt><dd>Changing a record without changing its reference. Verification fails.</dd>
-            <dt style="color:var(--ok)">Update</dt><dd>Publishing a new record and recording a new version onchain. Both versions verify.</dd>
+            <dt style="color:var(--bad)">Tampering</dt><dd>The bytes of a document changed, but the CID on Avalanche did not. The new bytes hash to a different CID, so the check fails.</dd>
+            <dt style="color:var(--ok)">Update</dt><dd>New bytes, a new manifest CID, and a new version written to Avalanche. Both versions still verify, each against its own CID.</dd>
           </dl>
         </div>
         <div class="panel sub">
