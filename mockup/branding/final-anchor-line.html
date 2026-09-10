@@ -1,0 +1,159 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Verifiable RWA Records · identity</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--black:#080909;--z900:#161A1E;--z700:#2A3037;--z400:#8C95A1;--z300:#B9C0C9;--white:#fff;
+--rec:#F5F6F8;--ink:#0F1216;--ink-2:#4B5563;--rule:#DDE1E6;
+--ava:#E84142;--fil:#0090FF;--ipfs:#69C4CD;--ipfs-ink:#378085;--ok:#1FBF75;--bad:#F5A524}
+*{box-sizing:border-box}
+body{margin:0;width:1280px;background:var(--black);color:var(--white);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:16px;line-height:1.5}
+h1,h2,h3{font-family:'Schibsted Grotesk',system-ui,sans-serif;margin:0;letter-spacing:-.02em}
+.mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace}
+.ov{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--z400);font-weight:600}
+.board{padding:40px 48px 36px;display:grid;gap:28px}
+.head{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:end;border-bottom:1px solid var(--z700);padding-bottom:22px}
+.head h1{font-size:40px;font-weight:800}
+.head p{color:var(--z300);margin:8px 0 0;max-width:56ch}
+.head .right{display:grid;gap:8px}
+.jobs{display:grid;gap:6px;font-size:14px}
+.jobs div{display:grid;grid-template-columns:14px 110px 1fr;gap:10px;align-items:center;color:var(--z300)}
+.jobs i{width:14px;height:14px;border-radius:3px;display:inline-block}
+.jobs b{color:#fff;font-weight:600}
+/* anchor line */
+.aline{position:relative;padding-left:18px}
+.aline::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:2px;background:linear-gradient(180deg,var(--ava) 0 26%,var(--rule) 26% 74%,var(--fil) 74% 100%)}
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:36px;align-items:center;padding:44px;border:1px solid var(--z700);border-radius:16px;background:radial-gradient(70% 90% at 100% 50%,rgba(0,144,255,.10),transparent 60%),radial-gradient(60% 90% at 0% 0%,rgba(232,65,66,.10),transparent 55%),var(--black)}
+.hero h2{font-size:56px;font-weight:800;line-height:1.02;max-width:14ch}
+.hero p{color:var(--z300);font-size:19px;max-width:44ch;margin:16px 0 0}
+.ctas{display:flex;gap:12px;margin-top:24px}
+.btn{font-family:'Schibsted Grotesk',system-ui,sans-serif;font-weight:700;font-size:16px;padding:13px 20px;border-radius:8px;border:1px solid var(--z700);color:#fff;background:transparent}
+.btn.p{background:#fff;color:var(--ink);border-color:#fff}
+/* record card, dark and light variants */
+.rec{background:var(--rec);color:var(--ink);border-radius:12px;padding:26px 26px 22px 30px;position:relative;box-shadow:0 30px 60px rgba(0,0,0,.5)}
+.rec::before{content:"";position:absolute;left:12px;top:22px;bottom:22px;width:4px;border-radius:2px;background:linear-gradient(180deg,var(--ava) 0 24%,var(--rule) 24% 76%,var(--fil) 76% 100%)}
+.rec .row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tag{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;display:inline-flex;gap:7px;align-items:center;border:1px solid}
+.tag i{width:7px;height:7px;border-radius:50%;display:inline-block}
+.tag.ava{color:#B32A2B;border-color:rgba(232,65,66,.4);background:rgba(232,65,66,.08)} .tag.ava i{background:var(--ava)}
+.tag.fil{color:#0062B8;border-color:rgba(0,144,255,.45);background:rgba(0,144,255,.08)} .tag.fil i{background:var(--fil)}
+.tag.ipfs{color:var(--ipfs-ink);border-color:rgba(105,196,205,.55);background:rgba(105,196,205,.14)} .tag.ipfs i{background:var(--ipfs)}
+.rec .k{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+.rec h3{font-size:28px;font-weight:800;margin-top:14px;line-height:1.05}
+.rec .sub{color:var(--ink-2);margin-top:4px}
+.tri{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;height:4px;margin-top:14px}
+.tri i{display:block;border-radius:2px}.tri .a{background:var(--ava)}.tri .b{background:var(--ipfs)}.tri .c{background:var(--fil)}
+.rec .cid{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:12.5px;color:var(--ink);word-break:break-all;margin-top:12px;padding:10px 12px;background:#fff;border:1px solid var(--rule);border-radius:6px}
+.rec .foot{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:12px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-2)}
+/* proof tiles */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.tile{background:var(--z900);border:1px solid var(--z700);border-top:3px solid var(--z400);border-radius:8px;padding:14px 16px;display:grid;gap:6px}
+.tile.ava{border-top-color:var(--ava)} .tile.ipfs{border-top-color:var(--ipfs)} .tile.fil{border-top-color:var(--fil)} .tile.ok{border-top-color:var(--ok)}
+.tile .n{font-family:'Schibsted Grotesk',sans-serif;font-weight:800;font-size:22px}
+.tile .t{font-size:14px;color:var(--z300)}
+.tile .who{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.tile.ava .who{color:var(--ava)} .tile.ipfs .who{color:var(--ipfs)} .tile.fil .who{color:var(--fil)} .tile.ok .who{color:var(--ok)}
+/* lower grid */
+.three{display:grid;grid-template-columns:1fr 1fr 1.1fr;gap:18px;align-items:start}
+.card{background:var(--z900);border:1px solid var(--z700);border-radius:12px;padding:18px}
+.verd{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;padding:16px 18px;border-radius:10px;border:1px solid var(--z700);background:var(--black)}
+.verd .big{font-family:'Schibsted Grotesk',sans-serif;font-size:30px;font-weight:800;letter-spacing:-.02em}
+.verd.ok .big{color:var(--ok)} .verd.bad .big{color:var(--bad)}
+.verd ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;color:var(--z300);font-size:13px}
+.verd li::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:7px}
+.verd li.x::before{background:var(--bad)}
+.datarow{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 14px;border:1px solid var(--z700);border-radius:8px;background:var(--black);margin-top:10px}
+.datarow .f{font-family:'Schibsted Grotesk',sans-serif;font-weight:700;font-size:14px}.datarow .f small{display:block;color:var(--z400);font-family:'IBM Plex Sans';font-weight:400;font-size:12px}
+.datarow .cid{grid-column:1/-1;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--z300);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill{font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--z700);color:var(--ok)}
+.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.s{border-radius:8px;height:64px;padding:8px;display:flex;flex-direction:column;justify-content:flex-end;border:1px solid var(--z700)}
+.s b{font-family:'Schibsted Grotesk',sans-serif;font-weight:700;font-size:12px;color:#fff}.s span{font-size:10.5px;font-family:'IBM Plex Mono',monospace;color:rgba(255,255,255,.75)}
+.s.light b{color:var(--ink)} .s.light span{color:var(--ink-2)}
+.type .d{font-family:'Schibsted Grotesk',sans-serif;font-size:30px;font-weight:800;line-height:1.05;letter-spacing:-.025em;margin-top:8px}
+.type .b{margin-top:8px;color:var(--z300);font-size:14px}
+.type .m{margin-top:8px;font-size:12px;color:var(--ipfs);word-break:break-all}
+/* light treatment */
+.light{background:#fff;color:var(--ink);border-radius:12px;padding:18px;border:1px solid var(--rule)}
+.light .ov{color:var(--ink-2)}
+.light h3{font-size:22px;font-weight:800;margin-top:8px}
+.light p{color:var(--ink-2);font-size:14px;margin:6px 0 0}
+.light .mini{margin-top:12px;border:1px solid var(--rule);border-radius:8px;padding:12px 12px 12px 18px;position:relative;background:var(--rec)}
+.light .mini::before{content:"";position:absolute;left:7px;top:10px;bottom:10px;width:3px;border-radius:2px;background:linear-gradient(180deg,var(--ava) 0 24%,var(--rule) 24% 76%,var(--fil) 76% 100%)}
+.light .mini b{font-family:'Schibsted Grotesk',sans-serif;font-size:15px}
+.light .mini .cid{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-2);word-break:break-all;margin-top:4px}
+.light .btn{color:var(--ink);border-color:var(--ink)} .light .btn.p{background:var(--ink);color:#fff;border-color:var(--ink)}
+.foot{color:var(--z400);font-size:12px;border-top:1px solid var(--z700);padding-top:14px;display:flex;justify-content:space-between}
+</style></head><body><div class="board">
+  <div class="head">
+    <div><div class="ov">Recommended identity · Verifiable RWA Records</div><h1 style="margin-top:8px">Anchor line</h1>
+      <p>One rule runs from Avalanche red, through the record, into Filecoin blue. The asset anchors at the top, the proof holds at the bottom, and the record sits between them. Both partners at full strength, each with a job, never mixed. The product's own identity is the record card, a surface neither brand owns.</p></div>
+    <div class="right"><div class="ov">Color jobs</div>
+      <div class="jobs">
+        <div><i style="background:var(--ava)"></i><b>Avalanche</b><span>Asset identity and the anchor. Registers and points.</span></div>
+        <div><i style="background:var(--ipfs)"></i><b>IPFS</b><span>The fingerprint. Aqua from ipfs-css; teal #378085 for text on light.</span></div>
+        <div><i style="background:var(--fil)"></i><b>Filecoin</b><span>Storage and proof. Says the bytes are still there.</span></div>
+        <div><i style="background:var(--ok)"></i><b>Verified</b><span>Semantic only. Never a brand color.</span></div>
+        <div><i style="background:var(--bad)"></i><b>Failed</b><span>Amber, so failure never looks like Avalanche.</span></div>
+      </div></div>
+  </div>
+
+  <div class="hero">
+    <div>
+      <h2>Records your token can vouch for</h2>
+      <p>Anchor every deed, survey, and tax record to the asset on Avalanche. Filecoin proves they are still there. Anyone can check.</p>
+      <div class="ctas"><button class="btn p">Walk through the demo</button><button class="btn">Fork the template</button></div>
+    </div>
+    <div class="rec">
+      <div class="row"><span class="k">Property record</span><span class="tag ava"><i></i>Avalanche · BAL-PROP-001</span></div>
+      <h3>123 Main Street</h3>
+      <div class="sub">Bergen County, NJ · Parcel DEMO-123456 · Version 2</div>
+      <div class="tri"><i class="a"></i><i class="b"></i><i class="c"></i></div>
+      <div class="row" style="margin-top:12px"><span class="k">Record set fingerprint</span><span class="tag ipfs"><i></i>IPFS</span></div>
+      <div class="cid">bafybeia3qgtjcq3tmvc2jlpc5a3ez2ujvxrvyhmqwj4uwq2evp6k5cu7pe</div>
+      <div class="foot"><span>Deed · Parcel · Tax 2026 · Survey</span><span class="tag fil"><i></i>Filecoin · proof 38 min ago</span></div>
+    </div>
+  </div>
+
+  <div class="tiles">
+    <div class="tile ava"><span class="n">1</span><span class="t">Asset identity read from the registry</span><span class="who">Avalanche</span></div>
+    <div class="tile ipfs"><span class="n">2</span><span class="t">Manifest fingerprint matches the anchored CID</span><span class="who">IPFS</span></div>
+    <div class="tile fil"><span class="n">3</span><span class="t">Storage proof posted 38 min ago</span><span class="who">Filecoin</span></div>
+    <div class="tile ok"><span class="n">4</span><span class="t">Deed digest matches the manifest</span><span class="who">Match</span></div>
+  </div>
+
+  <div class="three">
+    <div class="card">
+      <div class="ov">Verdicts and rows</div>
+      <div style="display:grid;gap:10px;margin-top:10px">
+        <div class="verd ok"><div class="big">Verified</div><ul><li>Onchain reference</li><li>Content integrity</li><li>Data available</li><li>Filecoin storage</li></ul></div>
+        <div class="verd bad"><div class="big">Failed</div><ul><li>Onchain reference</li><li class="x">Content integrity</li><li>Data available</li><li>Filecoin storage</li></ul></div>
+      </div>
+      <div class="datarow"><div class="f">deed.pdf<small>184 KB · unchanged since v1</small></div><span class="pill">Verified</span><div class="cid">bafybeihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku</div></div>
+    </div>
+    <div class="card type aline">
+      <div class="ov">Palette and type</div>
+      <div class="sw" style="margin-top:10px">
+        <div class="s" style="background:#080909"><b>Stage</b><span>#080909</span></div>
+        <div class="s light" style="background:#F5F6F8"><b>Record</b><span>#F5F6F8</span></div>
+        <div class="s" style="background:#E84142"><b>Avalanche</b><span>#E84142</span></div>
+        <div class="s" style="background:#0090FF"><b>Filecoin</b><span>#0090FF</span></div>
+        <div class="s" style="background:#69C4CD"><b>IPFS</b><span>#69C4CD</span></div>
+        <div class="s" style="background:#1FBF75"><b>Verified</b><span>#1FBF75</span></div>
+        <div class="s" style="background:#F5A524"><b>Failed</b><span>#F5A524</span></div>
+        <div class="s" style="background:#161A1E"><b>Panel</b><span>#161A1E</span></div>
+      </div>
+      <div class="d">Change one line, and the fingerprint changes</div>
+      <div class="b">Schibsted Grotesk 800 for headlines. IBM Plex Sans for body. IBM Plex Mono for identifiers. Neither partner ships this pairing, and it holds on a projector.</div>
+      <div class="m mono">bafybeihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku</div>
+    </div>
+    <div class="light">
+      <div class="ov">Light treatment · README and docs</div>
+      <h3>Add verifiable records to an Avalanche RWA</h3>
+      <p>Same line, same card, same colors on white. The identity survives outside the dark app.</p>
+      <div class="mini"><b>123 Main Street</b> <span class="tag ava" style="margin-left:6px"><i></i>BAL-PROP-001</span><div class="cid">bafybeia3qgtjcq3tmvc2jlpc5a3ez2ujvxrvyhmqwj4uwq2evp6k5cu7pe</div></div>
+      <div class="ctas" style="margin-top:14px"><button class="btn p">Get started</button><button class="btn">Read the pattern</button></div>
+    </div>
+  </div>
+
+  <div class="foot"><span>Merged from Anchor line (claude) and Proof Ledger + Linked Record (codex). No imagery from either brand.</span><span class="mono">final candidate · r2</span></div>
+</div></body></html>

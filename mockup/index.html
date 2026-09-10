@@ -1,0 +1,837 @@
+<title>Verifiable RWA Records</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#080909; --surface:#161A1E; --surface-2:#1E242B; --line:#2A3037; --line-strong:#3A4250;
+  --text:#FFFFFF; --muted:#B9C0C9; --faint:#8C95A1;
+  --rec:#F5F6F8; --rec-ink:#0F1216; --rec-ink-2:#4B5563; --rec-rule:#DDE1E6;
+  --ava:#E84142; --fil:#0090FF; --ipfs:#69C4CD; --ava-ink:#FF6B6C; --fil-ink:#3DA9FF; --ipfs-ink:#69C4CD; --ok:#1FBF75; --warn:#F5A524; --bad:#F5A524;
+  --ok-bg:rgba(31,191,117,.12); --bad-bg:rgba(245,165,36,.12); --warn-bg:rgba(245,165,36,.12);
+  --ava-bg:rgba(232,65,66,.14); --fil-bg:rgba(0,144,255,.14); --ipfs-bg:rgba(105,196,205,.14);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 14px 40px rgba(0,0,0,.45);
+  --display:"Schibsted Grotesk",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r:8px;
+  --anchor:linear-gradient(180deg,var(--ava) 0 26%,var(--line-strong) 26% 74%,var(--fil) 74% 100%);
+  --anchor-light:linear-gradient(180deg,var(--ava) 0 26%,var(--rec-rule) 26% 74%,var(--fil) 74% 100%);
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#F5F6F8; --surface:#FFFFFF; --surface-2:#EEF1F4; --line:#DDE1E6; --line-strong:#B9C0C9;
+    --text:#0F1216; --muted:#4B5563; --faint:#707B8F;
+    --ava-ink:#B32A2B; --fil-ink:#0062B8; --ipfs-ink:#378085;
+    --ok:#178F5A; --warn:#B8760F; --bad:#B8760F;
+    --ok-bg:rgba(23,143,90,.10); --bad-bg:rgba(184,118,15,.10); --warn-bg:rgba(184,118,15,.10);
+    --ava-bg:rgba(232,65,66,.10); --fil-bg:rgba(0,144,255,.10); --ipfs-bg:rgba(105,196,205,.18);
+    --shadow:0 1px 2px rgba(16,21,32,.06),0 8px 24px rgba(16,21,32,.08);
+    --anchor:linear-gradient(180deg,var(--ava) 0 26%,var(--line-strong) 26% 74%,var(--fil) 74% 100%);
+  }
+}
+:root[data-theme="light"]{
+  --bg:#F5F6F8; --surface:#FFFFFF; --surface-2:#EEF1F4; --line:#DDE1E6; --line-strong:#B9C0C9;
+  --text:#0F1216; --muted:#4B5563; --faint:#707B8F;
+  --ava-ink:#B32A2B; --fil-ink:#0062B8; --ipfs-ink:#378085;
+  --ok:#178F5A; --warn:#B8760F; --bad:#B8760F;
+  --ok-bg:rgba(23,143,90,.10); --bad-bg:rgba(184,118,15,.10); --warn-bg:rgba(184,118,15,.10);
+  --ava-bg:rgba(232,65,66,.10); --fil-bg:rgba(0,144,255,.10); --ipfs-bg:rgba(105,196,205,.18);
+  --shadow:0 1px 2px rgba(16,21,32,.06),0 8px 24px rgba(16,21,32,.08);
+  --anchor:linear-gradient(180deg,var(--ava) 0 26%,var(--line-strong) 26% 74%,var(--fil) 74% 100%);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:0 48px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+h1{font-size:34px;font-weight:800}
+h2{font-size:22px;font-weight:800}
+h3{font-size:14px;font-weight:700}
+p{margin:0}
+a{color:var(--fil-ink)}
+code,.mono{font-family:var(--mono);font-size:12px}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+
+/* ---- mock chrome (the part that is NOT the product) ---- */
+.mockbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding-block:12px;border-bottom:1px dashed var(--line-strong);margin-bottom:18px}
+.mockbar .tag{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.flow{display:flex;flex-wrap:wrap;gap:6px}
+.flow button{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:5px 11px;font-size:12px;display:flex;gap:6px;align-items:center}
+.flow button .n{font-family:var(--mono);font-size:11px;color:var(--faint)}
+.flow button[aria-current="step"]{border-color:var(--text);color:var(--text);background:var(--surface-2)}
+.flow button[aria-current="step"] .n{color:var(--text)}
+.mocktools{display:flex;gap:8px;align-items:center}
+.mocktools button{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:var(--r);padding:5px 10px;font-size:12px}
+.mocktools button[aria-pressed="true"]{color:var(--text);border-color:var(--line-strong)}
+
+/* ---- app shell ---- */
+.app{max-width:1120px;margin-inline:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:var(--shadow);overflow:hidden}
+.topbar{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--line);background:var(--surface)}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:15px}
+.brand .mark{width:6px;height:24px;border-radius:2px;background:var(--anchor)}
+.nav{display:flex;gap:2px}
+.nav button{border:0;background:transparent;color:var(--muted);padding:6px 12px;border-radius:var(--r);font-weight:500}
+.nav button[aria-current="page"]{background:var(--surface-2);color:var(--text)}
+.nets{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 9px;font-size:12px;font-weight:500;border:1px solid transparent;white-space:nowrap}
+.pill .dot{width:7px;height:7px;border-radius:50%}
+.pill.ava{background:var(--ava-bg);color:var(--text);border-color:rgba(232,65,66,.35)} .pill.ava .dot{background:var(--ava)}
+.pill.fil{background:var(--fil-bg);color:var(--text);border-color:rgba(0,144,255,.35)} .pill.fil .dot{background:var(--fil)}
+.pill.ipfs{background:var(--ipfs-bg);color:var(--text);border-color:rgba(105,196,205,.5)} .pill.ipfs .dot{background:var(--ipfs)}
+.pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.ok .dot{background:var(--ok)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.warn .dot{background:var(--warn)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.bad .dot{background:var(--bad)}
+.pill.neutral{background:var(--surface-2);color:var(--muted)}
+.wallet{font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+.screen{display:none;padding:32px 24px 36px}
+.screen[data-active]{display:block}
+.screen-head{display:flex;flex-wrap:wrap;gap:12px;align-items:end;justify-content:space-between;margin-bottom:20px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.lede{color:var(--muted);max-width:62ch;margin-top:4px}
+
+.grid{display:grid;gap:16px}
+.grid>*{min-width:0}
+.grid.two{grid-template-columns:1fr 1fr}
+.grid.wide{grid-template-columns:1.6fr 1fr}
+@media (max-width:900px){.grid.two,.grid.wide{grid-template-columns:1fr}}
+
+.panel{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:20px;position:relative}
+.panel.aline{padding-left:26px}
+.panel.aline::before{content:"";position:absolute;left:10px;top:18px;bottom:18px;width:4px;border-radius:2px;background:var(--anchor)}
+.panel.sub{background:var(--surface-2);border-color:transparent}
+.panel-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;align-items:baseline}
+.kv dt{color:var(--muted);font-size:12px;white-space:nowrap}
+.kv dd{margin:0;overflow-wrap:anywhere}
+.kv dd.mono{font-size:12px}
+
+.field{display:grid;gap:4px;margin-bottom:12px}
+.field label{font-size:12px;color:var(--muted);font-weight:500}
+.field input,.field select,.field textarea{font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);padding:8px 10px;width:100%}
+.field .hint{font-size:12px;color:var(--faint)}
+
+.btn{border:1px solid var(--line-strong);background:transparent;color:var(--text);border-radius:var(--r);padding:11px 16px;font-family:var(--display);font-weight:700;display:inline-flex;align-items:center;gap:8px}
+.btn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+.btn.ava{background:var(--ava);border-color:var(--ava);color:#fff}
+.btn.fil{background:var(--fil);border-color:var(--fil);color:#fff}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+.tbl-wrap{overflow-x:auto}
+.cid{font-family:var(--mono);font-size:12px;color:var(--text)}
+.cid.dim{color:var(--muted)}
+.cid.short{display:inline-block;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
+.file{display:flex;align-items:center;gap:10px}
+.file .ico{width:28px;height:28px;border-radius:5px;background:var(--surface-2);display:grid;place-items:center;font-family:var(--mono);font-size:9px;color:var(--muted);border:1px solid var(--line)}
+.file .name{font-weight:500}
+.file .meta{font-size:12px;color:var(--faint)}
+
+.callout{border-left:3px solid var(--fil);background:var(--fil-bg);padding:12px 16px;border-radius:0 var(--r) var(--r) 0;font-size:14px}
+.callout strong{font-weight:600}
+.callout.ava{border-left-color:var(--ava);background:var(--ava-bg)}
+
+.checks{display:grid;gap:6px}
+.check{display:flex;align-items:center;gap:10px;font-size:13px}
+.check .ic{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;flex:none}
+.check.ok .ic{background:var(--ok);color:#fff}
+td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(--ok)}
+.check.bad .ic{background:var(--bad);color:#0F1216}
+.check.pending .ic{border:2px solid var(--line-strong);color:transparent}
+.check .who{margin-left:auto;flex:none;font-size:11px;font-family:var(--mono);color:var(--faint);white-space:nowrap}
+.check .who.ava{color:var(--ava-ink)} .check .who.fil{color:var(--fil-ink)} .check .who.ipfs{color:var(--ipfs-ink)}
+
+.verdict{display:flex;align-items:center;gap:20px;padding:20px 24px;border-radius:12px;border:1px solid;background:var(--surface)}
+.verdict.ok{border-color:color-mix(in srgb,var(--ok) 50%,transparent)}
+.verdict.bad{border-color:color-mix(in srgb,var(--bad) 55%,transparent)}
+.verdict .big{font-family:var(--display);font-size:34px;font-weight:800;letter-spacing:-.02em}
+.verdict.ok .big{color:var(--ok)} .verdict.bad .big{color:var(--bad)}
+.verdict .sum{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px}
+.verdict .sum span::before{content:"✓ ";font-weight:700}
+.verdict.ok .sum span::before{color:var(--ok)}
+.verdict.bad .sum span.x::before{content:"✕ ";color:var(--bad)}
+
+.pre{max-width:100%;font-family:var(--mono);font-size:13px;line-height:1.55;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;overflow-x:auto;white-space:pre;color:var(--text);margin:0}
+.pre .k{color:var(--muted)} .pre .s{color:var(--fil-ink)} .pre .n{color:var(--warn)}
+
+.steps{display:grid;gap:0}
+.step{display:grid;grid-template-columns:24px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.step:last-child{border-bottom:0}
+.step .bullet{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:11px;background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.step.done .bullet{background:var(--ok);color:#fff;border-color:var(--ok)}
+.step.active .bullet{border-color:var(--text);color:var(--text)}
+.step .t{font-weight:600}
+.step .d{font-size:12px;color:var(--muted)}
+
+.timeline{position:relative;display:grid;gap:14px;padding-left:22px}
+.timeline::before{content:"";position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--line-strong)}
+.ver{position:relative}
+.ver::before{content:"";position:absolute;left:-19px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--surface);border:2px solid var(--line-strong)}
+.ver.current::before{background:var(--ava);border-color:var(--ava)}
+.ver .head{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:baseline}
+.ver .head .v{font-family:var(--display);font-weight:700}
+.ver .head .when{color:var(--muted);font-size:12px}
+.ver ul{margin:6px 0 0;padding-left:18px;color:var(--muted);font-size:13px}
+.ver ul li.changed{color:var(--text)}
+.ver ul li.changed::after{content:" · updated";color:var(--warn);font-size:11px;font-family:var(--mono)}
+
+.drop{border:1.5px dashed var(--line-strong);border-radius:8px;padding:22px;text-align:center;color:var(--muted);background:var(--surface-2)}
+.drop strong{color:var(--text)}
+.compare{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center}
+.compare>*{min-width:0}
+@media (max-width:760px){.compare{grid-template-columns:1fr}}
+.compare .box{border:1px solid var(--line);border-radius:var(--r);padding:12px;background:var(--surface)}
+.compare .box .cid{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.compare .box .lab{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.compare .neq{font-family:var(--display);font-size:22px;color:var(--bad);text-align:center}
+.diff{font-family:var(--mono);font-size:15px;background:var(--surface-2);border-radius:var(--r);padding:10px 12px;margin-top:10px}
+.diff .del{color:var(--bad);text-decoration:line-through}
+.diff .add{color:var(--ok)}
+
+.veil{position:fixed;inset:0;background:rgba(11,14,20,.55);display:none;place-items:center;z-index:50}
+.veil[data-show]{display:grid}
+.veil .card{background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:22px 26px;min-width:300px;box-shadow:var(--shadow);display:grid;gap:10px}
+.veil .card .t{font-family:var(--display);font-weight:700;font-size:17px;display:flex;align-items:center;gap:10px}
+.veil .card .d{font-size:13px;color:var(--muted)}
+.veil .bar{height:4px;border-radius:2px;background:var(--surface-2);overflow:hidden}
+.veil .bar i{display:block;height:100%;width:0;background:var(--text);transition:width 1.4s linear}
+.veil.ava .bar i{background:var(--ava)} .veil.fil .bar i{background:var(--fil)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:13px;font-weight:500;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s}
+.toast[data-show]{opacity:1}
+
+.notes{max-width:1120px;margin:16px auto 0;border:1px dashed var(--line-strong);border-radius:8px;padding:14px 18px;background:transparent}
+.notes[hidden]{display:none}
+.notes h3{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.notes .n{display:none}
+.notes .n[data-active]{display:block}
+.notes ul{margin:0;padding-left:18px;color:var(--muted);font-size:13px;display:grid;gap:4px}
+.notes li b{color:var(--text);font-weight:600}
+.notes .q{color:var(--warn);font-family:var(--mono);font-size:11px;margin-right:6px}
+
+
+/* ---- record card ---- */
+.rec{background:var(--rec);color:var(--rec-ink);border-radius:12px;padding:24px 24px 20px 30px;position:relative;box-shadow:var(--shadow)}
+.rec::before{content:"";position:absolute;left:12px;top:22px;bottom:22px;width:4px;border-radius:2px;background:var(--anchor-light)}
+.rec .row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.rec .k{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--rec-ink-2);font-weight:600}
+.rec h3{font-size:26px;font-weight:800;margin-top:12px;line-height:1.05;letter-spacing:-.02em}
+.rec .sub{color:var(--rec-ink-2);margin-top:4px;font-size:14px}
+.rec .tri{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;height:4px;margin-top:14px}
+.rec .tri i{display:block;border-radius:2px}.rec .tri .a{background:var(--ava)}.rec .tri .b{background:var(--ipfs)}.rec .tri .c{background:var(--fil)}
+.rec .cid{font-family:var(--mono);font-size:12px;color:var(--rec-ink);word-break:break-all;margin-top:12px;padding:10px 12px;background:#fff;border:1px solid var(--rec-rule);border-radius:6px}
+.rec .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--rec-rule);font-size:13px;color:var(--rec-ink-2)}
+.rtag{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;display:inline-flex;gap:7px;align-items:center;border:1px solid;white-space:nowrap}
+.rtag i{width:7px;height:7px;border-radius:50%;display:inline-block}
+.rtag.ava{color:#B32A2B;border-color:rgba(232,65,66,.4);background:rgba(232,65,66,.08)} .rtag.ava i{background:var(--ava)}
+.rtag.fil{color:#0062B8;border-color:rgba(0,144,255,.45);background:rgba(0,144,255,.08)} .rtag.fil i{background:var(--fil)}
+.rtag.ipfs{color:#378085;border-color:rgba(105,196,205,.55);background:rgba(105,196,205,.14)} .rtag.ipfs i{background:#69C4CD}
+/* ---- proof tiles ---- */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:900px){.tiles{grid-template-columns:1fr 1fr}}
+.tile{background:var(--surface-2);border:1px solid var(--line);border-top:3px solid var(--faint);border-radius:8px;padding:12px 14px;display:grid;gap:4px;align-content:start}
+.tile.ava{border-top-color:var(--ava)} .tile.ipfs{border-top-color:var(--ipfs)} .tile.fil{border-top-color:var(--fil)} .tile.ok{border-top-color:var(--ok)}
+.tile .n{font-family:var(--display);font-weight:800;font-size:20px}
+.tile .t{font-size:13px;color:var(--muted)}
+.tile .who{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.tile.ava .who{color:var(--ava-ink)} .tile.ipfs .who{color:var(--ipfs-ink)} .tile.fil .who{color:var(--fil-ink)} .tile.ok .who{color:var(--ok)}
+/* ---- landing (screen 0) ---- */
+.landing{padding:0}
+.hero{padding:48px 28px 44px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1.05fr .95fr;gap:36px;align-items:center;background:radial-gradient(60% 90% at 100% 50%,var(--fil-bg),transparent 60%),radial-gradient(50% 80% at 0% 0%,var(--ava-bg),transparent 50%)}
+@media (max-width:900px){.hero{grid-template-columns:1fr}}
+.hero .eyebrow{margin-bottom:14px}
+.hero h1{font-size:clamp(30px,4.4vw,50px);line-height:1.02;letter-spacing:-.025em;max-width:14ch}
+.hero .sub{font-size:16px;color:var(--muted);max-width:58ch;margin-top:16px}
+.hero .ctas{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.hero .fine{font-size:12px;color:var(--faint);margin-top:14px}
+.land-sec{padding:28px;border-bottom:1px solid var(--line)}
+.land-sec:last-child{border-bottom:0}
+.land-sec h2{margin-bottom:6px}
+.land-sec .lede{margin-bottom:18px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width:900px){.three{grid-template-columns:1fr}}
+.pillar{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--surface);display:grid;gap:8px;align-content:start;border-top:3px solid var(--line-strong)}
+.pillar.ava{border-top-color:var(--ava)} .pillar.fil{border-top-color:var(--fil)} .pillar.ipfs{border-top-color:var(--ipfs)}
+.pillar .ask{font-family:var(--display);font-weight:700;font-size:16px}
+.pillar .ans{color:var(--muted);font-size:13px}
+.ledger{display:grid;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.ledger .row{display:grid;grid-template-columns:200px 1fr;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+.ledger .row:last-child{border-bottom:0}
+.ledger .row .what{font-weight:600}
+.ledger .row .gap{color:var(--muted);font-size:13px}
+@media (max-width:640px){.ledger .row{grid-template-columns:1fr}}
+.teaser{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center}
+@media (max-width:760px){.teaser{grid-template-columns:1fr}}
+.teaser .box{border:1px solid var(--line);border-radius:8px;padding:14px;background:var(--surface)}
+.teaser .box.bad{border-color:color-mix(in srgb,var(--bad) 60%,transparent)}
+.teaser .lab{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.teaser .box.bad .lab{color:var(--bad)}
+.teaser .line{font-family:var(--mono);font-size:12px;margin-top:8px;padding:6px 8px;background:var(--surface-2);border-radius:4px}
+.teaser .neq{font-family:var(--display);font-size:26px;font-weight:700;color:var(--faint);text-align:center}
+.split{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;align-items:start}
+@media (max-width:900px){.split{grid-template-columns:1fr}}
+.notfor{border-left:3px solid var(--warn);background:var(--warn-bg);padding:10px 14px;border-radius:0 var(--r) var(--r) 0;font-size:13px}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="mockbar">
+  <div>
+    <div class="tag">Click-through mockup · not code</div>
+    <div class="flow" id="flow" aria-label="Screens"></div>
+  </div>
+  <div class="mocktools">
+    <button id="notesToggle" aria-pressed="true">Design notes</button>
+    <button id="prevBtn">← Prev</button>
+    <button id="nextBtn">Next →</button>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <div class="topbar">
+    <button class="brand" data-go="0" style="border:0;background:transparent;color:inherit;padding:0"><span class="mark"></span> Verifiable RWA Records</button>
+    <nav class="nav" aria-label="Views">
+      <button data-view="issuer" aria-current="page">Issuer</button>
+      <button data-view="asset">Asset</button>
+      <button data-view="verify">Verify</button>
+    </nav>
+    <div class="nets">
+      <span class="pill ava"><span class="dot"></span>Avalanche Fuji</span>
+      <span class="pill fil"><span class="dot"></span>Filecoin Calibration</span>
+      <span class="wallet">0x7a3F…9c21</span>
+    </div>
+  </div>
+
+
+  <!-- 0. Landing -->
+  <section class="screen landing" data-screen="0" data-view="landing">
+    <div class="hero">
+      <div>
+      <div class="eyebrow">Reference template · Avalanche + IPFS + Filecoin</div>
+      <h1>Records your token can vouch for</h1>
+      <p class="sub">Anchor every deed, survey, and tax record to the asset on Avalanche. Filecoin proves they are still there. Anyone can check. Fork the template to add it to your own issuer stack.</p>
+      <div class="ctas">
+        <button class="btn primary" data-go="1">Walk through the demo</button>
+        <button class="btn">Fork the template</button>
+      </div>
+      <p class="fine">Synthetic data only. Runs on Avalanche Fuji and Filecoin Calibration testnets.</p>
+      </div>
+      <div class="rec">
+        <div class="row"><span class="k">Property record</span><span class="rtag ava"><i></i>Avalanche · BAL-PROP-001</span></div>
+        <h3>123 Main Street</h3>
+        <div class="sub">Bergen County, NJ · Parcel DEMO-123456 · Version 2</div>
+        <div class="tri"><i class="a"></i><i class="b"></i><i class="c"></i></div>
+        <div class="row" style="margin-top:12px"><span class="k">Record set fingerprint</span><span class="rtag ipfs"><i></i>IPFS</span></div>
+        <div class="cid">bafybeia3qgtjcq3tmvc2jlpc5a3ez2ujvxrvyhmqwj4uwq2evp6k5cu7pe</div>
+        <div class="foot"><span>Deed · Parcel · Tax 2026 · Survey</span><span class="rtag fil"><i></i>Filecoin · proof 38 min ago</span></div>
+      </div>
+    </div>
+
+    <div class="land-sec">
+      <h2>The token is immutable. The evidence behind it usually is not.</h2>
+      <p class="lede">Most tokenized assets point at a URL. A URL says where a file is today. It does not say whether it is the same file, whether it changed, or whether it will be there next year.</p>
+      <div class="ledger">
+        <div class="row"><div class="what">URL in token metadata</div><div class="gap">Anyone who controls the server can swap the file.</div></div>
+        <div class="row"><div class="what">Hash in an internal database</div><div class="gap">Only the issuer can check it.</div></div>
+        <div class="row"><div class="what">Nothing</div><div class="gap">The token trades on trust in the issuer's infrastructure.</div></div>
+      </div>
+    </div>
+
+    <div class="land-sec">
+      <h2>No single point of trust</h2>
+      <p class="lede">Three questions, each answered by a different system. None of them has to trust the others.</p>
+      <div class="three">
+        <div class="pillar ava"><span class="pill ava"><span class="dot"></span>Avalanche</span><div class="ask">Which record set belongs to this asset?</div><div class="ans">The registry stores the manifest reference on the asset. One transaction per version.</div></div>
+        <div class="pillar ipfs"><span class="pill ipfs"><span class="dot"></span>IPFS</span><div class="ask">What does that record set contain?</div><div class="ans">Each file's CID is a fingerprint of its bytes. Change one character and the CID changes.</div></div>
+        <div class="pillar fil"><span class="pill fil"><span class="dot"></span>Filecoin</span><div class="ask">Are the files still stored?</div><div class="ans">Storage providers post proofs of possession on a schedule anyone can check.</div></div>
+      </div>
+    </div>
+
+    <div class="land-sec">
+      <h2>Change one line in a deed and verification fails</h2>
+      <p class="lede">Same filename, different owner line, different fingerprint. The registry never pointed at the second file, so it fails.</p>
+      <div class="teaser">
+        <div class="box"><div class="lab">Deed on record</div><div class="cid">bafybeihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku</div><div class="line">Owner: Example Property LLC</div></div>
+        <div class="neq">≠</div>
+        <div class="box bad"><div class="lab">Deed you were handed</div><div class="cid">bafybeic7kwr5oi2ewaib3wmzgmxbsxnd3y2dtafp7hjoe2dg3cknptavwi</div><div class="line">Owner: Different Property LLC</div></div>
+      </div>
+    </div>
+
+    <div class="land-sec">
+      <div class="split">
+        <div>
+          <h2>Built for issuers already on Avalanche</h2>
+          <p class="lede" style="margin-bottom:12px">Keep your token contract. Add one registry call per version. The template ships a five-file synthetic property, a Fuji registry contract, and a verify screen that reads in about 30 seconds.</p>
+          <div class="ctas" style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" data-go="1">Walk through the demo</button><button class="btn ghost" data-go="5">Skip to Verify</button></div>
+        </div>
+        <div class="notfor"><strong>Not for confidential records.</strong> This template stores public data. Sensitive documents need encryption and key management before storage.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1. Create asset -->
+  <section class="screen" data-screen="1" data-view="issuer">
+    <div class="screen-head">
+      <div>
+        <div class="eyebrow">Issuer · step 1 of 3</div>
+        <h1>Create property asset</h1>
+        <p class="lede">Register an identifiable asset on Avalanche. Offchain records get attached to it in the next step. This is a registry entry, not a security token.</p>
+      </div>
+    </div>
+    <div class="grid wide">
+      <div class="panel">
+        <div class="field"><label for="f-asset">Asset ID</label><input id="f-asset" value="BAL-PROP-001"><span class="hint">Namespaced to your wallet on the registry, so forks never collide.</span></div>
+        <div class="grid two">
+          <div class="field"><label for="f-type">Asset type</label><select id="f-type"><option>real-estate</option><option>vehicle</option><option>equipment</option></select></div>
+          <div class="field"><label for="f-parcel">Parcel ID</label><input id="f-parcel" value="DEMO-123456"></div>
+        </div>
+        <div class="field"><label for="f-addr">Address</label><input id="f-addr" value="123 Main Street"></div>
+        <div class="grid two">
+          <div class="field"><label for="f-jur">Jurisdiction</label><input id="f-jur" value="Bergen County, NJ"></div>
+          <div class="field"><label for="f-issuer">Issuer</label><input id="f-issuer" value="Demo RWA Issuer"></div>
+        </div>
+        <div class="actions">
+          <button class="btn ava" data-go="2">Register on Avalanche</button>
+          <span class="hint" style="color:var(--faint);font-size:12px">Signs one Fuji transaction · ~2s</span>
+        </div>
+      </div>
+      <div class="panel sub">
+        <div class="panel-title"><h3>What gets written onchain</h3><span class="pill ava"><span class="dot"></span>Avalanche</span></div>
+        <dl class="kv">
+          <dt>Contract</dt><dd class="mono">AssetRecordRegistry · 0x4Bc1…e8F0</dd>
+          <dt>Function</dt><dd class="mono">registerAsset(assetId, metadataCid)</dd>
+          <dt>Stores</dt><dd>Owner, asset ID, current manifest CID, version count</dd>
+          <dt>Does not store</dt><dd>Any document bytes. Those live on IPFS and Filecoin.</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Upload records -->
+  <section class="screen" data-screen="2" data-view="issuer">
+    <div class="screen-head">
+      <div>
+        <div class="eyebrow">Issuer · step 2 of 3</div>
+        <h1>Add asset records</h1>
+        <p class="lede">Each file is fingerprinted into a content identifier before it leaves the browser, then stored on Filecoin with a proof schedule.</p>
+      </div>
+      <span class="pill ok"><span class="dot"></span>BAL-PROP-001 registered · tx 0x91ab…7d3e</span>
+    </div>
+    <div class="callout" style="margin-bottom:16px;border-left-color:var(--ipfs)"><strong>CID = fingerprint of the bytes.</strong> Change one character in a document and its CID changes. The CID is what the manifest and Avalanche will reference, never a URL.</div>
+    <div class="panel">
+      <div class="drop" style="margin-bottom:14px;padding:16px"><strong>Drop records here</strong> or choose files · PDF, JSON, JPG · fingerprinted in your browser before upload</div>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Document</th><th>Type</th><th>Fingerprint (IPFS CID)</th><th>Filecoin</th></tr></thead>
+        <tbody>
+          <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">property.json</div><div class="meta">1.2 KB</div></div></div></td><td>property_metadata</td><td><span class="cid short">bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi</span></td><td><span class="pill ok"><span class="dot"></span>Proving</span></td></tr>
+          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">deed.pdf</div><div class="meta">184 KB</div></div></div></td><td>deed</td><td><span class="cid short">bafybeihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku</span></td><td><span class="pill ok"><span class="dot"></span>Proving</span></td></tr>
+          <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">parcel.json</div><div class="meta">3.4 KB</div></div></div></td><td>parcel_record</td><td><span class="cid short">bafybeif2ewg7nzsx5lnsjyu4qdtx4gvpqjqvyoxt3dywbcz2nkddp3ppfe</span></td><td><span class="pill ok"><span class="dot"></span>Proving</span></td></tr>
+          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">tax-assessment-2025.pdf</div><div class="meta">96 KB</div></div></div></td><td>tax_assessment</td><td><span class="cid short">bafybeiczsscdsbs7ffqz55asqdf3smv6klcw3gofszvwlyarci47bgf354</span></td><td><span class="pill warn"><span class="dot"></span>Committing onchain</span></td></tr>
+          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">survey.pdf</div><div class="meta">2.1 MB</div></div></div></td><td>survey</td><td><span class="cid short">bafybeibxdpc3xfgzawzkv5zljwi4ns3a4mqvfdgdc6xgtbwmcp2zn5jhpm</span></td><td><span class="pill neutral"><span class="dot" style="background:var(--faint)"></span>Uploading 71%</span></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="actions">
+        <button class="btn ghost">+ Add document</button>
+        <span style="flex:1"></span>
+        <button class="btn primary" data-go="3">Build manifest</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Manifest & anchor -->
+  <section class="screen" data-screen="3" data-view="issuer">
+    <div class="screen-head">
+      <div>
+        <div class="eyebrow">Issuer · step 3 of 3</div>
+        <h1>Anchor the manifest</h1>
+        <p class="lede">The manifest lists every record by its content CID and its Filecoin piece CID. It is stored on Filecoin like any other record. Avalanche keeps the manifest CID plus where Filecoin holds it, so a verifier needs nothing else.</p>
+      </div>
+    </div>
+    <div class="grid wide">
+      <div class="panel aline">
+        <div class="panel-title"><h3>manifest.json · version 1</h3><span class="cid dim">bafybeia3q…u7pe</span></div>
+<pre class="pre">{
+  <span class="k">"assetId"</span>: <span class="s">"BAL-PROP-001"</span>,
+  <span class="k">"version"</span>: <span class="n">1</span>,
+  <span class="k">"createdAt"</span>: <span class="s">"2026-01-10T15:04:00Z"</span>,
+  <span class="k">"records"</span>: [
+    {
+      <span class="k">"type"</span>: <span class="s">"deed"</span>,
+      <span class="k">"filename"</span>: <span class="s">"deed.pdf"</span>,
+      <span class="k">"cid"</span>: <span class="s">"bafybeihdwd…vyku"</span>,
+      <span class="k">"pieceCid"</span>: <span class="s">"bafkzcibca…"</span>
+    },
+    {
+      <span class="k">"type"</span>: <span class="s">"parcel_record"</span>,
+      <span class="k">"filename"</span>: <span class="s">"parcel.json"</span>,
+      <span class="k">"cid"</span>: <span class="s">"bafybeif2ew…ppfe"</span>,
+      <span class="k">"pieceCid"</span>: <span class="s">"bafkzcibcb…"</span>
+    },
+    {
+      <span class="k">"type"</span>: <span class="s">"tax_assessment"</span>,
+      <span class="k">"filename"</span>: <span class="s">"tax-assessment-2025.pdf"</span>,
+      <span class="k">"cid"</span>: <span class="s">"bafybeiczss…f354"</span>,
+      <span class="k">"pieceCid"</span>: <span class="s">"bafkzcibcc…"</span>
+    },
+    {
+      <span class="k">"type"</span>: <span class="s">"survey"</span>,
+      <span class="k">"filename"</span>: <span class="s">"survey.pdf"</span>,
+      <span class="k">"cid"</span>: <span class="s">"bafybeibxdp…jhpm"</span>,
+      <span class="k">"pieceCid"</span>: <span class="s">"bafkzcibcd…"</span>
+    }
+  ],
+  <span class="k">"storage"</span>: {
+    <span class="k">"network"</span>: <span class="s">"filecoin-calibration"</span>,
+    <span class="k">"dataSetId"</span>: <span class="n">1842</span>,
+    <span class="k">"providerId"</span>: <span class="n">12</span>
+  }
+}</pre>
+        <div class="steps" style="margin-top:14px">
+          <div class="step done"><span class="bullet">✓</span><div><div class="t">Manifest stored on Filecoin</div><div class="d">Storage ID 1842 · provider 12 · <span class="mono">bafkzcibce…</span></div></div></div>
+          <div class="step active"><span class="bullet">2</span><div><div class="t">Write manifest reference to Avalanche</div><div class="d">Manifest CID plus its Filecoin storage ID · one Fuji transaction</div></div></div>
+        </div>
+        <div class="actions"><button class="btn ava" data-go="4">Anchor to Avalanche</button></div>
+      </div>
+      <div style="display:grid;gap:16px;align-content:start">
+        <div class="panel sub">
+          <div class="panel-title"><h3>Who vouches for what</h3></div>
+          <div class="checks">
+            <div class="check ok"><span class="ic">✓</span>Which record set belongs to the asset<span class="who ava">AVALANCHE</span></div>
+            <div class="check ok"><span class="ic">✓</span>What that record set contains<span class="who ipfs">IPFS CID</span></div>
+            <div class="check ok"><span class="ic">✓</span>That the bytes are still being stored<span class="who fil">FILECOIN</span></div>
+          </div>
+        </div>
+        <div class="callout ava"><strong>Two identifiers, on purpose.</strong> The IPFS CID is the fingerprint people reference. The Filecoin storage ID (piece CID) is what the proof system tracks. The manifest carries both so a verifier needs nothing else.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Asset page -->
+  <section class="screen" data-screen="4" data-view="asset">
+    <div class="screen-head">
+      <div>
+        <div class="eyebrow">Asset · real-estate</div>
+        <h1>123 Main Street</h1>
+        <p class="lede">Bergen County, NJ · Parcel DEMO-123456 · Issued by Demo RWA Issuer</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span class="pill ok"><span class="dot"></span>All records verified 4 min ago</span>
+        <button class="btn" data-go="5">Verify now</button>
+      </div>
+    </div>
+    <div class="grid two" style="margin-bottom:16px">
+      <div class="panel" style="border-top:3px solid var(--ava)">
+        <div class="panel-title"><h3>Onchain asset</h3><span class="pill ava"><span class="dot"></span>Avalanche Fuji</span></div>
+        <dl class="kv">
+          <dt>Asset ID</dt><dd class="mono">BAL-PROP-001</dd>
+          <dt>Contract</dt><dd class="mono">0x4Bc1…e8F0 <a href="#" onclick="return false">Snowtrace ↗</a></dd>
+          <dt>Owner</dt><dd class="mono">0x7a3F…9c21</dd>
+          <dt>Manifest CID</dt><dd class="mono">bafybeia3q…u7pe <span class="pill neutral" style="margin-left:6px">v2</span></dd>
+          <dt>Anchored</dt><dd>Apr 15, 2026 · tx <span class="mono">0xd04c…21be</span></dd>
+        </dl>
+      </div>
+      <div class="panel" style="border-top:3px solid var(--fil)">
+        <div class="panel-title"><h3>Filecoin storage</h3><span class="pill fil"><span class="dot"></span>Calibration</span></div>
+        <dl class="kv">
+          <dt>Storage ID</dt><dd><span class="mono">1842</span> <a href="#" onclick="return false">Storage proofs ↗</a></dd>
+          <dt>Provider</dt><dd>Provider 12 · <span class="mono">pdp.provider-12.example</span></dd>
+          <dt>Files</dt><dd>5 of 5 committed onchain</dd>
+          <dt>Last proof</dt><dd>38 min ago <span class="mono" style="color:var(--faint)">· epoch 2,913,477</span></dd>
+          <dt>Next proof due</dt><dd>in about 23 h <span class="pill ok" style="padding:1px 7px;margin-left:4px"><span class="dot"></span>on schedule</span></dd>
+        </dl>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title"><h3>Records · version 2</h3><button class="btn ghost" data-go="7" style="padding:4px 10px;font-size:12px">History</button></div>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Document</th><th>Fingerprint</th><th>Integrity</th><th>Retrievable</th><th>Stored</th><th>Last proof</th></tr></thead>
+        <tbody>
+          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">deed.pdf</div><div class="meta">184 KB · unchanged since v1</div></div></div></td><td><span class="cid short">bafybeihdwdcefgh</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
+          <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">parcel.json</div><div class="meta">3.4 KB</div></div></div></td><td><span class="cid short">bafybeif2ewg7nzs</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
+          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">tax-assessment-2026.pdf</div><div class="meta">101 KB · replaced 2025 in v2</div></div></div></td><td><span class="cid short">bafybeigq3lqmxwn</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
+          <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">survey.pdf</div><div class="meta">2.1 MB</div></div></div></td><td><span class="cid short">bafybeibxdpc3xfg</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Verify -->
+  <section class="screen" data-screen="5" data-view="verify">
+    <div class="screen-head">
+      <div>
+        <div class="eyebrow">Verify · anyone, no wallet needed</div>
+        <h1>Verify asset records</h1>
+        <p class="lede">Reads the pointer from Avalanche, fetches the manifest and every record, re-hashes the bytes, and checks the Filecoin proof set. Nothing here trusts the issuer.</p>
+      </div>
+    </div>
+    <div class="grid wide">
+      <div style="display:grid;gap:16px">
+        <div class="verdict ok">
+          <div class="big">VERIFIED</div>
+          <div class="sum"><span>Onchain reference</span><span>Content integrity</span><span>Data available</span><span>Filecoin storage</span></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title"><h3>Per record</h3><span class="cid dim">manifest bafybeia3q…u7pe · v2</span></div>
+          <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Record</th><th>Content matches CID</th><th>Retrievable</th><th>Stored on Filecoin</th><th>Storage proven</th></tr></thead>
+            <tbody>
+              <tr><td class="file"><span class="ico">PDF</span><span class="name">deed.pdf</span></td><td><span class="check ok"><span class="ic">✓</span></span></td><td><span class="check ok"><span class="ic">✓</span></span></td><td><span class="check ok"><span class="ic">✓</span></span></td><td><span class="check ok"><span class="ic">✓</span></span></td></tr>
+              <tr><td class="file"><span class="ico">JSON</span><span class="name">parcel.json</span></td><td><span class="check ok"><span class="ic">✓</span></span></td><td><span class="check ok"><span class="ic">✓</span></span></td><td><span class="check ok"><span class="ic">✓</span></span></td><td><span class="check ok"><span class="ic">✓</span></span></td></tr>
+              <tr><td class="file"><span class="ico">PDF</span><span class="name">tax-assessment-2026.pdf</span></td><td><span class="check ok"><span class="ic">✓</span></span></td><td><span class="check ok"><span class="ic">✓</span></span></td><td><span class="check ok"><span class="ic">✓</span></span></td><td><span class="check ok"><span class="ic">✓</span></span></td></tr>
+              <tr><td class="file"><span class="ico">PDF</span><span class="name">survey.pdf</span></td><td><span class="check ok"><span class="ic">✓</span></span></td><td><span class="check ok"><span class="ic">✓</span></span></td><td><span class="check ok"><span class="ic">✓</span></span></td><td><span class="check ok"><span class="ic">✓</span></span></td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;gap:16px;align-content:start">
+        <div class="panel">
+          <div class="field" style="margin-bottom:8px"><label for="v-asset">Asset to verify</label><input id="v-asset" value="BAL-PROP-001"></div>
+          <div class="tiles" style="grid-template-columns:1fr 1fr">
+            <div class="tile ava"><span class="n">1</span><span class="t">Asset identity read from the registry</span><span class="who">Avalanche</span></div>
+            <div class="tile ipfs"><span class="n">2</span><span class="t">Manifest fingerprint matches the anchored CID</span><span class="who">IPFS</span></div>
+            <div class="tile fil"><span class="n">3</span><span class="t">Storage proof posted 38 min ago</span><span class="who">Filecoin</span></div>
+            <div class="tile ok"><span class="n">4</span><span class="t">All 4 records re-hashed and matched</span><span class="who">Match</span></div>
+          </div>
+          <div class="actions"><button class="btn" data-go="5">Re-run</button><span style="font-size:12px;color:var(--faint)">Took 6.2s</span></div>
+        </div>
+        <div class="panel sub">
+          <div class="panel-title"><h3>Have a document you were handed?</h3></div>
+          <p style="color:var(--muted);font-size:13px;margin-bottom:10px">Check whether a file someone sent you is the one anchored to this asset.</p>
+          <button class="btn primary" data-go="6">Check a document</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Tamper -->
+  <section class="screen" data-screen="6" data-view="verify">
+    <div class="screen-head">
+      <div>
+        <div class="eyebrow">Verify · document check</div>
+        <h1>Check a document against the asset</h1>
+        <p class="lede">The file is hashed locally. If its fingerprint is not in the manifest anchored on Avalanche, it is not the document on record.</p>
+      </div>
+    </div>
+    <div class="grid wide">
+      <div style="display:grid;gap:16px">
+        <div class="verdict bad">
+          <div class="big">FAILED</div>
+          <div class="sum"><span>Onchain reference</span><span class="x">Content integrity</span><span>Data available</span><span>Filecoin storage</span></div>
+        </div>
+        <div class="panel">
+          <p style="margin-bottom:12px"><strong>The document you provided does not match the deed recorded for BAL-PROP-001.</strong> Its fingerprint appears in no version of this asset's manifest.</p>
+          <div class="compare">
+            <div class="box">
+              <div class="lab">Anchored on Avalanche · deed.pdf</div>
+              <div class="cid">bafybeihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku</div>
+              <div class="diff">Owner: Example Property LLC</div>
+            </div>
+            <div class="neq">≠</div>
+            <div class="box" style="border-color:color-mix(in srgb,var(--bad) 60%,transparent)">
+              <div class="lab" style="color:var(--bad)">Your file · deed.pdf</div>
+              <div class="cid">bafybeic7kwr5oi2ewaib3wmzgmxbsxnd3y2dtafp7hjoe2dg3cknptavwi</div>
+              <div class="diff"><span class="del">Owner: Example Property LLC</span><br><span class="add">Owner: Different Property LLC</span></div>
+            </div>
+          </div>
+          <p style="color:var(--muted);font-size:12px;margin-top:12px">Text diff is illustrative and only shown for PDFs with extractable text. The verdict comes from the CID mismatch alone.</p>
+        </div>
+      </div>
+      <div style="display:grid;gap:16px;align-content:start">
+        <div class="panel">
+          <div class="drop"><strong>deed.pdf</strong><br>184 KB · dropped 2s ago<br><span style="font-size:12px">Hashed in your browser. Never uploaded.</span></div>
+          <div class="actions"><button class="btn ghost">Check another file</button></div>
+        </div>
+        <div class="callout ava"><strong>This is tampering, not an update.</strong> A legitimate change publishes a new version and records it on Avalanche. See how that looks in <a href="#" data-go="7">version history</a>.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. History -->
+  <section class="screen" data-screen="7" data-view="asset">
+    <div class="screen-head">
+      <div>
+        <div class="eyebrow">Asset · history</div>
+        <h1>123 Main Street · record history</h1>
+        <p class="lede">Every version is a manifest CID written to Avalanche. Old versions stay independently verifiable. Nothing is overwritten.</p>
+      </div>
+      <button class="btn ava" data-go="2">Publish new version</button>
+    </div>
+    <div class="grid wide">
+      <div class="panel">
+        <div class="timeline">
+          <div class="ver current">
+            <div class="head"><span class="v">Version 2</span><span class="pill ava" style="padding:1px 8px"><span class="dot"></span>current on Avalanche</span><span class="when">Apr 15, 2026 · tx 0xd04c…21be</span></div>
+            <div class="cid dim" style="margin-top:4px">manifest bafybeia3qgtjcq3tmvc2jlpc5a3ez2ujvxrvyhmqwj4uwq2evp6k5cu7pe</div>
+            <ul>
+              <li>deed.pdf</li>
+              <li>parcel.json</li>
+              <li class="changed">tax-assessment-2026.pdf</li>
+              <li>survey.pdf</li>
+            </ul>
+            <div class="actions" style="margin-top:8px"><button class="btn ghost" data-go="5" style="padding:4px 10px;font-size:12px">Verify v2</button></div>
+          </div>
+          <div class="ver">
+            <div class="head"><span class="v">Version 1</span><span class="when">Jan 10, 2026 · tx 0x91ab…7d3e</span></div>
+            <div class="cid dim" style="margin-top:4px">manifest bafybeid5t2ycp6jofqy4gpvzs4oidb7jbewv3fjnuzhtsrdvgw7qgxdh3q</div>
+            <ul>
+              <li>deed.pdf</li>
+              <li>parcel.json</li>
+              <li>tax-assessment-2025.pdf</li>
+              <li>survey.pdf</li>
+            </ul>
+            <div class="actions" style="margin-top:8px"><button class="btn ghost" style="padding:4px 10px;font-size:12px">Verify v1</button></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;gap:16px;align-content:start">
+        <div class="panel sub">
+          <div class="panel-title"><h3>Tampering vs update</h3></div>
+          <dl class="kv">
+            <dt style="color:var(--bad)">Tampering</dt><dd>Changing a record without changing its reference. Verification fails.</dd>
+            <dt style="color:var(--ok)">Update</dt><dd>Publishing a new record and recording a new version onchain. Both versions verify.</dd>
+          </dl>
+        </div>
+        <div class="panel sub">
+          <div class="panel-title"><h3>Source of history</h3><span class="pill ava"><span class="dot"></span>Avalanche</span></div>
+          <p style="font-size:13px;color:var(--muted)">Read from <span class="mono">ManifestUpdated</span> events on the registry. No indexer, no database.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="notes" id="notes">
+  <h3>Design notes · screen <span id="notesNum">1</span></h3>
+  <div class="n" data-n="0"><ul>
+    <li><b>Category first.</b> Headline names the category (verifiable offchain records), the value, and the who (Avalanche RWA issuers) before any feature.</li>
+    <li><b>Order follows the sales narrative:</b> problem, what issuers do today including do-nothing, what a fix looks like, tamper proof, then the offer.</li>
+    <li><b>Identity: Anchor line.</b> One rule from Avalanche red through the record into Filecoin blue. The record card is the hero object. Colors: Avalanche #E84142, IPFS #69C4CD (ipfs-css aqua, #378085 on light), Filecoin #0090FF, verified #1FBF75, failed #F5A524. Schibsted Grotesk, IBM Plex Sans, IBM Plex Mono.</li>
+    <li><span class="q">Q</span>"Fork the template" needs the real repo URL once SgtPooki/placeholder-project-name exists.</li>
+    <li><span class="q">Q</span>Is a partner logo row (Avalanche, Filecoin) wanted here, or does that need clearance first?</li>
+  </ul></div>
+  <div class="n" data-n="1"><ul>
+    <li><b>Registry, not token.</b> The form writes one registry entry. Do we want a token visual anywhere for the Avalanche audience, or is "asset" enough?</li>
+    <li><b>Env key, no wallet connect.</b> Top-right shows an address but there is no connect flow. Shared key funds both Fuji and Calibration. Gemini suggested a "Connect Core Wallet" opener; rejected, it adds a flow the template does not ship.</li>
+    <li><b>Transaction moment.</b> Chain writes show a 1.5s signing overlay in the chain color so the audience sees the write happen. Skipped under reduced motion.</li>
+    <li><b>Asset type dropdown keeps vehicle and equipment.</b> Zero-cost signal that the pattern generalizes beyond real estate (Gemini round 2 agreed).</li>
+  </ul></div>
+  <div class="n" data-n="2"><ul>
+    <li><b>One upload per file.</b> Each record gets its own CID and its own Filecoin status so the per-record checks later are honest.</li>
+    <li><b>Status vocabulary:</b> Uploading → Committing onchain → Proving. "Proving" is the resting state. Avoids claiming a fresh proof that has not landed.</li>
+    <li><span class="q">Q</span>Show piece CIDs in this table too, or keep them in the manifest only?</li>
+  </ul></div>
+  <div class="n" data-n="3"><ul>
+    <li><b>Manifest is a first-class object.</b> Shown raw on purpose. Balcony engineers will want to see the schema, not a summary.</li>
+    <li><b>Anchor writes four things:</b> manifest CID, its piece CID, data set ID, version. That makes a verifier self-sufficient from the Avalanche record.</li>
+    <li><span class="q">Q</span>Is showing the "Who vouches for what" panel here too early, or is this exactly where the story lands?</li>
+  </ul></div>
+  <div class="n" data-n="4"><ul>
+    <li><b>Two cards, two chains.</b> Onchain asset is red-tagged Avalanche, storage is blue-tagged Filecoin. The color rule holds across every screen.</li>
+    <li><b>Proof fields in plain words.</b> "Last proof 38 min ago", "next proof due in 23 h", with epoch numbers demoted to muted mono. Explorer link reads "Storage proofs".</li>
+    <li><span class="q">Q</span>Do we want a property image on this page? PRD lists property.jpg. Cursor's review suggested cutting it first if time is short.</li>
+  </ul></div>
+  <div class="n" data-n="5"><ul>
+    <li><b>Verdict first, evidence below.</b> The 30-second read is the banner plus the four summary checks. Per-record table is for the engineer.</li>
+    <li><b>No wallet on this view.</b> It reads Fuji and Filecoin, and hashes in the browser. That is the "anyone can verify" claim made visible.</li>
+    <li><span class="q">Q</span>Retrieval path: Synapse download by piece CID (reliable) vs public IPFS gateway (better story). Mockup does not commit either way.</li>
+  </ul></div>
+  <div class="n" data-n="6"><ul>
+    <li><b>Tamper is a local file check.</b> Gateways will not serve tampered bytes, so the honest scenario is "someone handed me this PDF". The file never leaves the browser.</li>
+    <li><b>Amber, not Avalanche red.</b> Failure is amber in both themes so the brand color never means "bad".</li>
+    <li><b>Owner-line diff stays.</b> It is the "aha" for a non-technical viewer. Needs PDF text extraction in the build; the disclaimer covers the illustrative case.</li>
+  </ul></div>
+  <div class="n" data-n="7"><ul>
+    <li><b>Timeline from events.</b> History is read straight from registry events. No indexer, which keeps the fork simple.</li>
+    <li><b>Changed rows are marked.</b> Only the tax assessment differs between v1 and v2, and it says so.</li>
+    <li><b>"Publish new version" reopens the upload step pre-filled.</b> A separate diff flow is overkill for the demo.</li>
+  </ul></div>
+</div>
+
+<div class="veil" id="veil" aria-live="polite"><div class="card"><div class="t"><span class="pill ava" id="veilPill"><span class="dot"></span>Avalanche</span><span id="veilTitle">Signing transaction</span></div><div class="d" id="veilDesc"></div><div class="bar"><i id="veilBar"></i></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  var screens = [
+    {n:0,label:'Overview'},{n:1,label:'Create asset'},{n:2,label:'Upload records'},{n:3,label:'Anchor manifest'},
+    {n:4,label:'Asset page'},{n:5,label:'Verify'},{n:6,label:'Tamper'},{n:7,label:'History'}
+  ];
+  var txs = {2:{chain:'ava',title:'Signing on Avalanche',desc:'registerAsset(BAL-PROP-001) · Fuji'},3:{chain:'fil',title:'Storing on Filecoin',desc:'manifest.json → provider 12 · storage ID 1842'},4:{chain:'ava',title:'Signing on Avalanche',desc:'setManifest(BAL-PROP-001, bafybeia3q…u7pe) · Fuji'}};
+  var toasts = {2:'Registered BAL-PROP-001 on Avalanche Fuji',3:'Manifest stored on Filecoin',4:'Manifest anchored · tx 0xd04c…21be',5:'Verification complete',6:'Fingerprint mismatch'};
+  var cur = 1;
+  var flow = document.getElementById('flow');
+  screens.forEach(function(s){
+    var b = document.createElement('button');
+    b.innerHTML = '<span class="n">'+s.n+'</span>'+s.label;
+    b.addEventListener('click',function(){ go(s.n,false); });
+    b.dataset.n = s.n; flow.appendChild(b);
+  });
+  function go(n, fromCta){
+    n = Math.max(0, Math.min(7, n));
+    cur = n;
+    document.querySelectorAll('.screen').forEach(function(el){
+      if (+el.dataset.screen === n) el.setAttribute('data-active',''); else el.removeAttribute('data-active');
+    });
+    var view = document.querySelector('.screen[data-screen="'+n+'"]').dataset.view;
+    document.querySelectorAll('.nav button').forEach(function(b){
+      if (b.dataset.view === view) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current');
+    });
+    flow.querySelectorAll('button').forEach(function(b){
+      if (+b.dataset.n === n) b.setAttribute('aria-current','step'); else b.removeAttribute('aria-current');
+    });
+    document.querySelectorAll('.notes .n').forEach(function(el){
+      if (+el.dataset.n === n) el.setAttribute('data-active',''); else el.removeAttribute('data-active');
+    });
+    document.getElementById('notesNum').textContent = n;
+    if (fromCta && toasts[n]) toast(toasts[n]);
+    if (fromCta && txs[n]) txmoment(txs[n]);
+    try { localStorage.setItem('rwa-mock-screen', String(n)); } catch(e){}
+    document.getElementById('app').scrollIntoView({block:'start',behavior:'auto'});
+  }
+  var veil = document.getElementById('veil');
+  function txmoment(tx){
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+    veil.className = 'veil ' + tx.chain;
+    var pill = document.getElementById('veilPill'); pill.className = 'pill ' + tx.chain; pill.innerHTML = '<span class="dot"></span>' + (tx.chain === 'ava' ? 'Avalanche' : 'Filecoin');
+    document.getElementById('veilTitle').textContent = tx.title;
+    document.getElementById('veilDesc').textContent = tx.desc;
+    var bar = document.getElementById('veilBar'); bar.style.width = '0';
+    veil.setAttribute('data-show','');
+    requestAnimationFrame(function(){ bar.style.width = '100%'; });
+    setTimeout(function(){ veil.removeAttribute('data-show'); }, 1500);
+  }
+  var toastEl = document.getElementById('toast'), tt;
+  function toast(msg){ toastEl.textContent = msg; toastEl.setAttribute('data-show',''); clearTimeout(tt); tt = setTimeout(function(){ toastEl.removeAttribute('data-show'); }, 2200); }
+  document.addEventListener('click', function(e){
+    var t = e.target.closest('[data-go]'); if (!t) return;
+    e.preventDefault(); go(+t.dataset.go, true);
+  });
+  document.querySelectorAll('.nav button').forEach(function(b){
+    b.addEventListener('click', function(){
+      var first = {issuer:1, asset:4, verify:5}[b.dataset.view]; go(first,false);
+    });
+  });
+  document.getElementById('prevBtn').addEventListener('click', function(){ go(cur-1,false); });
+  document.getElementById('nextBtn').addEventListener('click', function(){ go(cur+1,false); });
+  var notes = document.getElementById('notes'), nt = document.getElementById('notesToggle');
+  nt.addEventListener('click', function(){
+    var on = nt.getAttribute('aria-pressed') === 'true';
+    nt.setAttribute('aria-pressed', on ? 'false' : 'true'); notes.hidden = on;
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 'ArrowRight') go(cur+1,false); if (e.key === 'ArrowLeft') go(cur-1,false);
+  });
+  var start = 0; try { var st = localStorage.getItem('rwa-mock-screen'); if (st !== null) start = +st; } catch(e){}
+  go(start,false);
+})();
+</script>
