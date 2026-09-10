@@ -10,3 +10,4 @@ contracts/broadcast/
 .research/
 .slopcheck/
 __screenshots__/
+.vitest-attachments/
