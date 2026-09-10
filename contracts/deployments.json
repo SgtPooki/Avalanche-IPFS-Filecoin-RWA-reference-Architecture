@@ -1,0 +1,12 @@
+{
+  "avalanche-fuji": {
+    "chainId": 43113,
+    "rpc": "https://api.avax-test.network/ext/bc/C/rpc",
+    "explorer": "https://testnet.snowtrace.io",
+    "AssetRecordRegistry": {
+      "address": "0x7fdfdb7F166A3dEE947A5533e20B8E5Ce8c80863",
+      "deployer": "0x44f08D1beFe61255b3C3A349C392C560FA333759",
+      "deployedAt": "2026-09-10"
+    }
+  }
+}

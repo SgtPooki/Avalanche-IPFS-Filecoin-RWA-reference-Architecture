@@ -4,3 +4,6 @@ node_modules/
 !.env.example
 dist/
 .DS_Store
+contracts/out/
+contracts/cache/
+contracts/broadcast/
