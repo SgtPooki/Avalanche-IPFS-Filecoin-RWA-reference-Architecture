@@ -1,15 +1,4 @@
-/**
- * Verify an asset against both chains.
- *
- * The claim the whole template makes, on one screen. It reads the pointer from
- * Avalanche, fetches the manifest and every record from Filecoin, re-hashes
- * them, and reads the storage proofs. It holds no key and asks the issuer for
- * nothing.
- *
- * The verdict comes first and the evidence follows, because the thirty-second
- * read is "did this pass", and the per-record table is for whoever wants to
- * know why.
- */
+// Display the verdict and per-record evidence from both public networks.
 
 import { useCallback, useState } from 'react'
 import type { Address, PublicClient } from 'viem'
@@ -106,7 +95,7 @@ function Running({ progress }: { progress: VerifyProgress }) {
   return (
     <>
       <div className="verdict">
-        <div className="big">CHECKING</div>
+        <div className="big">Checking</div>
         <div className="sub">{progress.message}</div>
       </div>
       {progress.total > 0 && (
@@ -123,7 +112,7 @@ function Verdict({ verdict, seconds }: { verdict: AssetVerdict; seconds: number 
     <>
       <div className="verdict">
         {/* Amber, never red: the brand colour must not come to mean "bad". */}
-        <div className={verdict.verified ? 'big ok' : 'big bad'}>{verdict.verified ? 'VERIFIED' : 'FAILED'}</div>
+        <div className={verdict.verified ? 'big ok' : 'big bad'}>{verdict.verified ? 'Verified' : 'Failed'}</div>
         <div className="sub">
           version {verdict.anchor?.version} · checked in {seconds.toFixed(1)}s
         </div>

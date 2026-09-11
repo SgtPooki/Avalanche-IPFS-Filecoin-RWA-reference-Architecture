@@ -1,16 +1,4 @@
-/*
- * Lifted from mockup/index.html rather than rewritten.
- *
- * The mockup is the approved design and its CSS already handles both themes,
- * the anchor-line rule, and the record card. Reinterpreting it in a component
- * library would cost days and lose decisions nobody wrote down. What is gone
- * from it: the click-through chrome (.screen, .flow, .notes, .mock-head), which
- * belongs to the mockup's own navigation and not to the app.
- *
- * Light is the default and does not follow the operating system, so the
- * recording looks the same whatever the machine is set to. Dark is
- * data-theme="dark".
- */
+/* Shared identity tokens and components from the approved mockup. */
 
 :root{
   --bg:#F5F6F8; --surface:#FFFFFF; --surface-2:#EEF1F4; --line:#DDE1E6; --line-strong:#B9C0C9;
@@ -238,11 +226,11 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
 
 .verdict .sum{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px}
 
-.verdict .sum span::before{content:"✓ ";font-weight:700}
+.verdict .sum span::before{content:"\2713 ";font-weight:700}
 
 .verdict.ok .sum span::before{color:var(--ok)}
 
-.verdict.bad .sum span.x::before{content:"✕ ";color:var(--bad)}
+.verdict.bad .sum span.x::before{content:"\00d7 ";color:var(--bad)}
 
 .pre{max-width:100%;font-family:var(--mono);font-size:13px;line-height:1.55;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;overflow:auto;max-height:520px;white-space:pre;color:var(--text);margin:0}
 
@@ -469,8 +457,8 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
 
 /* App shell. The mockup drew this inside its own screen chrome, which did not
    come across with the rest of the stylesheet. */
-.app { max-width: 1120px; margin: 0 auto; }
-.top { display: flex; align-items: center; gap: 10px; padding: 18px 0 24px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.app { max-width: 1120px; margin: 0 auto; border: 0; border-radius: 0; box-shadow: none; background: transparent; overflow: visible; }
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 18px 0 24px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
 .brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; }
 .brand .mark { width: 4px; height: 22px; border-radius: 2px; background: var(--anchor); }
 .drop { display: block; width: 100%; text-align: center; padding: 34px 18px; border: 1px dashed var(--line-strong); border-radius: var(--r); background: var(--surface-2); color: var(--text); }
@@ -485,3 +473,36 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
 .nav button { background: none; border: 0; padding: 6px 12px; border-radius: 6px; color: var(--muted); font-weight: 500; }
 .nav button[aria-current="page"] { color: var(--text); background: var(--surface-2); }
 .verdict .big { font-family: var(--display); font-weight: 800; font-size: 34px; letter-spacing: -.02em; color: var(--text); }
+
+.screen-head { margin-bottom: 20px; }
+.record-identity { margin: 24px 0; padding: 18px 0; border-block: 1px solid var(--line); }
+.anchor-details { margin: 16px 0; }
+.record-note { margin: 16px 0; }
+.record-history { margin-top: 24px; gap: 28px; grid-template-columns: minmax(0, 1fr); }
+.record-history .ver { padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+.records-table { margin-block: 18px; min-width: 740px; }
+.records-table .meta { color: var(--muted); font-size: 12px; }
+.manifest-json { margin-top: 16px; }
+.manifest-json summary { cursor: pointer; margin-bottom: 10px; }
+.records-table .linklike { min-width: 80px; }
+.records-table td { overflow-wrap: normal; }
+main, section, .split > *, .verdict, .verdict > * { min-width: 0; }
+section, .sub { overflow-wrap: anywhere; }
+.panel { border-radius: 8px; }
+.panel .verdict { border: 0; padding: 0 0 16px; background: transparent; }
+.top .chains { flex-wrap: wrap; }
+.nav { margin-left: 0; flex-wrap: wrap; }
+.verdict { flex-wrap: wrap; }
+*, .verdict .big { letter-spacing: 0; }
+.eyebrow, th { text-transform: none; }
+@media (max-width: 600px) {
+  body { padding-inline: 12px; }
+  h1 { font-size: 28px; }
+  .top .chains { margin-left: 0; }
+  .top .nav { width: 100%; }
+  .nav button { padding: 6px 9px; }
+  .kv { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .kv dd { margin-bottom: 10px; }
+  .panel { padding: 16px; }
+  .verdict .big { font-size: 28px; }
+}

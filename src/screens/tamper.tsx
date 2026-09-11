@@ -1,14 +1,4 @@
-/**
- * Check a document against the asset.
- *
- * The file is hashed in the browser and never uploaded. That is not a
- * convenience, it is the scenario: a gateway will not serve tampered bytes, so
- * the only way anyone holds a doctored deed is that a person handed it to them.
- *
- * This screen needs no key, no funds, and no writes. It is also the only screen
- * that works with both chains unreachable, which makes it the right first thing
- * to build: if the CID comes out right here, the browser bundle is sound.
- */
+// Hash the local file, then look for its CID in the published history.
 
 import { useCallback, useRef, useState } from 'react'
 import { computeFileCid } from '../lib/cid.js'
@@ -86,7 +76,7 @@ export function TamperScreen({ assetId, lookup, ready, onOpenHistory }: TamperSc
               {check.state === 'hashing'
                 ? `Hashing ${check.filename}…`
                 : check.state === 'searching'
-                  ? `${check.cid} — looking for it in every version anchored on Avalanche…`
+                  ? `${check.cid}: looking for it in every version anchored on Avalanche...`
                   : check.state === 'failed'
                     ? `Could not read ${check.filename}: ${check.message}`
                     : ready
@@ -136,7 +126,7 @@ function Verdict({
     <>
       <div className="verdict">
         {/* Amber, never red: the brand colour must not come to mean "bad". */}
-        <div className={onRecord ? 'big ok' : 'big bad'}>{onRecord ? 'ON RECORD' : 'FAILED'}</div>
+        <div className={onRecord ? 'big ok' : 'big bad'}>{onRecord ? 'On record' : 'Failed'}</div>
         <div className="sub">
           {check.filename} · {check.size.toLocaleString('en-US')} bytes
         </div>

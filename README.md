@@ -15,7 +15,7 @@ npm run verify
 
 The command checks `FAIRVIEW-0031` on Avalanche Fuji and Filecoin Calibration. It prints one row per record: whether the fetched content matches its CID, whether retrieval succeeded, and whether the data set has a current storage proof. A failed check exits with status 1. Network or provider failures can fail verification too; inspect the reported problems before concluding that a document changed.
 
-Run the browser app with `npm run dev`, then visit the local URL Vite prints. Verify and Check a document use the public networks. The committed [seed output](seed-output.json) selects the browser's asset and publisher.
+Run the browser app with `npm run dev`, then visit the local URL Vite prints. Asset shows the current record set; History reads every published version and lets you inspect its manifest and download records. Verify and Check a document use the public networks. The committed [seed output](seed-output.json) selects the browser's asset and publisher.
 
 Try both deeds from the terminal:
 
@@ -90,5 +90,7 @@ npm run build
 ```
 
 The browser tests use headless Chromium. On a new machine, install it with `npx playwright install chromium`. Contract tests run separately with `forge test` from `contracts/`.
+
+With the dev server running, `node scripts/check-app.mjs http://127.0.0.1:5173` checks the live demo's Asset and History screens, downloads the deed, exercises an RPC failure and retry, and saves desktop and mobile screenshots under `/tmp/anchorline-qa`. This network check expects the shared demo's two versions.
 
 See the [build plan](docs/build-plan.md) for implementation decisions and [contracts/README.md](contracts/README.md) for the registry API. AVAX and Avalanche are trademarks of Ava Labs, Inc. Filecoin and IPFS are trademarks of their respective foundations.
