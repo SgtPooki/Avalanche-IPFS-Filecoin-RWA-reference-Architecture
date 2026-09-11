@@ -35,7 +35,7 @@ const LIVE = 'Live: Avalanche Fuji and Filecoin Calibration'
 const MOCKUP = 'Mockup footage: design click-through, not the app'
 
 const say = (text) => ({ text })
-const WAIT_NOTE = 'Still waiting on storage providers. Shown at 2x from here; the verdict prints the real time.'
+const WAIT_NOTE = 'Still waiting on the networks. Shown at 2x until they answer; times printed on screen are real.'
 const SPEED = 2
 
 /**
@@ -142,17 +142,30 @@ async function label(text) {
   }, { text, mockup: text === MOCKUP })
 }
 
-/** Speaks one scene: caption each line and hold it for the clip's length. */
+/**
+ * Speaks one scene: caption each line and hold it for the clip's length. If the
+ * scene's action is still running when the lines end, the wait note goes up
+ * and the window until the action finishes is marked, so the mux can play it
+ * at SPEED. Nothing spoken is ever inside such a window.
+ */
 async function narrate(scene, { until } = {}) {
   const lines = SCRIPT[scene]
-  const pending = until == null ? null : until()
+  let settled = until == null
+  const pending = until == null ? null : until().then(() => { settled = true })
   for (const line of lines) {
     timeline.push({ scene, at: at(), seconds: line.seconds, file: line.file, text: line.text })
     await page.evaluate((text) => { document.getElementById('demo-caption').textContent = text }, line.text)
     await sleep(line.seconds * 1000 + 250)
   }
+  if (pending == null || settled) {
+    await page.evaluate(() => { document.getElementById('demo-caption').textContent = '' })
+    return
+  }
+  await page.evaluate((text) => { document.getElementById('demo-caption').textContent = text }, WAIT_NOTE)
+  timeline.push({ scene: 'wait', at: at(), text: WAIT_NOTE })
+  await pending
+  timeline.push({ scene: 'resume', at: at() })
   await page.evaluate(() => { document.getElementById('demo-caption').textContent = '' })
-  if (pending != null) await pending
 }
 
 function card(title, lines) {
@@ -195,12 +208,7 @@ try {
   await nav('Verify now').click()
   const verifyStarted = at()
   const verified = page.getByText('Verified', { exact: true })
-  await narrate('verifyStart')
-  // Whatever wait is left after the narration is played back at double speed.
-  // The caption says so, and the verdict prints the real elapsed time.
-  await page.evaluate((text) => { document.getElementById('demo-caption').textContent = text }, WAIT_NOTE)
-  timeline.push({ scene: 'wait', at: at(), text: WAIT_NOTE })
-  await verified.waitFor()
+  await narrate('verifyStart', { until: () => verified.waitFor() })
   const verifySeconds = Number((await page.locator('.verdict .sub').first().innerText()).match(/checked in ([\d.]+)s/)?.[1])
   timeline.push({ scene: 'verified', at: at(), verifySeconds, waitedSeconds: at() - verifyStarted })
   // Bring the per-record table into frame; the caption covers the bottom.
@@ -273,24 +281,36 @@ const probe = async (file) => Number((await run('ffprobe', ['-v', 'error', '-sho
 const lead = Math.max(0, (await probe(raw)) - total)
 for (const entry of timeline) entry.at += lead
 
-// The silent part of the Verify wait runs at SPEED. Times after it move up
-// by the amount removed, and the narration clips are placed on the edited
-// timeline, so nothing spoken is touched.
-const wait = timeline.find((entry) => entry.scene === 'wait')
-const verdictEntry = timeline.find((entry) => entry.scene === 'verified')
-const cutFrom = wait.at
-const cutTo = verdictEntry.at
-const removed = (cutTo - cutFrom) * (1 - 1 / SPEED)
-for (const entry of timeline) {
-  if (entry.at >= cutTo) entry.at -= removed
-  else if (entry.at > cutFrom) entry.at = cutFrom + (entry.at - cutFrom) / SPEED
+// Every silent wait window runs at SPEED. Later times move up by the amount
+// removed so far, and the narration clips are placed on the edited timeline,
+// so nothing spoken is touched.
+const windows = []
+for (const [index, entry] of timeline.entries()) {
+  if (entry.scene === 'wait') windows.push({ from: entry.at, to: timeline[index + 1].at })
 }
+let removed = 0
+const segments = []
+let cursor = 0
+for (const window of windows) {
+  segments.push(`trim=start=${cursor}:end=${window.from},setpts=PTS-STARTPTS`)
+  segments.push(`trim=start=${window.from}:end=${window.to},setpts=(PTS-STARTPTS)/${SPEED}`)
+  cursor = window.to
+}
+segments.push(`trim=start=${cursor},setpts=PTS-STARTPTS`)
 const picture = [
-  `[0:v]trim=end=${cutFrom},setpts=PTS-STARTPTS[v0]`,
-  `[0:v]trim=start=${cutFrom}:end=${cutTo},setpts=(PTS-STARTPTS)/${SPEED}[v1]`,
-  `[0:v]trim=start=${cutTo},setpts=PTS-STARTPTS[v2]`,
-  '[v0][v1][v2]concat=n=3:v=1:a=0[v]',
+  ...segments.map((segment, index) => `[0:v]${segment}[v${index}]`),
+  `${segments.map((_, index) => `[v${index}]`).join('')}concat=n=${segments.length}:v=1:a=0[v]`,
 ].join(';')
+for (const entry of timeline) {
+  let shifted = entry.at
+  for (const window of windows) {
+    if (entry.at >= window.to) shifted -= (window.to - window.from) * (1 - 1 / SPEED)
+    else if (entry.at > window.from) shifted -= (entry.at - window.from) * (1 - 1 / SPEED)
+  }
+  entry.at = shifted
+}
+for (const window of windows) removed += (window.to - window.from) * (1 - 1 / SPEED)
+const verdictEntry = timeline.find((entry) => entry.scene === 'verified')
 
 const clips = timeline.filter((entry) => entry.file != null)
 const inputs = clips.flatMap((clip) => ['-i', clip.file])
@@ -311,18 +331,18 @@ await run('ffmpeg', [
 // note is included: it is on screen, so it belongs in the transcript too.
 const stamp = (seconds) => new Date(seconds * 1000).toISOString().slice(11, 23)
 const cues = timeline
-  .filter((entry) => entry.text != null)
-  .map((entry) => ({ from: entry.at, to: entry.scene === 'wait' ? verdictEntry.at : entry.at + entry.seconds, text: entry.text }))
+  .map((entry, index) => ({ entry, next: timeline[index + 1] }))
+  .filter(({ entry }) => entry.text != null)
+  .map(({ entry, next }) => ({ from: entry.at, to: entry.scene === 'wait' ? next.at : entry.at + entry.seconds, text: entry.text }))
 const vtt = ['WEBVTT', '', ...cues.map((cue) => `${stamp(cue.from)} --> ${stamp(cue.to)}\n${cue.text}\n`)].join('\n')
 await writeFile(path.join(output, 'captions.vtt'), vtt)
 await writeFile(
   path.join(output, 'timeline.json'),
-  JSON.stringify({ recordedAt: new Date(started).toISOString(), url, lead, spedUp: { from: cutFrom, to: cutTo - removed, factor: SPEED, removedSeconds: removed }, timeline }, null, 2)
+  JSON.stringify({ recordedAt: new Date(started).toISOString(), url, lead, spedUp: { windows: windows.length, factor: SPEED, removedSeconds: removed }, timeline }, null, 2)
 )
 
 // Poster: the verdict, a beat after Verify finished.
-const verdict = timeline.find((entry) => entry.scene === 'verified')
-await run('ffmpeg', ['-y', '-loglevel', 'error', '-ss', String(verdict.at + 1), '-i', mp4, '-frames:v', '1', path.join(output, 'poster.png')])
+await run('ffmpeg', ['-y', '-loglevel', 'error', '-ss', String(verdictEntry.at + 1), '-i', mp4, '-frames:v', '1', path.join(output, 'poster.png')])
 
 console.log(`wrote ${mp4}`)
-console.log(`  ${(await probe(mp4)).toFixed(1)}s total, verification took ${verdict.verifySeconds}s live, ${removed.toFixed(1)}s of silent waiting removed by playing it at ${SPEED}x`)
+console.log(`  ${(await probe(mp4)).toFixed(1)}s total, verification took ${verdictEntry.verifySeconds}s live, ${removed.toFixed(1)}s of silent waiting removed by playing ${windows.length} windows at ${SPEED}x`)

@@ -2,7 +2,7 @@
 
 A 2-3 minute recording of Anchorline verifying a real-world asset record set on Avalanche Fuji and Filecoin Calibration. Everything on screen is live except one labelled publishing segment, which walks the click-through mockup because storing a record on Filecoin takes about two minutes.
 
-`node scripts/record-demo.mjs` produces the recording from this script with headless Chromium and synthesized narration (macOS `say`, Samantha voice). The narration lines in that script are the ones below; change both together. Every chain read runs at real length except the silent tail of the Verify wait, which plays at double speed under a caption saying so. Total running time still moves with provider response times: takes on 2026-09-11 ran from 3:06 to 4:23 before that edit.
+`node scripts/record-demo.mjs` produces the recording from this script with headless Chromium and synthesized narration (macOS `say`, Samantha voice). The narration lines in that script are the ones below; change both together. Every chain read runs at real length while its narration plays. Where a read outlasts its narration, the silent remainder plays at double speed under a caption saying so. Total running time still moves with provider response times: uncut takes on 2026-09-11 ran from 3:06 to 4:23.
 
 ## Disclosures
 
@@ -10,7 +10,7 @@ State these on screen, not only here.
 
 - The title card says the narration is synthesized speech reading a written script.
 - A label in the top right reads "Live: Avalanche Fuji and Filecoin Calibration" for the app segments and switches to "Mockup footage: design click-through, not the app" for the publishing segment.
-- The Verify wait is real time while the narration runs. Whatever is left plays at 2x under the caption "Still waiting on storage providers. Shown at 2x from here; the verdict prints the real time." The verdict's `checked in Ns` is the unedited figure. `timeline.json` records how many seconds the edit removed.
+- Any wait that outlasts its narration plays at 2x under the caption "Still waiting on the networks. Shown at 2x until they answer; times printed on screen are real." The verdict's `checked in Ns` is the unedited figure. `timeline.json` records how many windows were sped up and how many seconds that removed.
 - All documents are synthetic. There is no 123 Main Street in Fairview County.
 
 ## Shot list
@@ -31,7 +31,7 @@ Open the app, click Asset. The record set loads from both chains while the line 
 
 ### 3. Verify, live
 
-Click Verify, then Verify now. Progress stays on screen for the whole read, 42 to 81 seconds in the takes so far. The three lines play at the start of the wait; the rest of the wait shows the progress counter at 2x with the disclosure caption.
+Click Verify, then Verify now. Progress stays on screen for the whole read, 42 to 81 seconds in the takes so far. The three lines play at the start of the wait; any remainder shows the progress counter at 2x with the disclosure caption.
 
 > Verify needs no wallet, no account, and no key. It reads the pointer from Avalanche, fetches the manifest and every record from Filecoin, re-hashes each one, and reads the storage proof state for the data set.
 
@@ -45,7 +45,7 @@ When the verdict lands, scroll so the per-record table is in frame.
 
 ### 4. Check a document, both deeds
 
-Click Check a document and choose `data/deed.pdf`. The lookup reads every anchored version, about 15 seconds.
+Click Check a document and choose `data/deed.pdf`. The lookup fetches each anchored version's manifest, newest first, and stops at the first match: 12 to 18 seconds in the takes so far. The doctored deed matches nothing, so it reads every version: 20 to 35 seconds.
 
 > Now someone hands you a deed. Drop it in. It is hashed in the browser and never uploaded, then looked for in every version anchored on Avalanche.
 
@@ -79,4 +79,4 @@ Clone and verify commands, the no-key statement, and the bridge credit.
 
 ## Output
 
-The recorder writes `anchorline-demo.mp4`, `poster.png`, `captions.vtt` and `timeline.json` to the output directory, `recording/` by default. `timeline.json` records when each line started in the finished picture, how long the live verification took, and the span played at 2x; `npm run share -- recording` builds the share page from it and from `seed-output.json`, so the chapter times and identifiers on the page come from the take rather than from hand-typed values.
+The recorder writes `anchorline-demo.mp4`, `poster.png`, `captions.vtt` and `timeline.json` to the output directory, `recording/` by default. `timeline.json` records when each line started in the finished picture, how long the live verification took, and the windows played at 2x; `npm run share -- recording` builds the share page from it and from `seed-output.json`, so the chapter times and identifiers on the page come from the take rather than from hand-typed values.

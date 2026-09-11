@@ -25,7 +25,7 @@ interface TimelineEntry {
 }
 interface Timeline {
   recordedAt: string
-  spedUp: { factor: number; removedSeconds: number }
+  spedUp: { windows: number; factor: number; removedSeconds: number }
   timeline: TimelineEntry[]
 }
 const take = JSON.parse(await readFile(path.resolve(outDir, 'timeline.json'), 'utf8')) as Timeline
@@ -281,7 +281,7 @@ npm run verify</pre>
 
   <div class="card">
     <h2>About the ${verifySeconds} seconds of waiting</h2>
-    <p>Most of it is storage providers answering. The narration runs over it in real time; the silent ${take.spedUp.removedSeconds.toFixed(0) === '0' ? 'remainder' : `remainder plays at ${take.spedUp.factor}x under a caption saying so, which removed ${take.spedUp.removedSeconds.toFixed(1)} seconds`}. The verdict on screen prints the unedited time. Anchoring on Avalanche takes about four seconds. Storing a record on Filecoin takes about two minutes, which is why an asset is published ahead of a demo and never during one, and why the publishing segment walks the design mockup instead of the app.</p>
+    <p>Most of it is storage providers answering. The narration runs over every chain read in real time. Where a read outlasts its narration, the silent remainder plays at ${take.spedUp.factor}x under a caption saying so: ${take.spedUp.windows} such windows in this take, ${take.spedUp.removedSeconds.toFixed(1)} seconds removed in total. Every time printed on screen is unedited. Anchoring on Avalanche takes about four seconds. Storing a record on Filecoin takes about two minutes, which is why an asset is published ahead of a demo and never during one, and why the publishing segment walks the design mockup instead of the app.</p>
     <p class="fine">Synthetic data throughout. There is no 123 Main Street in Fairview County and there is no Example State. The tampered deed exists only on disk; its fingerprint <span class="mono">${escape(
       short(seed.tamperedDeedCid, 10, 6)
     )}</span> appears in no version and was never uploaded anywhere.</p>
