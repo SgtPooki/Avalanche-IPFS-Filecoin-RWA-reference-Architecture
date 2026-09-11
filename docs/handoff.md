@@ -1,6 +1,6 @@
 # Handoff
 
-You are finishing anchorline, a forkable worked example for the Avalanche Summit in New York, Sept 16-17 2026. The recording must exist by the evening of Monday Sept 15. Repo: `/Users/sgtpooki/code/work/filoz/sgtpooki/anchorline`, public at `https://github.com/SgtPooki/anchorline`, branch `main`.
+You are finishing anchorline, a forkable worked example for the Avalanche Summit in New York, Sept 16-17 2026. The recording must exist by the evening of Tuesday Sept 15. Repo: `/Users/sgtpooki/code/work/filoz/sgtpooki/anchorline`, public at `https://github.com/SgtPooki/anchorline`, branch `main`.
 
 Read these first and treat them as settled: `docs/build-plan.md` (deliverables, architecture decisions, identity, writing rules, order of work, what changed since the plan, and a "Where it stands" section), `README.md`, `contracts/README.md`, `mockup/index.html` with its design-notes drawer, and `.research/` for local-only background that must never be quoted in public text.
 
@@ -15,7 +15,7 @@ Do not rebuild any of this. It has run against real testnets, not in theory.
 - The demo asset is seeded on both chains with two versions. `seed-output.json` is committed and the app reads it.
 - End to end verification, read-only and with no key. `npm run verify` prints a per-record table and a verdict.
 - The tamper check both ways. `npm run verify -- FAIRVIEW-0031 --file data/deed-tampered.pdf` is refused; the real deed is found on record.
-- The app has two screens, Verify and Tamper, both against live chains.
+- The app has four screens, Asset, Verify, Check a document and History, all against live chains.
 - 148 tests across four vitest projects: `node`, `browser` (playwright chromium), `profile`, `files`.
 
 The demo asset is `FAIRVIEW-0031` under `0x44f08D1beFe61255b3C3A349C392C560FA333759`. The registry is `0x7fdfdb7F166A3dEE947A5533e20B8E5Ce8c80863` on Fuji, deployed at block 58303958. Do not redeploy it and do not change `AssetRecordRegistry.sol`.
@@ -28,13 +28,17 @@ Measured, not estimated. They are why the demo is shaped the way it is.
 - Verifying: 43 to 85 seconds, most of it storage providers answering. Live, with progress on screen.
 - Storing one record on Filecoin: about 2 minutes. Never live. Seeding takes about 12 minutes.
 
-## What is left, in the order I would do it
+## What is done since this was written
 
-1. **Rewrite the README as "how to add verifiable offchain records to an Avalanche RWA."** The largest gap. It still says the app is in progress and has no fork map. A forker needs to be told: replace `scripts/lib/dataset.ts` and the record type strings to change domain, keep `src/lib/` as is, add a chain to `contracts/deployments.json` to move networks, run `npm run seed`, open Verify. Say plainly that verifying needs no key and no funds and that publishing needs both. Carry a blunt warning that the env-file key is a demo pattern.
-2. **Asset and History screens.** Both read-only and cheap. History makes "nothing is overwritten" concrete. Do not build the issuer upload flow: uploads take two minutes and can never be live, so that part of the recording is narrated over the mockup.
-3. **A written 2-3 minute demo script**, then re-record. There is already a recording at `scripts/build-share-page.ts` output; treat it as a draft.
-4. **An architecture diagram.** Team review showed that what is stored where is the thing people fail to grasp.
-5. **The timed fresh-clone run** against the 30-minute target. Time verifying and publishing separately: verifying needs no funds, publishing needs faucets and is largely outside our control.
+Everything the original list asked for is done and pushed. Details live in the files named.
+
+1. README rewritten as the fork guide, with the fork map and `docs/architecture.svg` embedded.
+2. Asset and History screens, live and read-only. The issuer upload flow stays in the mockup by decision.
+3. `docs/demo-script.md` and `scripts/record-demo.mjs`, which records headlessly with synthesized narration. `npm run share -- recording` wraps the take, reading chapter times from the take's `timeline.json`.
+4. The architecture diagram.
+5. The timed fresh-clone run, in `docs/fresh-clone-run.md`.
+
+The verifier used to keep running after printing its verdict; `scripts/verify.ts` now exits once the last line has flushed. If a wall-clock timing differs from the printed one by minutes again, that is the place to look.
 
 ## Hard rules
 

@@ -1,18 +1,22 @@
 # Build plan
 
-Target: a forkable worked example shown at the Avalanche Summit, New York, Sept 16-17, 2026. The recording must exist by the evening of Monday Sept 15. Everything below is agreed; do not relitigate it. Open questions are listed at the end.
+Target: a forkable worked example shown at the Avalanche Summit, New York, Sept 16-17, 2026. The recording must exist by the evening of Tuesday Sept 15. Everything below is agreed; do not relitigate it. Open questions are listed at the end.
 
-## Where it stands, 2026-09-11
+## Where it stands, 2026-09-11 evening
 
 Working and proven against live testnets, not planned:
 
-- The whole verification path. Read the manifest pointer off Avalanche Fuji, fetch every record from Filecoin Calibration, re-hash each one, read the storage proofs. No key, no account, nothing asked of the issuer. `npm run verify` does it from a terminal in about a minute.
+- The whole verification path. Read the manifest pointer off Avalanche Fuji, fetch every record from Filecoin Calibration, re-hash each one, read the storage proofs. No key, no account, nothing asked of the issuer. `npm run verify` does it from a terminal in about a minute and exits when the verdict prints.
 - The tamper check. A deed with one name changed comes back as not a document of record; the real deed comes back as on record. It also works in a browser, where the file is hashed locally and never uploaded.
 - Storage. One record stored on Calibration takes about two minutes, comes back as a CAR, extracts to the original bytes, and re-hashes to the CID it went up under. Proof state reads back with a real last-proven time.
 - Anchoring. Two versions written to the registry on Fuji, read back with history and transaction hashes. A write confirms in about four seconds.
 - The demo asset is seeded on both chains with two versions, so nothing in the recording waits on a storage provider.
+- The app has four screens: Asset, Verify, Check a document, and History, all read-only against both chains.
+- The README is the "how to add verifiable offchain records to an Avalanche RWA" guide with a fork map, and it embeds `docs/architecture.svg`.
+- The demo script is `docs/demo-script.md`; `scripts/record-demo.mjs` records it headlessly with synthesized narration and `scripts/build-share-page.ts` wraps the take.
+- The timed fresh-clone run is written up in `docs/fresh-clone-run.md`.
 
-Not built yet: most of the app screens, the README rewrite, the architecture diagram, the demo script, and the timed fresh-clone run. The app currently has the tamper screen only.
+Not built, by decision: the issuer upload screens. They exist in the mockup only, and the recording narrates publishing over that mockup with a label saying so.
 
 Timings worth knowing, because they decide what can be live on stage: storing a record is about two minutes, so publishing is narrated and never live. Verifying is about a minute, so it is live. Anchoring is about four seconds, so it is live.
 
@@ -73,8 +77,8 @@ Audience, settled 2026-09-11: Avalanche RWA issuers in general, not any one comp
 2. Done. `lib/filecoin.ts` against Calibration: upload, `pieceStatus`, download, re-hash.
 3. Done. `lib/avalanche.ts`: viem client for the registry, plus history. The plan said read history from logs; the contract also has a `history()` view, so the versions come from the view in one call and the logs are read only to attach a transaction hash to each. No indexer either way.
 4. Done. Seed script producing the demo asset with v1 and v2.
-5. In progress. App screens. Verify first, then Issuer, then Asset and History.
-6. Not started. README, diagram, demo script, fresh-clone timing.
+5. Done. App screens: Verify, Check a document, Asset, History. The issuer screens stay in the mockup.
+6. Done. README, diagram, demo script and recorder, fresh-clone timing.
 
 ## Not in scope
 
