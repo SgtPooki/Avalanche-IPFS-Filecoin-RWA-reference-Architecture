@@ -14,7 +14,9 @@
     "test:unit": "vitest run --project node --project browser",
     "test:files": "vitest run --project files",
     "spike:calibration": "tsx --env-file=.env scripts/spike-calibration.ts",
-    "spike:fuji": "tsx --env-file=.env scripts/spike-fuji.ts"
+    "spike:fuji": "tsx --env-file=.env scripts/spike-fuji.ts",
+    "seed": "tsx --env-file=.env scripts/seed.ts",
+    "verify": "tsx scripts/verify.ts"
   },
   "dependencies": {
     "@filoz/synapse-sdk": "^2.0.0",
