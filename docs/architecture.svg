@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="820" viewBox="0 0 1240 820" font-family="'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="14" fill="#0F1216">
+  <title>Anchorline architecture: what is stored where, and who reads what</title>
+  <desc>An issuer stores record bytes with a Filecoin storage provider and anchors one manifest pointer per version on Avalanche. IPFS CIDs name the content on both sides. A verifier reads the pointer from Avalanche, fetches and re-hashes the bytes from the provider, and reads data set proof state from Filecoin. The registry never reads Filecoin.</desc>
+  <defs>
+    <marker id="ava" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#B32A2B"/></marker>
+    <marker id="fil" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#0062B8"/></marker>
+    <marker id="ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#4B5563"/></marker>
+    <linearGradient id="anchor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E84142"/><stop offset=".26" stop-color="#E84142"/>
+      <stop offset=".26" stop-color="#B9C0C9"/><stop offset=".74" stop-color="#B9C0C9"/>
+      <stop offset=".74" stop-color="#0090FF"/><stop offset="1" stop-color="#0090FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="1240" height="820" fill="#F5F6F8"/>
+
+  <!-- Title -->
+  <rect x="40" y="36" width="5" height="52" rx="2" fill="url(#anchor)"/>
+  <text x="58" y="58" font-size="24" font-weight="700">What is stored where</text>
+  <text x="58" y="82" fill="#4B5563">Avalanche holds pointers and history. Filecoin providers hold bytes. Filecoin's chain holds proof state. IPFS CIDs name the content everywhere.</text>
+
+  <!-- Issuer -->
+  <g>
+    <rect x="40" y="150" width="220" height="132" rx="10" fill="#FFFFFF" stroke="#DDE1E6"/>
+    <text x="60" y="180" font-size="16" font-weight="700">Issuer</text>
+    <text x="60" y="202" fill="#4B5563">One funded account, holds the</text>
+    <text x="60" y="220" fill="#4B5563">only key in the system.</text>
+    <text x="60" y="246" fill="#4B5563">Publishes; the browser app</text>
+    <text x="60" y="264" fill="#4B5563">never signs anything.</text>
+  </g>
+
+  <!-- Verifier -->
+  <g>
+    <rect x="40" y="560" width="220" height="150" rx="10" fill="#FFFFFF" stroke="#DDE1E6"/>
+    <text x="60" y="590" font-size="16" font-weight="700">Verifier</text>
+    <text x="60" y="612" fill="#4B5563">Anyone. No key, no account,</text>
+    <text x="60" y="630" fill="#4B5563">no funds. Reads both chains</text>
+    <text x="60" y="648" fill="#4B5563">and hashes bytes locally.</text>
+    <text x="60" y="678" font-family="'IBM Plex Mono', ui-monospace, Menlo, monospace" font-size="12.5">npm run verify</text>
+    <text x="60" y="696" font-family="'IBM Plex Mono', ui-monospace, Menlo, monospace" font-size="12.5">Verify screen in the app</text>
+  </g>
+
+  <!-- Avalanche -->
+  <g>
+    <rect x="360" y="130" width="380" height="240" rx="10" fill="#FFFFFF" stroke="#B32A2B" stroke-width="1.5"/>
+    <rect x="360" y="130" width="380" height="34" rx="10" fill="#B32A2B"/>
+    <rect x="360" y="154" width="380" height="10" fill="#B32A2B"/>
+    <text x="378" y="153" fill="#FFFFFF" font-size="13" font-weight="600" letter-spacing=".04">AVALANCHE FUJI C-CHAIN</text>
+    <text x="378" y="190" font-size="15" font-weight="700">AssetRecordRegistry</text>
+    <text x="378" y="212" fill="#4B5563">Keyed by publisher address and asset id.</text>
+    <text x="378" y="230" fill="#4B5563">Append-only versions, each holding:</text>
+    <g font-family="'IBM Plex Mono', ui-monospace, Menlo, monospace" font-size="12.5">
+      <text x="396" y="254">manifestCid        (IPFS CID)</text>
+      <text x="396" y="272">manifestPieceCid   (Filecoin piece)</text>
+      <text x="396" y="290">dataSetId, publishedAt</text>
+    </g>
+    <text x="378" y="320" fill="#4B5563">Stores no document bytes and never</text>
+    <text x="378" y="338" fill="#4B5563">reads Filecoin. Proof checks happen in the</text>
+    <text x="378" y="356" fill="#4B5563">verifier, not in the contract.</text>
+  </g>
+
+  <!-- IPFS CIDs band -->
+  <g>
+    <rect x="360" y="410" width="380" height="96" rx="10" fill="#FFFFFF" stroke="#378085" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <text x="378" y="436" font-size="13" font-weight="600" fill="#378085" letter-spacing=".04">IPFS CONTENT IDENTIFIERS</text>
+    <text x="378" y="458" fill="#4B5563">A CID is the hash of the bytes. Change one byte</text>
+    <text x="378" y="476" fill="#4B5563">and the CID changes. A CID names content; it does</text>
+    <text x="378" y="494" fill="#4B5563">not by itself promise that anyone still stores it.</text>
+  </g>
+
+  <!-- Filecoin storage provider -->
+  <g>
+    <rect x="820" y="130" width="380" height="240" rx="10" fill="#FFFFFF" stroke="#0062B8" stroke-width="1.5"/>
+    <rect x="820" y="130" width="380" height="34" rx="10" fill="#0062B8"/>
+    <rect x="820" y="154" width="380" height="10" fill="#0062B8"/>
+    <text x="838" y="153" fill="#FFFFFF" font-size="13" font-weight="600" letter-spacing=".04">FILECOIN CALIBRATION, STORAGE PROVIDER</text>
+    <text x="838" y="190" font-size="15" font-weight="700">The bytes, one piece per file</text>
+    <g font-family="'IBM Plex Mono', ui-monospace, Menlo, monospace" font-size="12.5">
+      <text x="856" y="216">manifest.json        stored last</text>
+      <text x="856" y="234">property.json        deed.pdf</text>
+      <text x="856" y="252">parcel.json          survey.pdf</text>
+      <text x="856" y="270">tax-assessment-2026.pdf</text>
+    </g>
+    <text x="838" y="300" fill="#4B5563">Each record has an IPFS CID for its content</text>
+    <text x="838" y="318" fill="#4B5563">and a piece CID for retrieval and proofs.</text>
+    <text x="838" y="336" fill="#4B5563">The manifest lists both for every record,</text>
+    <text x="838" y="354" fill="#4B5563">plus SHA-256, size and media type.</text>
+  </g>
+
+  <!-- Filecoin chain proof state -->
+  <g>
+    <rect x="820" y="410" width="380" height="150" rx="10" fill="#FFFFFF" stroke="#0062B8" stroke-width="1.5"/>
+    <rect x="820" y="410" width="380" height="34" rx="10" fill="#0062B8"/>
+    <rect x="820" y="434" width="380" height="10" fill="#0062B8"/>
+    <text x="838" y="433" fill="#FFFFFF" font-size="13" font-weight="600" letter-spacing=".04">FILECOIN CALIBRATION, ONCHAIN PROOF STATE</text>
+    <text x="838" y="470" font-size="15" font-weight="700">Data set proofs (PDP)</text>
+    <g font-family="'IBM Plex Mono', ui-monospace, Menlo, monospace" font-size="12.5">
+      <text x="856" y="496">dataSetLastProven, dataSetNextProofDue</text>
+      <text x="856" y="514">isProofOverdue</text>
+    </g>
+    <text x="838" y="542" fill="#4B5563">Belongs to the data set a piece sits in, not to each file.</text>
+  </g>
+
+  <!-- Issuer publishes: 1 store, 2 anchor -->
+  <path d="M260 190 C 300 190, 300 110, 360 110 L 780 110 C 800 110, 810 130, 820 160" fill="none" stroke="#0062B8" stroke-width="2" marker-end="url(#fil)"/>
+  <text x="520" y="104" fill="#0062B8" font-size="13" font-weight="600">1. Store each record, then the manifest. About two minutes per record.</text>
+
+  <path d="M260 236 L 360 236" fill="none" stroke="#B32A2B" stroke-width="2" marker-end="url(#ava)"/>
+  <text x="268" y="228" fill="#B32A2B" font-size="13" font-weight="600">2. setManifest</text>
+  <text x="268" y="256" fill="#4B5563" font-size="12.5">about 4 s</text>
+
+  <!-- CIDs: the manifest CID on Avalanche names the manifest bytes on Filecoin -->
+  <path d="M740 262 L 820 262" fill="none" stroke="#378085" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#ink)"/>
+  <text x="746" y="252" fill="#378085" font-size="12" font-weight="600">same CID</text>
+
+  <!-- Verifier reads: a, b, c -->
+  <path d="M150 560 L 150 500 C 150 470, 180 470, 300 470 L 300 300 L 360 300" fill="none" stroke="#B32A2B" stroke-width="2" marker-end="url(#ava)"/>
+  <text x="150" y="440" fill="#B32A2B" font-size="13" font-weight="600">a. Read latest pointer</text>
+  <text x="150" y="458" fill="#B32A2B" font-size="13" font-weight="600">and version history</text>
+
+  <path d="M260 600 L 780 600 C 800 600, 805 590, 805 570 L 805 330 L 820 330" fill="none" stroke="#0062B8" stroke-width="2" marker-end="url(#fil)"/>
+  <text x="290" y="574" fill="#0062B8" font-size="13" font-weight="600">b. Fetch the manifest and every record by piece CID,</text>
+  <text x="290" y="592" fill="#0062B8" font-size="13" font-weight="600">re-hash the bytes, compare with the CIDs on Avalanche</text>
+
+  <path d="M260 650 L 790 650 C 810 650, 812 640, 812 620 L 812 500 L 820 500" fill="none" stroke="#0062B8" stroke-width="2" marker-end="url(#fil)"/>
+  <text x="290" y="672" fill="#0062B8" font-size="13" font-weight="600">c. Read proof state for each record's data set</text>
+
+  <!-- Legend / verdict -->
+  <rect x="360" y="700" width="840" height="100" rx="10" fill="#FFFFFF" stroke="#DDE1E6"/>
+  <text x="378" y="726" font-weight="700">Verified means all three held.</text>
+  <text x="378" y="748" fill="#4B5563">The fetched manifest hashes to the CID on Avalanche. Every record hashes to the CID in that manifest.</text>
+  <text x="378" y="766" fill="#4B5563">Every data set holding a record has a current proof.</text>
+  <text x="378" y="788" fill="#4B5563">Matching bytes prove a document is the one published under that account. They do not prove its contents are true.</text>
+</svg>

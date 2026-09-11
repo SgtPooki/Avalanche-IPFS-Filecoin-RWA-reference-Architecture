@@ -30,6 +30,10 @@ The original appears in the published history. The doctored copy changes the own
 
 Avalanche holds the manifest's IPFS CID, its Filecoin piece CID and data set id, and an append-only version history. Filecoin providers hold the manifest and record bytes. IPFS CIDs identify content; they do not by themselves promise storage or availability.
 
+![Architecture: the issuer stores bytes with a Filecoin provider and anchors a manifest pointer on Avalanche; the verifier reads the pointer from Avalanche, re-hashes the bytes from Filecoin, and reads data set proof state from Filecoin](docs/architecture.svg)
+
+The verifier reads both networks. The registry stores pointers and never reads Filecoin, so a proof check is a client-side act, not a contract guarantee. Inspect the live pieces yourself: the [registry on Snowtrace](https://testnet.snowtrace.io/address/0x7fdfdb7F166A3dEE947A5533e20B8E5Ce8c80863), the [demo data set on the PDP explorer](https://pdp.filecoin.cloud/calibration/dataset/54), and the [Synapse SDK](https://github.com/FilOzone/synapse-sdk) that reads `pieceStatus` for proof times. Snowtrace answers browsers, not curl.
+
 The manifest lists each file's name, type, content CID, piece CID, data set id, SHA-256 digest, size, and media type. Verification starts with the Avalanche pointer, checks the fetched manifest against that CID, then retrieves and checks each record. Filecoin proof times describe the data set holding a piece, not a separate proof timestamp for each file.
 
 The example has two versions. Version 2 replaces the 2025 tax assessment with the 2026 assessment and reuses the other four records. The registry retains both manifest pointers. Keeping a pointer does not guarantee that its bytes will remain retrievable forever: storage must stay funded and providers must remain available.
