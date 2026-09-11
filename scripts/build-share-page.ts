@@ -1,12 +1,13 @@
 /**
  * Build the page that wraps the demo recording.
  *
- * Generated from `seed-output.json` rather than written by hand, so every
- * address, CID and transaction hash on the page is the one actually on chain.
- * A share page whose identifiers do not match the asset is worse than no share
- * page: the audience for this checks.
+ * Generated from `seed-output.json` and the recording's `timeline.json` rather
+ * than written by hand, so every address, CID and transaction hash on the page
+ * is the one actually on chain, and every chapter time is the moment that
+ * narration line started in the take. A share page whose identifiers do not
+ * match the asset is worse than no share page: the audience for this checks.
  *
- *   npm run share -- <dir containing anchorline-demo.mp4 and poster.png>
+ *   npm run share -- <dir written by scripts/record-demo.mjs>
  */
 
 import { readFile, writeFile } from 'node:fs/promises'
@@ -15,6 +16,22 @@ import seed from '../seed-output.json' with { type: 'json' }
 
 const outDir = process.argv[2]
 if (outDir == null) throw new Error('usage: npm run share -- path/to/dir')
+
+interface TimelineEntry {
+  scene: string
+  at: number
+  text?: string
+  verifySeconds?: number
+}
+interface Timeline {
+  recordedAt: string
+  spedUp: { factor: number; removedSeconds: number }
+  timeline: TimelineEntry[]
+}
+const take = JSON.parse(await readFile(path.resolve(outDir, 'timeline.json'), 'utf8')) as Timeline
+const verified = take.timeline.find((entry) => entry.scene === 'verified')
+if (verified?.verifySeconds == null) throw new Error('timeline.json has no verified entry; record the demo first')
+const verifySeconds = verified.verifySeconds
 
 const REPO = 'https://github.com/SgtPooki/anchorline'
 
@@ -90,16 +107,22 @@ const olderVersions = earlier
   )
   .join('\n')
 
-const CHAPTERS: Array<[seconds: number, label: string, text: string]> = [
-  [0, '0:00', 'Verify runs. Reads the pointer from Avalanche, pulls five records from Filecoin, re-hashes each one.'],
-  [
-    70,
-    '1:10',
-    'Verified in 68.6 seconds. Every record: the bytes hash to the CID the manifest lists, they are retrievable, and Filecoin proof state is current.',
-  ],
-  [95, '1:35', 'The real deed, dropped in. Hashed in the browser, found on record.'],
-  [130, '2:10', 'The same deed with one name changed. Different fingerprint, in no version anchored on Avalanche. Refused.'],
-]
+/** One chapter per scene, at the second its first narration line started. */
+const CHAPTER_TEXT: Record<string, string> = {
+  asset: 'The asset. Avalanche holds the pointer, Filecoin providers hold the bytes.',
+  verifyStart: 'Verify runs. Reads the pointer from Avalanche, pulls five records from Filecoin, re-hashes each one.',
+  verifyDone: `Verified in ${verifySeconds} seconds. Every record: the bytes hash to the CID the manifest lists, they are retrievable, and Filecoin proof state is current.`,
+  deed: 'The real deed, dropped in. Hashed in the browser, found on record.',
+  tampered: 'The same deed with one name changed. Different fingerprint, in no version anchored on Avalanche. Refused.',
+  history: 'History. Version 1 is still there. Nothing is overwritten.',
+  publish: 'Publishing, narrated over the design mockup. Storing a record takes about two minutes, so it is never live.',
+}
+const clock = (seconds: number): string => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`
+const CHAPTERS: Array<[seconds: number, label: string, text: string]> = Object.entries(CHAPTER_TEXT).map(([scene, text]) => {
+  const entry = take.timeline.find((candidate) => candidate.scene === scene)
+  if (entry == null) throw new Error(`timeline.json has no ${scene} scene`)
+  return [Math.floor(entry.at), clock(entry.at), text]
+})
 
 const chapters = CHAPTERS.map(
   ([seconds, label, text]) =>
@@ -190,17 +213,19 @@ const html = `<!doctype html>
 <main>
   <div class="eyebrow">
     <span>anchorline</span>
-    <span>recorded ${escape(seed.seededAt.slice(0, 10))}</span>
+    <span>recorded ${escape(take.recordedAt.slice(0, 10))}</span>
     <span>Avalanche Fuji · Filecoin Calibration</span>
     <a href="${REPO}" target="_blank" rel="noopener noreferrer">github.com/SgtPooki/anchorline</a>
   </div>
 
   <h1>Verifiable offchain records for an Avalanche RWA</h1>
-  <p class="lede">A forkable worked example. Documents live on Filecoin and are addressed by their IPFS CID, a manifest CID is anchored on Avalanche, and anyone can check the whole chain of custody by reading both networks directly. Nothing below is mocked, and nothing here uses an issuer key.</p>
+  <p class="lede">A forkable worked example. Documents live on Filecoin and are addressed by their IPFS CID, a manifest CID is anchored on Avalanche, and anyone can check the whole chain of custody by reading both networks directly. Every app segment is live against public testnets and uses no key. The publishing segment is labelled mockup footage. The narration is synthesized speech reading <a href="${REPO}/blob/main/docs/demo-script.md" target="_blank" rel="noopener noreferrer">the written script</a>.</p>
 
   <div class="fold">
     <div class="player">
-      <video controls preload="metadata" poster="poster.png" src="anchorline-demo.mp4"></video>
+      <video controls preload="metadata" poster="poster.png" src="anchorline-demo.mp4">
+        <track kind="captions" src="captions.vtt" srclang="en" label="Narration" default>
+      </video>
       <div class="chapters">
 ${chapters}
       </div>
@@ -250,13 +275,13 @@ ${olderVersions}
     <p class="fine">Verifying needs no wallet, no account, and no key. It reads two public chains and hashes bytes.</p>
     <pre>git clone ${REPO}
 cd anchorline
-npm install
+npm ci
 npm run verify</pre>
   </div>
 
   <div class="card">
-    <h2>About the minute of waiting</h2>
-    <p>Most of it is storage providers answering. It is left in rather than cut, because it is what a verifier actually experiences. Anchoring on Avalanche takes about four seconds. Storing a record on Filecoin takes about two minutes, which is why an asset is published ahead of a demo and never during one.</p>
+    <h2>About the ${verifySeconds} seconds of waiting</h2>
+    <p>Most of it is storage providers answering. The narration runs over it in real time; the silent ${take.spedUp.removedSeconds.toFixed(0) === '0' ? 'remainder' : `remainder plays at ${take.spedUp.factor}x under a caption saying so, which removed ${take.spedUp.removedSeconds.toFixed(1)} seconds`}. The verdict on screen prints the unedited time. Anchoring on Avalanche takes about four seconds. Storing a record on Filecoin takes about two minutes, which is why an asset is published ahead of a demo and never during one, and why the publishing segment walks the design mockup instead of the app.</p>
     <p class="fine">Synthetic data throughout. There is no 123 Main Street in Fairview County and there is no Example State. The tampered deed exists only on disk; its fingerprint <span class="mono">${escape(
       short(seed.tamperedDeedCid, 10, 6)
     )}</span> appears in no version and was never uploaded anywhere.</p>
@@ -282,10 +307,11 @@ const target = path.resolve(outDir, 'index.html')
 await writeFile(target, html)
 
 // Fail loudly rather than shipping a page whose media is missing.
-for (const asset of ['anchorline-demo.mp4', 'poster.png']) {
+for (const asset of ['anchorline-demo.mp4', 'poster.png', 'captions.vtt']) {
   await readFile(path.resolve(outDir, asset)).catch(() => {
     throw new Error(`${asset} is missing from ${outDir}`)
   })
 }
 console.log(`wrote ${target}`)
 console.log(`  ${latest.records.length} records, ${seed.versions.length} versions, all identifiers from seed-output.json`)
+console.log(`  ${CHAPTERS.length} chapters from timeline.json, verification took ${verifySeconds}s in the take`)

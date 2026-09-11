@@ -11,3 +11,4 @@ contracts/broadcast/
 .slopcheck/
 __screenshots__/
 .vitest-attachments/
+recording/
