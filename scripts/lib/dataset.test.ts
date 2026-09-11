@@ -22,7 +22,7 @@ import { computeFileCid } from '../../src/lib/cid.js'
 import { buildDataset } from './dataset.js'
 
 const EXPECTED: Array<[name: string, cid: string, size: number]> = [
-  ['property.json', 'bafkreicyjmgjewfnasg7cmornjvtyk7qoebpsqt4u3v4iwskht6njthd6u', 507],
+  ['property.json', 'bafkreihat6nlbeqgljfbwzsfv6zcnutl4m44bgdehd67ejokoypsmlyw3e', 472],
   ['deed.pdf', 'bafkreidh5qsi5z6uo2thzvynr27ioajoviafqiveunrielhugyj65l6rzu', 2816],
   ['parcel.json', 'bafkreiejmexovymgvlxps3hpq6ez3ac5sjridcypurprugtsseggslaqiq', 1188],
   ['tax-assessment-2025.pdf', 'bafkreiek7fjuel7opibeayam6cfnww54pmyaez2cetk2i3rbpkcsjydkke', 2131],

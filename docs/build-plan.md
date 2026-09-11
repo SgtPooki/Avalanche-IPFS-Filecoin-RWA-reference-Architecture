@@ -2,6 +2,20 @@
 
 Target: a forkable worked example shown at the Avalanche Summit, New York, Sept 16-17, 2026. The recording must exist by the evening of Monday Sept 15. Everything below is agreed; do not relitigate it. Open questions are listed at the end.
 
+## Where it stands, 2026-09-11
+
+Working and proven against live testnets, not planned:
+
+- The whole verification path. Read the manifest pointer off Avalanche Fuji, fetch every record from Filecoin Calibration, re-hash each one, read the storage proofs. No key, no account, nothing asked of the issuer. `npm run verify` does it from a terminal in about a minute.
+- The tamper check. A deed with one name changed comes back as not a document of record; the real deed comes back as on record. It also works in a browser, where the file is hashed locally and never uploaded.
+- Storage. One record stored on Calibration takes about two minutes, comes back as a CAR, extracts to the original bytes, and re-hashes to the CID it went up under. Proof state reads back with a real last-proven time.
+- Anchoring. Two versions written to the registry on Fuji, read back with history and transaction hashes. A write confirms in about four seconds.
+- The demo asset is seeded on both chains with two versions, so nothing in the recording waits on a storage provider.
+
+Not built yet: most of the app screens, the README rewrite, the architecture diagram, the demo script, and the timed fresh-clone run. The app currently has the tamper screen only.
+
+Timings worth knowing, because they decide what can be live on stage: storing a record is about two minutes, so publishing is narrated and never live. Verifying is about a minute, so it is live. Anchoring is about four seconds, so it is live.
+
 ## Deliverables
 
 From the PRD, in the order they unblock each other:
@@ -49,20 +63,22 @@ python3 ~/.claude/skills/writing-core/scripts/writingcheck.py writing-docs <file
 
 Commit messages are subject and body only. No trailers, no tool attribution.
 
-Positioning: credit the May 2025 Avalanche and Filecoin bridge as the first connection between the networks, then say what this adds. Do not claim to be first, and do not grade the earlier work; the notes in the gitignored `.research/` folder hold the detail. The issuer stays the record of authority. Name ransomware survivability once. Do not describe Balcony's storage architecture; they have not published one.
+Positioning: credit the May 2025 Avalanche and Filecoin bridge as the first connection between the networks, then say what this adds. Do not claim to be first, and do not grade the earlier work; the notes in the gitignored `.research/` folder hold the detail. The issuer stays the record of authority. Name ransomware survivability once.
+
+Audience, settled 2026-09-11: Avalanche RWA issuers in general, not any one company. Marketed as RWAs on Avalanche, and legible to a reader as how to use IPFS and Filecoin for real-world asset records anywhere. Individual issuers are examples at most. Do not write copy aimed at one of them, do not speak for their architecture, and do not assume what they do or do not already store. An issuer who already content-addresses their documents should read this and see the part they are missing; an issuer pointing at a URL should read it and see the whole pattern. It has to work for both.
 
 ## Order of work
 
-1. Dataset generator and `lib/manifest.ts`. Confirm the browser-computed file CID equals the CAR root CID that filecoin-pin produces for the same file. This equality is what makes the tamper check honest. If they differ, the manifest must carry both and the verifier compares the raw-bytes CID.
-2. `lib/filecoin.ts` against Calibration: upload one record, read `pieceStatus`, download and re-hash. Script only, no UI.
-3. `lib/avalanche.ts`: viem client for the registry, read history from logs.
-4. Seed script producing the demo asset with v1 and v2.
-5. App screens in mockup order. Verify first, then Issuer, then Asset and History.
-6. README, diagram, demo script, fresh-clone timing.
+1. Done. Dataset generator and `lib/manifest.ts`. The browser-computed file CID equals the CAR root CID filecoin-pin produces for the same file, checked against a CID built from the CID and multihash specs rather than against another library.
+2. Done. `lib/filecoin.ts` against Calibration: upload, `pieceStatus`, download, re-hash.
+3. Done. `lib/avalanche.ts`: viem client for the registry, plus history. The plan said read history from logs; the contract also has a `history()` view, so the versions come from the view in one call and the logs are read only to attach a transaction hash to each. No indexer either way.
+4. Done. Seed script producing the demo asset with v1 and v2.
+5. In progress. App screens. Verify first, then Issuer, then Asset and History.
+6. Not started. README, diagram, demo script, fresh-clone timing.
 
 ## Not in scope
 
-A Balcony clone, a token standard, KYC, payments beyond storage funding, encryption, private data, a wallet-connect flow, an indexer, a hosted deployment, mainnet claims.
+A clone of any particular issuer's product, a token standard, KYC, payments beyond storage funding, encryption, private data, a wallet-connect flow, an indexer, a hosted deployment, mainnet claims.
 
 ## Telemetry
 
@@ -106,6 +122,10 @@ contract is fixed. The UI says there is one role rather than inventing a second.
 
 - Light by default, from team feedback on 2026-09-10 that the black and neon boards read wrong and the county-clerk treatment reads right. The mockup already carried the light tokens; the change was which one is the default.
 - No `version` in the manifest, from peer review. The registry owns version numbering.
+- `dataSetId` moved into each record rather than sitting once at the top of the manifest. Nothing guarantees a batch of uploads lands in one data set: a provider can seal one partway through and put the rest elsewhere. A manifest naming a single data set for everything would be wrong about the later records, and they would fail verification while being perfectly intact. `storage` at the top level stays as the network and provider hint; per record is what proofs are read against.
+- `parseManifest` refuses unknown fields rather than ignoring them. A manifest is hashed and anchored, so everything in it is part of what the issuer signed for.
+- The registry asset id is no longer written into `property.json`. The key is where a record set is filed, not a fact about the property, and baking it into a document coupled the two: changing the key changed the file, changed its CID, and forced the whole asset to be stored again.
+- Fuji C-Chain stays the demo network. The contract is plain EVM and runs on an Avalanche L1 unchanged, but a private L1 would break the claim the demo is making, because nobody watching could independently check anything on it. `contracts/deployments.json` is keyed by chain so a fork points at its own.
 
 ## Open questions
 

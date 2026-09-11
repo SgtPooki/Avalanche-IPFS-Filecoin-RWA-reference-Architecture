@@ -9,7 +9,7 @@ import { registryAbi } from './registry-abi.js'
 
 function anchor(overrides: Partial<AnchorInput> = {}): AnchorInput {
   return {
-    assetId: 'FAIRVIEW-PROP-0031',
+    assetId: 'FAIRVIEW-0031',
     manifestCid: 'bafkreimanifestbytes',
     manifestPieceCid: 'bafkzcibcamanifest',
     dataSetId: 1842,

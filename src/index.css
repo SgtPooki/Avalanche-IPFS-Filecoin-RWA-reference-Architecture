@@ -479,3 +479,5 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
 .verdict .big.ok { color: var(--ok); }
 .verdict .big.bad { color: var(--bad); }
 .linklike { background: none; border: 0; padding: 0; color: var(--fil-ink); text-decoration: underline; font: inherit; }
+.top .chains { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.dim { color: var(--faint); }

@@ -29,6 +29,17 @@ export type RecordType = (typeof RECORD_TYPES)[number]
 export interface ManifestRecord {
   /** UnixFS CID of the file bytes, as computed by `computeFileCid`. */
   cid: string
+  /**
+   * The Filecoin data set proving this piece.
+   *
+   * Per record, not per asset. Nothing guarantees a batch of uploads lands in
+   * one data set: a provider can seal one partway through and put the rest
+   * somewhere else. A manifest that named a single data set for everything
+   * would then be wrong about the later records, and they would fail
+   * verification with "this data set does not hold piece X" while being
+   * perfectly intact.
+   */
+  dataSetId: number
   filename: string
   mimeType: string
   /** Filecoin piece CID returned by the upload. */
@@ -92,20 +103,37 @@ function field<T>(source: Record<string, unknown>, key: string, kind: 'string' |
   return value as T
 }
 
-function asObject(value: unknown, where: string): Record<string, unknown> {
+function asObject(value: unknown, where: string, allowedKeys?: readonly string[]): Record<string, unknown> {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) {
     throw new ManifestError(`${where} must be an object`)
   }
-  return value as Record<string, unknown>
+  const object = value as Record<string, unknown>
+
+  // Unknown keys are refused rather than ignored. A manifest is hashed and
+  // anchored; anything inside it is part of what the issuer signed for, and
+  // silently dropping a field means the document on Filecoin and the document
+  // this code believes in are not the same document.
+  if (allowedKeys != null) {
+    const unknown = Object.keys(object).filter((key) => !allowedKeys.includes(key))
+    if (unknown.length > 0) {
+      throw new ManifestError(`${where} has unknown field${unknown.length > 1 ? 's' : ''} ${unknown.join(', ')}`)
+    }
+  }
+  return object
 }
+
+const RECORD_KEYS = ['cid', 'dataSetId', 'filename', 'mimeType', 'pieceCid', 'sha256', 'size', 'type'] as const
+const STORAGE_KEYS = ['dataSetId', 'network', 'providerId'] as const
+const MANIFEST_KEYS = ['assetId', 'records', 'schemaVersion', 'storage'] as const
 
 const SHA256_HEX = /^[0-9a-f]{64}$/
 
 function parseRecord(value: unknown, index: number): ManifestRecord {
   const where = `records[${index}]`
-  const source = asObject(value, where)
+  const source = asObject(value, where, RECORD_KEYS)
   const record: ManifestRecord = {
     cid: field(source, 'cid', 'string', where),
+    dataSetId: field(source, 'dataSetId', 'number', where),
     filename: field(source, 'filename', 'string', where),
     mimeType: field(source, 'mimeType', 'string', where),
     pieceCid: field(source, 'pieceCid', 'string', where),
@@ -122,6 +150,9 @@ function parseRecord(value: unknown, index: number): ManifestRecord {
   if (!Number.isInteger(record.size) || record.size < 0) {
     throw new ManifestError(`${where}.size must be a whole number of bytes, got ${record.size}`)
   }
+  if (!Number.isInteger(record.dataSetId) || record.dataSetId <= 0) {
+    throw new ManifestError(`${where}.dataSetId must be a positive whole number, got ${record.dataSetId}`)
+  }
   if (record.cid === '') throw new ManifestError(`${where}.cid must not be empty`)
   if (record.pieceCid === '') throw new ManifestError(`${where}.pieceCid must not be empty`)
 
@@ -129,7 +160,7 @@ function parseRecord(value: unknown, index: number): ManifestRecord {
 }
 
 function parseStorage(value: unknown): ManifestStorage {
-  const source = asObject(value, 'storage')
+  const source = asObject(value, 'storage', STORAGE_KEYS)
   return {
     dataSetId: field(source, 'dataSetId', 'number', 'storage'),
     network: field(source, 'network', 'string', 'storage'),
@@ -153,7 +184,7 @@ export function parseManifest(source: string | Uint8Array): Manifest {
     throw new ManifestError(`manifest is not JSON: ${(cause as Error).message}`)
   }
 
-  const root = asObject(value, 'manifest')
+  const root = asObject(value, 'manifest', MANIFEST_KEYS)
   const schemaVersion = field<number>(root, 'schemaVersion', 'number', 'manifest')
   if (schemaVersion !== MANIFEST_SCHEMA_VERSION) {
     throw new ManifestError(`unsupported schemaVersion ${schemaVersion}, this build reads ${MANIFEST_SCHEMA_VERSION}`)

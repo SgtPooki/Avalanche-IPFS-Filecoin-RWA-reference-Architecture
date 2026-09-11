@@ -23,16 +23,19 @@ export interface TamperScreenProps {
   assetId: string
   /** Looks the CID up across every anchored version. Null when nothing matches. */
   lookup: (cid: string) => Promise<DocumentMatch | null>
+  /** False while the chain clients are still connecting. */
+  ready: boolean
   onOpenHistory?: () => void
 }
 
 type Check =
   | { state: 'idle' }
   | { state: 'hashing'; filename: string; size: number }
+  | { state: 'searching'; filename: string; size: number; cid: string }
   | { state: 'done'; filename: string; size: number; cid: string; match: DocumentMatch | null }
   | { state: 'failed'; filename: string; message: string }
 
-export function TamperScreen({ assetId, lookup, onOpenHistory }: TamperScreenProps) {
+export function TamperScreen({ assetId, lookup, ready, onOpenHistory }: TamperScreenProps) {
   const [check, setCheck] = useState<Check>({ state: 'idle' })
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -42,6 +45,10 @@ export function TamperScreen({ assetId, lookup, onOpenHistory }: TamperScreenPro
       try {
         const bytes = new Uint8Array(await file.arrayBuffer())
         const cid = await computeFileCid(bytes)
+        // The CID is shown before the lookup finishes. Hashing is instant and
+        // reading both chains is not, so there is no reason to hold back the
+        // one answer already in hand.
+        setCheck({ state: 'searching', filename: file.name, size: file.size, cid })
         setCheck({ state: 'done', filename: file.name, size: file.size, cid, match: await lookup(cid) })
       } catch (cause) {
         setCheck({ state: 'failed', filename: file.name, message: (cause as Error).message })
@@ -78,9 +85,13 @@ export function TamperScreen({ assetId, lookup, onOpenHistory }: TamperScreenPro
             <p className="sub">
               {check.state === 'hashing'
                 ? `Hashing ${check.filename}…`
-                : check.state === 'failed'
-                  ? `Could not read ${check.filename}: ${check.message}`
-                  : 'Drop a file to check it.'}
+                : check.state === 'searching'
+                  ? `${check.cid} — looking for it in every version anchored on Avalanche…`
+                  : check.state === 'failed'
+                    ? `Could not read ${check.filename}: ${check.message}`
+                    : ready
+                      ? 'Drop a file to check it.'
+                      : 'Connecting to Avalanche and Filecoin…'}
             </p>
           )}
         </div>

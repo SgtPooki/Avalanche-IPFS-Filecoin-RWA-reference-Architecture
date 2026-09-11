@@ -11,7 +11,7 @@
 
 import { type PdfLine, type PdfPageSpec, buildPdf, escapeText } from './pdf.js'
 
-const ASSET_ID = 'FAIRVIEW-PROP-0031'
+const ASSET_ID = 'FAIRVIEW-0031'
 const ADDRESS = '123 Main Street'
 const CITY = 'Fairview'
 const COUNTY = 'Fairview County'
@@ -135,10 +135,20 @@ function parcelRecord(): unknown {
   }
 }
 
+/**
+ * The asset's own metadata.
+ *
+ * Deliberately does not carry the registry asset id. The registry key is where
+ * this record set is filed, not a fact about the property, and baking it into a
+ * document's bytes couples the two: changing the key changes this file, changes
+ * its CID, and forces the whole asset to be stored again. The manifest carries
+ * `assetId` at the top level, which is the right place for it. What identifies
+ * the property here is what identifies it in the county: the parcel number and
+ * the recorded instrument.
+ */
 function propertyMetadata(): unknown {
   return {
     address: { city: CITY, state: STATE, street: ADDRESS },
-    assetId: ASSET_ID,
     assetType: 'real_estate',
     assessorParcelNumber: PARCEL_NUMBER,
     disclaimer: DISCLAIMER,

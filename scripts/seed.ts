@@ -22,7 +22,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { calibration } from '@filoz/synapse-sdk'
 import { initializeSynapse } from 'filecoin-pin'
-import { anchorManifest, registry, writeClient } from '../src/lib/avalanche.js'
+import { anchorManifest, readClient, registry, versionCount, writeClient } from '../src/lib/avalanche.js'
 import { computeFileCid } from '../src/lib/cid.js'
 import { quietLogger, uploadRecord } from '../src/lib/filecoin.js'
 import { MANIFEST_SCHEMA_VERSION, type Manifest, type ManifestRecord, manifestBytes } from '../src/lib/manifest.js'
@@ -40,6 +40,13 @@ const NETWORK = 'filecoin-calibration'
 const V1 = ['property.json', 'deed.pdf', 'parcel.json', 'tax-assessment-2025.pdf', 'survey.pdf']
 const V2 = ['property.json', 'deed.pdf', 'parcel.json', 'tax-assessment-2026.pdf', 'survey.pdf']
 
+// The registry appends; it never overwrites. Seeding an asset that already has
+// versions adds more, which leaves the demo opening on a History screen full of
+// earlier attempts. Take the id from the command line so a re-seed can use a
+// fresh one, and refuse an id that is already in use unless told otherwise.
+const assetId = process.argv.find((a) => a.startsWith('--asset-id='))?.split('=')[1] ?? ASSET.assetId
+const append = process.argv.includes('--append')
+
 const dataset = buildDataset()
 const fileNamed = (name: string): DatasetFile => {
   const file = dataset.find((candidate) => candidate.name === name)
@@ -52,9 +59,19 @@ const synapse = await initializeSynapse({ privateKey: privateKey as `0x${string}
 const wallet = writeClient(privateKey as `0x${string}`)
 const owner = wallet.account!.address
 
-console.log(`asset     ${ASSET.assetId}`)
+console.log(`asset     ${assetId}`)
 console.log(`owner     ${owner}`)
 console.log(`registry  ${registry.address} on chain ${registry.chain.id}`)
+
+const existing = await versionCount(readClient(), owner, assetId)
+if (existing > 0 && !append) {
+  console.error(
+    `\n${assetId} already has ${existing} version${existing > 1 ? 's' : ''} under ${owner}.\n` +
+      'Seeding again would append to them, so the demo would open on a history of earlier attempts.\n' +
+      'Use --asset-id=SOMETHING-ELSE for a clean asset, or --append if more versions are what you want.'
+  )
+  process.exit(1)
+}
 
 /** Pieces already uploaded this run, so an unchanged record is stored once. */
 const uploaded = new Map<string, ManifestRecord & { dataSetId: number; providerId: number }>()
@@ -72,13 +89,13 @@ async function store(name: string): Promise<ManifestRecord & { dataSetId: number
   const result = await uploadRecord({ synapse, bytes: file.bytes, filename: file.name, logger })
   const record = {
     cid: result.cid,
+    dataSetId: result.dataSetId,
     filename: file.name,
     mimeType: file.mimeType,
     pieceCid: result.pieceCid,
     sha256: result.sha256,
     size: result.size,
     type: file.type ?? 'unknown',
-    dataSetId: result.dataSetId,
     providerId: result.providerId,
   }
   uploaded.set(name, record)
@@ -104,12 +121,12 @@ async function publish(label: string, names: string[]): Promise<SeededVersion> {
   for (const name of names) {
     const stored = await store(name)
     placement ??= { dataSetId: stored.dataSetId, providerId: stored.providerId }
-    const { dataSetId: _d, providerId: _p, ...record } = stored
+    const { providerId: _p, ...record } = stored
     records.push(record)
   }
 
   const manifest: Manifest = {
-    assetId: ASSET.assetId,
+    assetId,
     records,
     schemaVersion: MANIFEST_SCHEMA_VERSION,
     storage: { dataSetId: placement!.dataSetId, network: NETWORK, providerId: placement!.providerId },
@@ -125,7 +142,7 @@ async function publish(label: string, names: string[]): Promise<SeededVersion> {
   console.log(`\r    manifest.json              ${manifestUpload.cid.slice(0, 20)}…`)
 
   const anchored = await anchorManifest(wallet, {
-    assetId: ASSET.assetId,
+    assetId,
     manifestCid: manifestUpload.cid,
     manifestPieceCid: manifestUpload.pieceCid,
     dataSetId: manifestUpload.dataSetId,
@@ -148,7 +165,7 @@ const first = await publish('Version 1, the record set as filed', V1)
 const second = await publish('Version 2, the 2026 tax assessment replaces the 2025 one', V2)
 
 const output = {
-  assetId: ASSET.assetId,
+  assetId,
   owner,
   network: { avalanche: registry.chain.id, filecoin: NETWORK },
   registry: registry.address,
@@ -164,4 +181,4 @@ await writeFile(OUT, `${JSON.stringify(output, null, 2)}\n`)
 
 console.log(`\nSeeded in ${((Date.now() - started) / 60_000).toFixed(1)} min`)
 console.log(`Wrote ${path.relative(process.cwd(), OUT)}`)
-console.log(`Verify with: npm run verify -- ${ASSET.assetId}`)
+console.log(`Verify with: npm run verify -- ${assetId}`)

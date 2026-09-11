@@ -34,6 +34,8 @@ import {
   parseManifest,
 } from './manifest.js'
 
+export { manifestHistory } from './avalanche.js'
+export type { ManifestVersion } from './avalanche.js'
 export { getStorageStatus } from './filecoin.js'
 export type { StorageStatus } from './filecoin.js'
 
@@ -68,6 +70,15 @@ export interface StoreAssetRecordResult {
 /**
  * Publish a record set and anchor it on Avalanche.
  *
+ * The wallet here signs with a key this template reads from an env file,
+ * because a demo with one account and no connect flow is simpler to read and
+ * simpler to run. Do not carry that into anything real. A key in an env file
+ * becomes a key in a bundle the moment this runs in a browser, and a key in a
+ * bundle is a key that is gone. An issuer publishing real records wires
+ * `wallet` to whatever their custody actually is: a browser wallet the operator
+ * approves each write in, a signer held server-side, or an HSM. Nothing else
+ * here changes; `WalletClient` is the seam.
+ *
  * Records go up first, each as its own piece so each has its own CID and proof
  * state. The manifest is built from what came back and uploaded last, because
  * it has to name the piece CIDs. Only then is anything written to Avalanche: a
@@ -90,6 +101,7 @@ export async function storeAssetRecord(options: StoreAssetRecordOptions): Promis
     placement ??= { dataSetId: result.dataSetId, providerId: result.providerId }
     stored.push({
       cid: result.cid,
+      dataSetId: result.dataSetId,
       filename: record.filename,
       mimeType: record.mimeType,
       pieceCid: result.pieceCid,
@@ -222,10 +234,15 @@ export async function verifyAssetRecord(
   try {
     record = await getAssetRecord(client, synapse, owner, assetId)
   } catch (cause) {
+    // Avalanche may well hold a pointer; what failed is following it. Report
+    // the pointer when it can be read, so the UI can say "anchored, but the
+    // manifest could not be fetched" instead of the flatly wrong "not
+    // anchored" or the confusing "anchored" with nothing to show.
+    const anchor = await currentManifest(client, owner, assetId).catch(() => null)
     return {
       verified: false,
-      anchored: true,
-      anchor: null,
+      anchored: anchor != null,
+      anchor,
       manifest: null,
       records: [],
       problems: [(cause as Error).message],
@@ -243,11 +260,19 @@ export async function verifyAssetRecord(
     }
   }
 
-  // One context for the whole asset, and the records checked together. Opening
-  // a context costs several seconds of chain reads and every record is in the
-  // same data set, so doing it per record spent that cost once per file.
-  const context = await storageContext(synapse, record.manifest.storage.dataSetId).catch(() => null)
-  const records = await Promise.all(record.manifest.records.map((entry) => verifyOneRecord(synapse, entry, context)))
+  // One context per distinct data set, opened once and shared. Opening a
+  // context costs several seconds of chain reads, and records usually share a
+  // data set, so opening one per record spent that cost once per file. They do
+  // not always share one, though, so this groups rather than assuming.
+  const contexts = new Map<number, Awaited<ReturnType<typeof storageContext>> | null>()
+  await Promise.all(
+    [...new Set(record.manifest.records.map((entry) => entry.dataSetId))].map(async (dataSetId) => {
+      contexts.set(dataSetId, await storageContext(synapse, dataSetId).catch(() => null))
+    })
+  )
+  const records = await Promise.all(
+    record.manifest.records.map((entry) => verifyOneRecord(synapse, entry, contexts.get(entry.dataSetId) ?? null))
+  )
 
   for (const verdict of records) {
     if (verdict.problem != null) problems.push(`${verdict.filename}: ${verdict.problem}`)
@@ -314,6 +339,39 @@ async function verifyOneRecord(
  * scenario: gateways will not serve tampered bytes, so the only way to hold one
  * is for someone to have given it to you.
  */
+/**
+ * Find a CID in any version of an asset's history.
+ *
+ * Split out from `checkDocument` because a UI has already hashed the file by
+ * the time it wants to know, and passing the bytes back in only to hash them
+ * again is work for nothing.
+ */
+export async function findDocumentByCid(
+  client: PublicClient,
+  synapse: Synapse,
+  owner: Address,
+  assetId: string,
+  cid: string
+): Promise<{ version: number; record: ManifestRecord } | null> {
+  const versions = await manifestHistory(client, owner, assetId)
+
+  // Newest first: a document is usually current, and the answer is the same
+  // either way. A version whose manifest cannot be fetched is skipped rather
+  // than fatal, because one unreachable old manifest must not stop the file
+  // matching a version that is reachable.
+  for (const version of [...versions].reverse()) {
+    try {
+      const manifestFile = await fetchRecord(synapse, version.manifestPieceCid, version.manifestCid)
+      const record = parseManifest(manifestFile).records.find((entry) => entry.cid === cid)
+      if (record != null) return { version: version.version, record }
+    } catch {
+      // Try the others. A file matching nothing reachable reads as not on
+      // record, which is the verdict a caller would act on anyway.
+    }
+  }
+  return null
+}
+
 export async function checkDocument(
   client: PublicClient,
   synapse: Synapse,
@@ -322,13 +380,5 @@ export async function checkDocument(
   bytes: Uint8Array
 ): Promise<{ cid: string; matched: { version: number; record: ManifestRecord } | null }> {
   const cid = await computeFileCid(bytes)
-  const versions = await manifestHistory(client, owner, assetId)
-
-  for (const version of versions) {
-    const manifestFile = await fetchRecord(synapse, version.manifestPieceCid, version.manifestCid)
-    const manifest = parseManifest(manifestFile)
-    const record = manifest.records.find((entry) => entry.cid === cid)
-    if (record != null) return { cid, matched: { version: version.version, record } }
-  }
-  return { cid, matched: null }
+  return { cid, matched: await findDocumentByCid(client, synapse, owner, assetId, cid) }
 }

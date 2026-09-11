@@ -13,7 +13,7 @@
  * A second argument checks a local file against every version of the asset,
  * which is the tamper case:
  *
- *   npm run verify -- FAIRVIEW-PROP-0031 --file data/deed-tampered.pdf
+ *   npm run verify -- FAIRVIEW-0031 --file data/deed-tampered.pdf
  */
 
 import { readFile } from 'node:fs/promises'

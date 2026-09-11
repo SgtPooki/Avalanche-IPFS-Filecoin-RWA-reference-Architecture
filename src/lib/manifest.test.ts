@@ -21,6 +21,7 @@ function demoRecord(
 ): ManifestRecord {
   return {
     cid: `bafkrei${slug}bytes`,
+    dataSetId: 54,
     filename,
     mimeType,
     pieceCid: `bafkzcibca${slug}`,
@@ -32,7 +33,7 @@ function demoRecord(
 
 function demoManifest(): Manifest {
   return {
-    assetId: 'FAIRVIEW-PROP-0031',
+    assetId: 'FAIRVIEW-0031',
     records: [
       demoRecord('deed', 'deed.pdf', 'application/pdf', 188416, 'deed', 'a'),
       demoRecord('parcel', 'parcel.json', 'application/json', 3481, 'parcel_record', 'b'),
@@ -66,6 +67,7 @@ describe('canonicalize', () => {
           pieceCid: record.pieceCid,
           mimeType: record.mimeType,
           filename: record.filename,
+          dataSetId: record.dataSetId,
           cid: record.cid,
         })),
         assetId: manifest.assetId,
@@ -187,10 +189,20 @@ describe('parseManifest on the edges', () => {
     expect(parsed.schemaVersion).toBe(MANIFEST_SCHEMA_VERSION)
   })
 
-  it('ignores a version field left over from an older writer', () => {
+  it('refuses a version field left over from an older writer', () => {
+    // Refused rather than ignored. A manifest is hashed and anchored, so
+    // everything in it is part of what the issuer signed for; dropping a field
+    // quietly would mean the document on Filecoin and the document this code
+    // believes in are not the same document.
     const withVersion = { ...JSON.parse(canonicalize(demoManifest())), version: 7 }
 
-    expect(parseManifest(JSON.stringify(withVersion))).not.toHaveProperty('version')
+    expect(() => parseManifest(JSON.stringify(withVersion))).toThrow(/manifest has unknown field version/)
+  })
+
+  it('names every unknown field at once', () => {
+    const noisy = { ...JSON.parse(canonicalize(demoManifest())), version: 7, createdAt: 'yesterday' }
+
+    expect(() => parseManifest(JSON.stringify(noisy))).toThrow(/unknown fields version, createdAt/)
   })
 })
 
