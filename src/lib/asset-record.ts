@@ -313,23 +313,31 @@ export async function verifyAssetRecord(
   }
 }
 
+/** Proof state, or null when it cannot be read. Unreadable is not the same as unproven. */
+async function readProof(
+  context: Awaited<ReturnType<typeof storageContext>> | null,
+  pieceCid: string
+): Promise<StorageStatus | null> {
+  if (context == null) return null
+  // Bytes may still be correct and retrievable when proof state is unavailable,
+  // so this is reported rather than thrown.
+  return pieceStatusIn(context, pieceCid).catch(() => null)
+}
+
+/** Filecoin is holding it and the proof is not late. */
+function isProven(proof: StorageStatus | null): boolean {
+  return proof != null && proof.lastProven != null && !proof.isProofOverdue
+}
+
 async function verifyOneRecord(
   synapse: Synapse,
   entry: ManifestRecord,
   context: Awaited<ReturnType<typeof storageContext>> | null
 ): Promise<RecordVerdict> {
-  const base = { filename: entry.filename, cid: entry.cid }
-
   // Proof state first, because it names a provider known to hold this piece and
   // that is the fallback if the SDK's retrieval race comes back empty.
-  let proof: StorageStatus | null = null
-  try {
-    proof = context == null ? null : await pieceStatusIn(context, entry.pieceCid)
-  } catch {
-    // Unreadable proof state is reported as unproven rather than as a hard
-    // failure: the bytes may still be correct and retrievable.
-    proof = null
-  }
+  const proof = await readProof(context, entry.pieceCid)
+  const base = { filename: entry.filename, cid: entry.cid, proof, storageProven: isProven(proof) }
 
   let bytes: Uint8Array
   try {
@@ -339,33 +347,33 @@ async function verifyOneRecord(
       ...base,
       contentMatches: false,
       retrievable: false,
-      storageProven: proof != null && proof.lastProven != null && !proof.isProofOverdue,
-      proof,
       problem: `could not be retrieved (${(cause as Error).message})`,
     }
   }
 
   const recomputed = await computeFileCid(bytes)
   const contentMatches = recomputed === entry.cid
-  const storageProven = proof != null && proof.lastProven != null && !proof.isProofOverdue
+  const verdict: RecordVerdict = { ...base, contentMatches, retrievable: true }
 
-  const verdict: RecordVerdict = { ...base, contentMatches, retrievable: true, storageProven, proof }
-  if (!contentMatches) {
-    verdict.problem = `the bytes retrieved hash to ${recomputed}, but the manifest lists ${entry.cid}`
-  } else if (!storageProven) {
-    verdict.problem = proof == null ? 'proof state could not be read' : 'storage proof is overdue'
-  }
-  return verdict
+  const problem = describeProblem(entry, recomputed, contentMatches, base.storageProven, proof)
+  return problem == null ? verdict : { ...verdict, problem }
 }
 
-/**
- * Check a file someone handed you against every version of an asset.
- *
- * The file is hashed locally and never uploaded. A CID that appears in no
- * version of the manifest is not a document of record, which is the honest
- * scenario: gateways will not serve tampered bytes, so the only way to hold one
- * is for someone to have given it to you.
- */
+/** The first thing wrong with a record, in words a UI can show unchanged. */
+function describeProblem(
+  entry: ManifestRecord,
+  recomputed: string,
+  contentMatches: boolean,
+  storageProven: boolean,
+  proof: StorageStatus | null
+): string | undefined {
+  if (!contentMatches) {
+    return `the bytes retrieved hash to ${recomputed}, but the manifest lists ${entry.cid}`
+  }
+  if (storageProven) return undefined
+  return proof == null ? 'proof state could not be read' : 'storage proof is overdue'
+}
+
 /**
  * Find a CID in any version of an asset's history.
  *
@@ -399,6 +407,14 @@ export async function findDocumentByCid(
   return null
 }
 
+/**
+ * Check a file someone handed you against every version of an asset.
+ *
+ * The file is hashed locally and never uploaded. A CID that appears in no
+ * version of the manifest is not a document of record, which is the honest
+ * scenario: gateways will not serve tampered bytes, so the only way to hold one
+ * is for someone to have given it to you.
+ */
 export async function checkDocument(
   client: PublicClient,
   synapse: Synapse,
