@@ -56,7 +56,7 @@ Credit the May 2025 Avalanche and Filecoin bridge, never claim to be first, neve
 
 Each of these cost real time. Do not rediscover them.
 
-- **CID objects do not cross package boundaries.** `@ipld/car` resolves multiformats 14 while `@helia/unixfs` nests 13, so a CID from one fails the other's `instanceof` check and surfaces as "Path must be string or CID". Pass CIDs as strings. `src/lib/car.ts` has a test named after this.
+- **CID objects do not cross package boundaries.** `@ipld/car` resolves multiformats 14 while `@helia/unixfs` nests 13, so a CID from one fails the other's `instanceof` check and surfaces as the error "Path must be string or CID." Pass CIDs as strings. `src/lib/car.ts` has a test named after this.
 - **viem caches `getBlockNumber`** for its polling interval, and `waitForTransactionReceipt` warms that cache, so a history read straight after an anchor silently misses the newest version. Reads pass `cacheTime: 0`.
 - **Several Calibration providers are dead.** Three of eight hostnames do not resolve at all, so the SDK's retrieval race can exhaust on a piece two other providers serve instantly. `fetchRecord` reads proof state first and falls back to the provider `pieceStatus` names.
 - **`filecoin-pin add` cannot upload anything right now.** It runs a minimum setup check with a file size of zero and the cost calculation rejects a zero piece size. Filed as `filecoin-project/filecoin-pin#719`. Use `npm run publish -- <dir>`, which goes through the library instead.
