@@ -6,7 +6,8 @@
     "AssetRecordRegistry": {
       "address": "0x7fdfdb7F166A3dEE947A5533e20B8E5Ce8c80863",
       "deployer": "0x44f08D1beFe61255b3C3A349C392C560FA333759",
-      "deployedAt": "2026-09-10"
+      "deployedAt": "2026-09-10T16:57:16Z",
+      "deployBlock": 58303958
     }
   }
 }
