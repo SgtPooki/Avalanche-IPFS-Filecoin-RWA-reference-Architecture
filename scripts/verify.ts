@@ -27,6 +27,19 @@ import { ASSET } from './lib/dataset.js'
 
 const DEMO_OWNER = '0x44f08D1beFe61255b3C3A349C392C560FA333759' as Address
 
+/**
+ * Exit once the last line has flushed.
+ *
+ * Retrieval leaves sockets behind: measured right after a verdict, eight
+ * pending connects and twelve TCP sockets were still open, and one run sat
+ * for ten minutes after printing VERIFIED. Setting exitCode is not enough
+ * while those are alive. On macOS a piped stdout is asynchronous, so the exit
+ * waits for the write queue rather than cutting the verdict off.
+ */
+function finish(code: number): void {
+  process.stdout.write('', () => process.exit(code))
+}
+
 const args = process.argv.slice(2)
 const fileFlag = args.indexOf('--file')
 const filePath = fileFlag === -1 ? null : args[fileFlag + 1]
@@ -51,11 +64,11 @@ if (filePath != null) {
   if (matched == null) {
     console.log('  verdict      NOT A DOCUMENT OF RECORD')
     console.log(`               this fingerprint appears in no version of ${assetId}`)
-    process.exitCode = 1
+    finish(1)
   } else {
     console.log(`  verdict      on record as ${matched.record.filename}, version ${matched.version}`)
+    finish(0)
   }
-  process.exit(process.exitCode ?? 0)
 }
 
 const started = Date.now()
@@ -87,4 +100,4 @@ if (verdict.problems.length > 0) {
 }
 
 console.log(`\n${verdict.verified ? 'VERIFIED' : 'FAILED'} in ${took}s`)
-if (!verdict.verified) process.exitCode = 1
+finish(verdict.verified ? 0 : 1)
