@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8" /><title>browser download spike</title></head>
+  <body>
+    <p id="status">Loading the module, then the driver calls into it.</p>
+    <script type="module">
+      import { downloadFromCalibration } from '/src/live/download.browser-live.ts'
+      window.downloadFromCalibration = downloadFromCalibration
+      document.getElementById('status').textContent = 'ready'
+    </script>
+  </body>
+</html>
