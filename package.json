@@ -17,7 +17,9 @@
     "spike:fuji": "tsx --env-file=.env scripts/spike-fuji.ts",
     "seed": "tsx --env-file=.env scripts/seed.ts",
     "verify": "tsx scripts/verify.ts",
-    "spike:browser": "node scripts/spike-browser-download.mjs"
+    "spike:browser": "node scripts/spike-browser-download.mjs",
+    "publish": "tsx --env-file=.env scripts/publish.ts",
+    "share": "tsx scripts/build-share-page.ts"
   },
   "dependencies": {
     "@filoz/synapse-sdk": "^2.0.0",

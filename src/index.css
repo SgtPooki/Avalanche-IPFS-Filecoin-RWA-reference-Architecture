@@ -481,3 +481,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
 .linklike { background: none; border: 0; padding: 0; color: var(--fil-ink); text-decoration: underline; font: inherit; }
 .top .chains { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 .dim { color: var(--faint); }
+.nav { display: flex; gap: 4px; margin-left: 20px; }
+.nav button { background: none; border: 0; padding: 6px 12px; border-radius: 6px; color: var(--muted); font-weight: 500; }
+.nav button[aria-current="page"] { color: var(--text); background: var(--surface-2); }
+.verdict .big { font-family: var(--display); font-weight: 800; font-size: 34px; letter-spacing: -.02em; color: var(--text); }

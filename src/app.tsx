@@ -16,11 +16,15 @@ import seed from '../seed-output.json' with { type: 'json' }
 import { findDocumentByCid } from './lib/asset-record.js'
 import { type ReadClients, readOnlyClients } from './lib/read-clients.js'
 import { type DocumentMatch, TamperScreen } from './screens/tamper.js'
+import { VerifyScreen } from './screens/verify.js'
 
 const ASSET_ID = seed.assetId
 const OWNER = seed.owner as Address
 
+type View = 'verify' | 'tamper'
+
 export function App() {
+  const [view, setView] = useState<View>('verify')
   const [clients, setClients] = useState<ReadClients | null>(null)
   const [failed, setFailed] = useState<string | null>(null)
 
@@ -48,6 +52,18 @@ export function App() {
           <span className="mark" />
           Verifiable RWA Records
         </div>
+        <nav className="nav">
+          {(['verify', 'tamper'] as const).map((candidate) => (
+            <button
+              key={candidate}
+              type="button"
+              onClick={() => setView(candidate)}
+              {...(view === candidate ? { 'aria-current': 'page' as const } : {})}
+            >
+              {candidate === 'verify' ? 'Verify' : 'Check a document'}
+            </button>
+          ))}
+        </nav>
         <div className="chains">
           <span className="pill ava"><span className="dot" />Avalanche Fuji</span>
           <span className="pill fil"><span className="dot" />Filecoin Calibration</span>
@@ -58,7 +74,11 @@ export function App() {
         {failed != null && (
           <div className="callout neutral">Could not reach the networks: {failed}</div>
         )}
-        <TamperScreen assetId={ASSET_ID} lookup={lookup} ready={clients != null} />
+        {view === 'verify' ? (
+          <VerifyScreen assetId={ASSET_ID} owner={OWNER} clients={clients} />
+        ) : (
+          <TamperScreen assetId={ASSET_ID} lookup={lookup} ready={clients != null} />
+        )}
       </main>
     </div>
   )

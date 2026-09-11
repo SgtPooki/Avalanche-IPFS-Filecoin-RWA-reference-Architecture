@@ -1,32 +1,34 @@
 {
-  "assetId": "FAIRVIEW-PROP-0031",
+  "assetId": "FAIRVIEW-0031",
   "owner": "0x44f08D1beFe61255b3C3A349C392C560FA333759",
   "network": {
     "avalanche": 43113,
     "filecoin": "filecoin-calibration"
   },
   "registry": "0x7fdfdb7F166A3dEE947A5533e20B8E5Ce8c80863",
-  "seededAt": "2026-09-11T14:59:37.594Z",
+  "seededAt": "2026-09-11T16:29:10.701Z",
   "versions": [
     {
       "version": 1,
-      "manifestCid": "bafkreiah4vidwglh73y65hkxa2see6mu627dppb7rinpucgjaj7uk5t5jm",
-      "manifestPieceCid": "bafkzcibd4ahapr3lek44jqyr3thesmngepbz2t65zpvyze4obo3lj4zydqnx2jrw",
+      "manifestCid": "bafkreidxadjoty6rq6nl4zujfq7obkf7326ywgbtaf5cpyd3h6mjyq7jxa",
+      "manifestPieceCid": "bafkzcibd6igqocvpxchvl5d2cmvf4ha2cxqqyxg2hauga74f6pqmfeys5t6gypqk",
       "dataSetId": 54,
-      "transactionHash": "0x3e68c2baab55c374ba6e3595a36274b53236104796a410f08b40f2e3ed701d86",
-      "blockNumber": "58320299",
+      "transactionHash": "0x0e3e3a2b24e924f5bde42328c6daf54949390a66d51e39cc22e17af9c8f329c5",
+      "blockNumber": "58321610",
       "records": [
         {
-          "cid": "bafkreicyjmgjewfnasg7cmornjvtyk7qoebpsqt4u3v4iwskht6njthd6u",
+          "cid": "bafkreihat6nlbeqgljfbwzsfv6zcnutl4m44bgdehd67ejokoypsmlyw3e",
+          "dataSetId": 54,
           "filename": "property.json",
           "mimeType": "application/json",
-          "pieceCid": "bafkzcibdtqbql6grbwyzi2eyrtewbcrteyoklfv6fnmizxri5dshxrukvze7pjbj",
-          "sha256": "584b0c9258ad048df131d16a6b3c2bf07102f9427ca6ebc45a4a3cfcd4cce3f5",
-          "size": 507,
+          "pieceCid": "bafkzcibdx4bqlwzszkvpsg4epwstktpzbrjozaoivi5yitoymnfcd4qgtfmejujk",
+          "sha256": "e09f9ab092065a4a1b6645afb226d26be339c0986438fdf225ca761f262f16d9",
+          "size": 472,
           "type": "property_metadata"
         },
         {
           "cid": "bafkreidh5qsi5z6uo2thzvynr27ioajoviafqiveunrielhugyj65l6rzu",
+          "dataSetId": 54,
           "filename": "deed.pdf",
           "mimeType": "application/pdf",
           "pieceCid": "bafkzcibd74eao2wcvlngjfpimalqx3sjjpp6qjusu6nywc3jsfwiszmowxhaqwbr",
@@ -36,6 +38,7 @@
         },
         {
           "cid": "bafkreiejmexovymgvlxps3hpq6ez3ac5sjridcypurprugtsseggslaqiq",
+          "dataSetId": 54,
           "filename": "parcel.json",
           "mimeType": "application/json",
           "pieceCid": "bafkzcibd5mcqnwcpseuulxzwpndy5gytehdpj6qr7nrejnamlfminhg7afnljmrd",
@@ -45,6 +48,7 @@
         },
         {
           "cid": "bafkreiek7fjuel7opibeayam6cfnww54pmyaez2cetk2i3rbpkcsjydkke",
+          "dataSetId": 54,
           "filename": "tax-assessment-2025.pdf",
           "mimeType": "application/pdf",
           "pieceCid": "bafkzcibdvqhapdmp3pewvwqn43wrn7uicobawtw5rabkuusvoi3typ3u7r6ruqie",
@@ -54,6 +58,7 @@
         },
         {
           "cid": "bafkreid3kwdoyxzy6i4kxlzp4q3rgs5f7qbseoiely3rbdad6o6ixob2mi",
+          "dataSetId": 54,
           "filename": "survey.pdf",
           "mimeType": "application/pdf",
           "pieceCid": "bafkzcibdx4fqodbfznnzrqugdhhpxrllwvnr45fw35kwqng74xnbvcbzdn4mzlac",
@@ -65,23 +70,25 @@
     },
     {
       "version": 2,
-      "manifestCid": "bafkreif4qtf5pq2ptavpjcaty7supji2grvzwu3szs23txlczjrd5laslu",
-      "manifestPieceCid": "bafkzcibd4ahaonndkuw65bv2jnbhkjlwhkdgfxvmvejvxup55jgcgto2i6yylqyl",
+      "manifestCid": "bafkreihf2bpdj3mdk5du4vat5uduja7b5vfpjnhslsxxol6nfbzpmh6gua",
+      "manifestPieceCid": "bafkzcibd6igqp3l2o6mfe34hayns6ip4bg4nr3q7wo5f2zztfcvqoqibnqvyhiqa",
       "dataSetId": 54,
-      "transactionHash": "0x03b6d979847d64813f798b9b8b76532ca30b9e77f4466ff28ba3b00f4e0a7802",
-      "blockNumber": "58320341",
+      "transactionHash": "0x9528b6ed56116f2adb1e25f1d0a448f917a9fc8432bc69daf5997ffe5ee52ba9",
+      "blockNumber": "58321622",
       "records": [
         {
-          "cid": "bafkreicyjmgjewfnasg7cmornjvtyk7qoebpsqt4u3v4iwskht6njthd6u",
+          "cid": "bafkreihat6nlbeqgljfbwzsfv6zcnutl4m44bgdehd67ejokoypsmlyw3e",
+          "dataSetId": 54,
           "filename": "property.json",
           "mimeType": "application/json",
-          "pieceCid": "bafkzcibdtqbql6grbwyzi2eyrtewbcrteyoklfv6fnmizxri5dshxrukvze7pjbj",
-          "sha256": "584b0c9258ad048df131d16a6b3c2bf07102f9427ca6ebc45a4a3cfcd4cce3f5",
-          "size": 507,
+          "pieceCid": "bafkzcibdx4bqlwzszkvpsg4epwstktpzbrjozaoivi5yitoymnfcd4qgtfmejujk",
+          "sha256": "e09f9ab092065a4a1b6645afb226d26be339c0986438fdf225ca761f262f16d9",
+          "size": 472,
           "type": "property_metadata"
         },
         {
           "cid": "bafkreidh5qsi5z6uo2thzvynr27ioajoviafqiveunrielhugyj65l6rzu",
+          "dataSetId": 54,
           "filename": "deed.pdf",
           "mimeType": "application/pdf",
           "pieceCid": "bafkzcibd74eao2wcvlngjfpimalqx3sjjpp6qjusu6nywc3jsfwiszmowxhaqwbr",
@@ -91,6 +98,7 @@
         },
         {
           "cid": "bafkreiejmexovymgvlxps3hpq6ez3ac5sjridcypurprugtsseggslaqiq",
+          "dataSetId": 54,
           "filename": "parcel.json",
           "mimeType": "application/json",
           "pieceCid": "bafkzcibd5mcqnwcpseuulxzwpndy5gytehdpj6qr7nrejnamlfminhg7afnljmrd",
@@ -100,6 +108,7 @@
         },
         {
           "cid": "bafkreiexhmrobe6ttuahc7ne227kepu75qg2vtmwaxozlgxxzvdx54oxmq",
+          "dataSetId": 54,
           "filename": "tax-assessment-2026.pdf",
           "mimeType": "application/pdf",
           "pieceCid": "bafkzcibdvuhaouknpkvmksaa5xcc5mt4ytbyjrhjwjtps43qq2ycg4qtjf4kysza",
@@ -109,6 +118,7 @@
         },
         {
           "cid": "bafkreid3kwdoyxzy6i4kxlzp4q3rgs5f7qbseoiely3rbdad6o6ixob2mi",
+          "dataSetId": 54,
           "filename": "survey.pdf",
           "mimeType": "application/pdf",
           "pieceCid": "bafkzcibdx4fqodbfznnzrqugdhhpxrllwvnr45fw35kwqng74xnbvcbzdn4mzlac",

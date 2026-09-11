@@ -214,6 +214,14 @@ export interface AssetVerdict {
   problems: string[]
 }
 
+export interface VerifyProgress {
+  /** What is happening now, in words a UI can show unchanged. */
+  message: string
+  /** Records finished so far, and how many there are once the manifest is read. */
+  done: number
+  total: number
+}
+
 /**
  * Check an asset end to end, against both chains.
  *
@@ -221,13 +229,22 @@ export interface AssetVerdict {
  * manifest is checked against that pointer, every record is fetched and
  * re-hashed against the manifest, and the proof state comes from Filecoin.
  * A failure of any one of those fails the record, and each one says which.
+ *
+ * `onProgress` matters more than it looks. A run takes about a minute and
+ * sometimes two, most of it waiting on storage providers, and a UI with no
+ * progress is indistinguishable from a UI that has hung.
  */
 export async function verifyAssetRecord(
   client: PublicClient,
   synapse: Synapse,
   owner: Address,
-  assetId: string
+  assetId: string,
+  onProgress?: (progress: VerifyProgress) => void
 ): Promise<AssetVerdict> {
+  let done = 0
+  let total = 0
+  const note = (message: string): void => onProgress?.({ message, done, total })
+  note(`reading the pointer for ${assetId} from Avalanche`)
   const problems: string[] = []
 
   let record: AssetRecord
@@ -264,6 +281,9 @@ export async function verifyAssetRecord(
   // context costs several seconds of chain reads, and records usually share a
   // data set, so opening one per record spent that cost once per file. They do
   // not always share one, though, so this groups rather than assuming.
+  total = record.manifest.records.length
+  note('opening the Filecoin data sets that prove these records')
+
   const contexts = new Map<number, Awaited<ReturnType<typeof storageContext>> | null>()
   await Promise.all(
     [...new Set(record.manifest.records.map((entry) => entry.dataSetId))].map(async (dataSetId) => {
@@ -271,7 +291,12 @@ export async function verifyAssetRecord(
     })
   )
   const records = await Promise.all(
-    record.manifest.records.map((entry) => verifyOneRecord(synapse, entry, contexts.get(entry.dataSetId) ?? null))
+    record.manifest.records.map(async (entry) => {
+      const verdict = await verifyOneRecord(synapse, entry, contexts.get(entry.dataSetId) ?? null)
+      done += 1
+      note(`checked ${entry.filename}`)
+      return verdict
+    })
   )
 
   for (const verdict of records) {
@@ -295,31 +320,33 @@ async function verifyOneRecord(
 ): Promise<RecordVerdict> {
   const base = { filename: entry.filename, cid: entry.cid }
 
+  // Proof state first, because it names a provider known to hold this piece and
+  // that is the fallback if the SDK's retrieval race comes back empty.
+  let proof: StorageStatus | null = null
+  try {
+    proof = context == null ? null : await pieceStatusIn(context, entry.pieceCid)
+  } catch {
+    // Unreadable proof state is reported as unproven rather than as a hard
+    // failure: the bytes may still be correct and retrievable.
+    proof = null
+  }
+
   let bytes: Uint8Array
   try {
-    bytes = await fetchRecord(synapse, entry.pieceCid, entry.cid)
+    bytes = await fetchRecord(synapse, entry.pieceCid, entry.cid, { retrievalUrl: proof?.retrievalUrl })
   } catch (cause) {
     return {
       ...base,
       contentMatches: false,
       retrievable: false,
-      storageProven: false,
-      proof: null,
+      storageProven: proof != null && proof.lastProven != null && !proof.isProofOverdue,
+      proof,
       problem: `could not be retrieved (${(cause as Error).message})`,
     }
   }
 
   const recomputed = await computeFileCid(bytes)
   const contentMatches = recomputed === entry.cid
-
-  let proof: StorageStatus | null = null
-  try {
-    proof = context == null ? null : await pieceStatusIn(context, entry.pieceCid)
-  } catch {
-    // A proof state that cannot be read is reported as unproven rather than as
-    // a hard failure: the bytes may still be correct and retrievable.
-    proof = null
-  }
   const storageProven = proof != null && proof.lastProven != null && !proof.isProofOverdue
 
   const verdict: RecordVerdict = { ...base, contentMatches, retrievable: true, storageProven, proof }

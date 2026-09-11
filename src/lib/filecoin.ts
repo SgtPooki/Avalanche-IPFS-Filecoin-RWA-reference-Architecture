@@ -116,6 +116,14 @@ export async function uploadRecord(options: UploadRecordOptions): Promise<Stored
   }
 }
 
+export interface FetchRecordOptions {
+  /**
+   * A provider URL known to hold this piece, from `pieceStatus`. Used only if
+   * the SDK's own retrieval fails.
+   */
+  retrievalUrl?: string | null
+}
+
 /**
  * Fetch a record and hand back the document bytes.
  *
@@ -123,10 +131,36 @@ export async function uploadRecord(options: UploadRecordOptions): Promise<Stored
  * provider serving the wrong piece is caught here with both CIDs named. The
  * caller still re-hashes what comes back; this only means a mixed-up piece
  * fails with a useful message rather than as an unexplained mismatch.
+ *
+ * Two paths, because one is not reliable enough to stand on. The SDK races
+ * every provider that might hold the piece and takes the first answer, which is
+ * the right default and fails as a group: on a network where some provider
+ * hostnames do not resolve, the race can exhaust before a good one replies. A
+ * verify run failed exactly that way on a piece that two providers were serving
+ * in under half a second. So when the race loses, this asks the one provider
+ * that `pieceStatus` said holds the piece, directly.
  */
-export async function fetchRecord(synapse: Synapse, pieceCid: string, expectedCid: string): Promise<Uint8Array> {
-  const carBytes = await synapse.storage.download({ pieceCid })
-  return extractFileFromCar(carBytes, expectedCid)
+export async function fetchRecord(
+  synapse: Synapse,
+  pieceCid: string,
+  expectedCid: string,
+  options: FetchRecordOptions = {}
+): Promise<Uint8Array> {
+  try {
+    return extractFileFromCar(await synapse.storage.download({ pieceCid }), expectedCid)
+  } catch (cause) {
+    const url = options.retrievalUrl
+    if (url == null || url === '') throw cause
+
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new StorageError(
+        `retrieval failed twice for ${pieceCid}: the SDK reported "${(cause as Error).message}", ` +
+          `and ${url} answered ${response.status}`
+      )
+    }
+    return extractFileFromCar(new Uint8Array(await response.arrayBuffer()), expectedCid)
+  }
 }
 
 /** Proof state for one piece, in the terms the UI shows. */
