@@ -8,7 +8,7 @@
 import { useCallback } from 'react'
 import { type DocumentMatch, TamperScreen } from './screens/tamper.js'
 
-const ASSET_ID = 'BAL-PROP-001'
+const ASSET_ID = 'FAIRVIEW-PROP-0031'
 
 export function App() {
   // Wired to the seeded asset next. Until then the tamper screen proves the

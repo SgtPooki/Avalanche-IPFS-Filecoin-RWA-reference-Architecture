@@ -16,6 +16,7 @@
  */
 
 import type { Synapse } from '@filoz/synapse-sdk'
+import type { StorageContext } from '@filoz/synapse-sdk/storage'
 import { checkUploadReadiness, createCarFromFile, executeUpload } from 'filecoin-pin'
 import { type Logger, pino } from 'pino'
 import { extractFileFromCar } from './car.js'
@@ -140,23 +141,28 @@ export interface StorageStatus {
 }
 
 /**
- * Read proof state for a piece.
+ * Open a storage context on a data set.
+ *
+ * Worth holding on to. Opening one costs several seconds of chain reads, and
+ * every record in an asset lives in the same data set, so verifying five
+ * records with five contexts spends that cost five times for one answer.
+ */
+export async function storageContext(synapse: Synapse, dataSetId: number): Promise<StorageContext> {
+  const [context] = await synapse.storage.createContexts({ dataSetIds: [BigInt(dataSetId)] })
+  if (context == null) throw new StorageError(`no storage context for data set ${dataSetId}`)
+  return context
+}
+
+/**
+ * Read proof state for a piece in an already-open context.
  *
  * This is about the data set the piece belongs to, not the piece alone. The
  * provider proves it holds the set; there is no per-file proof, and the UI must
  * not imply one.
  */
-export async function getStorageStatus(
-  synapse: Synapse,
-  options: { pieceCid: string; dataSetId: number }
-): Promise<StorageStatus> {
-  const [context] = await synapse.storage.createContexts({ dataSetIds: [BigInt(options.dataSetId)] })
-  if (context == null) throw new StorageError(`no storage context for data set ${options.dataSetId}`)
-
-  const status = await context.pieceStatus({ pieceCid: options.pieceCid })
-  if (status == null) {
-    throw new StorageError(`data set ${options.dataSetId} does not hold piece ${options.pieceCid}`)
-  }
+export async function pieceStatusIn(context: StorageContext, pieceCid: string): Promise<StorageStatus> {
+  const status = await context.pieceStatus({ pieceCid })
+  if (status == null) throw new StorageError(`this data set does not hold piece ${pieceCid}`)
 
   return {
     lastProven: status.dataSetLastProven,
@@ -164,6 +170,14 @@ export async function getStorageStatus(
     isProofOverdue: status.isProofOverdue ?? false,
     retrievalUrl: status.retrievalUrl,
   }
+}
+
+/** Proof state for one piece. Opens a context per call; use the two above for several. */
+export async function getStorageStatus(
+  synapse: Synapse,
+  options: { pieceCid: string; dataSetId: number }
+): Promise<StorageStatus> {
+  return pieceStatusIn(await storageContext(synapse, options.dataSetId), options.pieceCid)
 }
 
 /**

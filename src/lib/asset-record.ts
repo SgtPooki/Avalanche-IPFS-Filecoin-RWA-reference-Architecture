@@ -19,7 +19,13 @@ import type { Synapse } from '@filoz/synapse-sdk'
 import type { Address, Hex, PublicClient, WalletClient } from 'viem'
 import { anchorManifest, currentManifest, type ManifestVersion, manifestHistory } from './avalanche.js'
 import { computeFileCid } from './cid.js'
-import { fetchRecord, getStorageStatus, type StorageStatus, uploadRecord } from './filecoin.js'
+import {
+  fetchRecord,
+  pieceStatusIn,
+  type StorageStatus,
+  storageContext,
+  uploadRecord,
+} from './filecoin.js'
 import {
   type Manifest,
   MANIFEST_SCHEMA_VERSION,
@@ -237,10 +243,11 @@ export async function verifyAssetRecord(
     }
   }
 
-  const records: RecordVerdict[] = []
-  for (const entry of record.manifest.records) {
-    records.push(await verifyOneRecord(synapse, entry, record.manifest.storage.dataSetId))
-  }
+  // One context for the whole asset, and the records checked together. Opening
+  // a context costs several seconds of chain reads and every record is in the
+  // same data set, so doing it per record spent that cost once per file.
+  const context = await storageContext(synapse, record.manifest.storage.dataSetId).catch(() => null)
+  const records = await Promise.all(record.manifest.records.map((entry) => verifyOneRecord(synapse, entry, context)))
 
   for (const verdict of records) {
     if (verdict.problem != null) problems.push(`${verdict.filename}: ${verdict.problem}`)
@@ -259,7 +266,7 @@ export async function verifyAssetRecord(
 async function verifyOneRecord(
   synapse: Synapse,
   entry: ManifestRecord,
-  dataSetId: number
+  context: Awaited<ReturnType<typeof storageContext>> | null
 ): Promise<RecordVerdict> {
   const base = { filename: entry.filename, cid: entry.cid }
 
@@ -282,7 +289,7 @@ async function verifyOneRecord(
 
   let proof: StorageStatus | null = null
   try {
-    proof = await getStorageStatus(synapse, { pieceCid: entry.pieceCid, dataSetId })
+    proof = context == null ? null : await pieceStatusIn(context, entry.pieceCid)
   } catch {
     // A proof state that cannot be read is reported as unproven rather than as
     // a hard failure: the bytes may still be correct and retrievable.

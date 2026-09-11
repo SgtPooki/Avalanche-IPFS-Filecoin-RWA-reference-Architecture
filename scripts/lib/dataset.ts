@@ -11,7 +11,7 @@
 
 import { type PdfLine, type PdfPageSpec, buildPdf, escapeText } from './pdf.js'
 
-const ASSET_ID = 'BAL-PROP-001'
+const ASSET_ID = 'FAIRVIEW-PROP-0031'
 const ADDRESS = '123 Main Street'
 const CITY = 'Fairview'
 const COUNTY = 'Fairview County'

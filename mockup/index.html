@@ -363,7 +363,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       <p class="fine">Synthetic data only. Runs on Avalanche Fuji and Filecoin Calibration testnets.</p>
       </div>
       <div class="rec">
-        <div class="row"><span class="k">Property record</span><span class="rtag ava"><i></i>Avalanche · BAL-PROP-001</span></div>
+        <div class="row"><span class="k">Property record</span><span class="rtag ava"><i></i>Avalanche · FAIRVIEW-PROP-0031</span></div>
         <h3>123 Main Street</h3>
         <div class="sub">Fairview County, Example State · Parcel 07-14-226-0031 · Version 2</div>
         <div class="tri"><i class="a"></i><i class="b"></i><i class="c"></i></div>
@@ -392,7 +392,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
           <h4>A pointer, per asset</h4>
           <div class="size">a few hundred bytes, onchain</div>
           <ul>
-            <li>the asset id, <code>BAL-PROP-001</code></li>
+            <li>the asset id, <code>FAIRVIEW-PROP-0031</code></li>
             <li>the CID of the current manifest</li>
             <li>that manifest's Filecoin piece CID and data set id</li>
             <li>one appended entry per version, never overwritten</li>
@@ -476,7 +476,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
     </div>
     <div class="grid wide">
       <div class="panel">
-        <div class="field"><label for="f-asset">Asset ID</label><input id="f-asset" value="BAL-PROP-001"><span class="hint">Namespaced to your wallet on the registry, so forks never collide.</span></div>
+        <div class="field"><label for="f-asset">Asset ID</label><input id="f-asset" value="FAIRVIEW-PROP-0031"><span class="hint">Namespaced to your wallet on the registry, so forks never collide.</span></div>
         <div class="grid two">
           <div class="field"><label for="f-type">Asset type</label><select id="f-type"><option>real-estate</option><option>vehicle</option><option>equipment</option></select></div>
           <div class="field"><label for="f-parcel">Parcel ID</label><input id="f-parcel" value="07-14-226-0031"></div>
@@ -511,7 +511,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
         <h1>Add asset records</h1>
         <p class="lede">Each file is fingerprinted into a content identifier before it leaves the browser, then stored on Filecoin with a proof schedule.</p>
       </div>
-      <span class="pill ok"><span class="dot"></span>BAL-PROP-001 registered · tx 0x91ab…7d3e</span>
+      <span class="pill ok"><span class="dot"></span>FAIRVIEW-PROP-0031 registered · tx 0x91ab…7d3e</span>
     </div>
     <div class="callout" style="margin-bottom:16px;border-left-color:var(--ipfs)"><strong>CID = fingerprint of the bytes.</strong> Change one character in a document and its CID changes. The CID is what the manifest and Avalanche point at, never a URL.</div>
     <div class="panel">
@@ -520,7 +520,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       <table>
         <thead><tr><th>Document</th><th>Type</th><th>Fingerprint (IPFS CID)</th><th>Filecoin</th></tr></thead>
         <tbody>
-          <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">property.json</div><div class="meta">1.2 KB</div></div></div></td><td>property_metadata</td><td><span class="cid short">bafkreig64pgrtedyfsy3gricwjaq2qnsj24bujn45gaj65yewiugwmwn64</span></td><td><span class="pill ok"><span class="dot"></span>Proving</span></td></tr>
+          <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">property.json</div><div class="meta">1.2 KB</div></div></div></td><td>property_metadata</td><td><span class="cid short">bafkreicyjmgjewfnasg7cmornjvtyk7qoebpsqt4u3v4iwskht6njthd6u</span></td><td><span class="pill ok"><span class="dot"></span>Proving</span></td></tr>
           <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">deed.pdf</div><div class="meta">184 KB</div></div></div></td><td>deed</td><td><span class="cid short">bafkreidh5qsi5z6uo2thzvynr27ioajoviafqiveunrielhugyj65l6rzu</span></td><td><span class="pill ok"><span class="dot"></span>Proving</span></td></tr>
           <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">parcel.json</div><div class="meta">3.4 KB</div></div></div></td><td>parcel_record</td><td><span class="cid short">bafkreiejmexovymgvlxps3hpq6ez3ac5sjridcypurprugtsseggslaqiq</span></td><td><span class="pill ok"><span class="dot"></span>Proving</span></td></tr>
           <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">tax-assessment-2025.pdf</div><div class="meta">96 KB</div></div></div></td><td>tax_assessment</td><td><span class="cid short">bafkreiek7fjuel7opibeayam6cfnww54pmyaez2cetk2i3rbpkcsjydkke</span></td><td><span class="pill warn"><span class="dot"></span>Committing onchain</span></td></tr>
@@ -549,10 +549,10 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       <div class="panel aline">
         <div class="panel-title"><h3>manifest.json</h3><span class="cid dim">bafybeia3q…u7pe</span></div>
 <pre class="pre">{
-  <span class="k">"assetId"</span>: <span class="s">"BAL-PROP-001"</span>,
+  <span class="k">"assetId"</span>: <span class="s">"FAIRVIEW-PROP-0031"</span>,
   <span class="k">"records"</span>: [
     {
-      <span class="k">"cid"</span>: <span class="s">"bafkreig64pg…wn64"</span>,
+      <span class="k">"cid"</span>: <span class="s">"bafkreicyjpg…wn64"</span>,
       <span class="k">"filename"</span>: <span class="s">"property.json"</span>,
       <span class="k">"mimeType"</span>: <span class="s">"application/json"</span>,
       <span class="k">"pieceCid"</span>: <span class="s">"bafkzcibca…"</span>,
@@ -653,7 +653,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
           <div class="rcan">The contract holding the pointer and the version history. <a href="#" onclick="return false">Snowtrace ↗</a></div>
         </div>
         <dl class="kv" style="margin-top:10px">
-          <dt>Asset ID</dt><dd class="mono">BAL-PROP-001</dd>
+          <dt>Asset ID</dt><dd class="mono">FAIRVIEW-PROP-0031</dd>
           <dt>Version</dt><dd>2 of 2 <span class="mono" style="color:var(--faint)">· assigned by the registry</span></dd>
           <dt>Anchored</dt><dd>Apr 15, 2026 · tx <span class="mono">0xd04c…21be</span></dd>
         </dl>
@@ -675,7 +675,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       <table>
         <thead><tr><th>Document</th><th>Type</th><th>Fingerprint</th><th>Integrity</th><th>Retrievable</th><th>Stored</th><th>Last proof</th></tr></thead>
         <tbody>
-          <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">property.json</div><div class="meta">501 B</div></div></div></td><td><span class="mono" style="font-size:11px;color:var(--muted)">property_metadata</span></td><td><span class="cid short">bafkreig64pgrted</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
+          <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">property.json</div><div class="meta">501 B</div></div></div></td><td><span class="mono" style="font-size:11px;color:var(--muted)">property_metadata</span></td><td><span class="cid short">bafkreicyjmgjewf</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
           <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">deed.pdf</div><div class="meta">2.8 KB · unchanged since v1</div></div></div></td><td><span class="mono" style="font-size:11px;color:var(--muted)">deed</span></td><td><span class="cid short">bafkreidh5qsi5z6</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
           <tr><td><div class="file"><span class="ico">JSON</span><div><div class="name">parcel.json</div><div class="meta">1.2 KB</div></div></div></td><td><span class="mono" style="font-size:11px;color:var(--muted)">parcel_record</span></td><td><span class="cid short">bafkreiejmexovym</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
           <tr><td><div class="file"><span class="ico">PDF</span><div><div class="name">tax-assessment-2026.pdf</div><div class="meta">2.1 KB · replaced 2025 in v2</div></div></div></td><td><span class="mono" style="font-size:11px;color:var(--muted)">tax_assessment</span></td><td><span class="cid short">bafkreiexhmrobe6</span></td><td><span class="pill ok"><span class="dot"></span>Match</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>Yes</span></td><td><span class="pill ok"><span class="dot"></span>38m</span></td></tr>
@@ -718,7 +718,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
       </div>
       <div style="display:grid;gap:16px;align-content:start">
         <div class="panel">
-          <div class="field" style="margin-bottom:8px"><label for="v-asset">Asset to verify</label><input id="v-asset" value="BAL-PROP-001"></div>
+          <div class="field" style="margin-bottom:8px"><label for="v-asset">Asset to verify</label><input id="v-asset" value="FAIRVIEW-PROP-0031"></div>
           <div class="tiles" style="grid-template-columns:1fr 1fr">
             <div class="tile ava"><span class="n">1</span><span class="t">Asset identity read from the registry</span><span class="who">Avalanche</span></div>
             <div class="tile ipfs"><span class="n">2</span><span class="t">Manifest fingerprint matches the anchored CID</span><span class="who">IPFS</span></div>
@@ -752,7 +752,7 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
           <div class="sum"><span>Anchored on Avalanche</span><span class="x">Content integrity</span><span>Data available</span><span>Filecoin storage</span></div>
         </div>
         <div class="panel">
-          <p style="margin-bottom:12px"><strong>The document you provided does not match the deed recorded for BAL-PROP-001.</strong> Its fingerprint appears in no version of this asset's manifest.</p>
+          <p style="margin-bottom:12px"><strong>The document you provided does not match the deed recorded for FAIRVIEW-PROP-0031.</strong> Its fingerprint appears in no version of this asset's manifest.</p>
           <div class="compare">
             <div class="box">
               <div class="lab">Anchored on Avalanche · deed.pdf</div>
@@ -891,8 +891,8 @@ td .check.ok .ic{background:transparent;color:var(--ok);border:1.5px solid var(-
     {n:0,label:'Overview'},{n:1,label:'Create asset'},{n:2,label:'Upload records'},{n:3,label:'Anchor manifest'},
     {n:4,label:'Asset page'},{n:5,label:'Verify'},{n:6,label:'Tamper'},{n:7,label:'History'}
   ];
-  var txs = {2:{chain:'ava',title:'Signing on Avalanche',desc:'registerAsset(BAL-PROP-001) · Fuji'},3:{chain:'fil',title:'Storing on Filecoin',desc:'manifest.json → provider 12 · storage ID 1842'},4:{chain:'ava',title:'Signing on Avalanche',desc:'setManifest(BAL-PROP-001, bafybeia3q…u7pe) · Fuji'}};
-  var toasts = {2:'Registered BAL-PROP-001 on Avalanche Fuji',3:'Manifest stored on Filecoin',4:'Manifest anchored · tx 0xd04c…21be',5:'Verification complete',6:'Fingerprint mismatch'};
+  var txs = {2:{chain:'ava',title:'Signing on Avalanche',desc:'registerAsset(FAIRVIEW-PROP-0031) · Fuji'},3:{chain:'fil',title:'Storing on Filecoin',desc:'manifest.json → provider 12 · storage ID 1842'},4:{chain:'ava',title:'Signing on Avalanche',desc:'setManifest(FAIRVIEW-PROP-0031, bafybeia3q…u7pe) · Fuji'}};
+  var toasts = {2:'Registered FAIRVIEW-PROP-0031 on Avalanche Fuji',3:'Manifest stored on Filecoin',4:'Manifest anchored · tx 0xd04c…21be',5:'Verification complete',6:'Fingerprint mismatch'};
   var cur = 1;
   var flow = document.getElementById('flow');
   screens.forEach(function(s){

@@ -32,7 +32,7 @@ function demoRecord(
 
 function demoManifest(): Manifest {
   return {
-    assetId: 'BAL-PROP-001',
+    assetId: 'FAIRVIEW-PROP-0031',
     records: [
       demoRecord('deed', 'deed.pdf', 'application/pdf', 188416, 'deed', 'a'),
       demoRecord('parcel', 'parcel.json', 'application/json', 3481, 'parcel_record', 'b'),
