@@ -1,7 +1,8 @@
-// Seed output selects the asset. Every screen uses read-only clients.
+// Seed output selects the asset unless the URL names another. Every screen
+// uses read-only clients.
 
 import { useCallback, useEffect, useState } from 'react'
-import type { Address } from 'viem'
+import { type Address, isAddress } from 'viem'
 import seed from '../seed-output.json' with { type: 'json' }
 import { type DocumentLookup, findDocumentByCid } from './lib/asset-record.js'
 import { type ReadClients, readOnlyClients } from './lib/read-clients.js'
@@ -10,8 +11,22 @@ import { VerifyScreen } from './screens/verify.js'
 import { AssetScreen } from './screens/asset.js'
 import { HistoryScreen } from './screens/history.js'
 
-const ASSET_ID = seed.assetId
-const OWNER = seed.owner as Address
+/**
+ * `?asset=ID&owner=0x…` points the same read-only app at any asset in the
+ * registry, so one hosted copy serves as a verifier for every fork. Anything
+ * missing or malformed falls back to the committed seed output.
+ */
+function selectedAsset(): { assetId: string; owner: Address } {
+  const params = new URLSearchParams(window.location.search)
+  const owner = params.get('owner')
+  const assetId = params.get('asset')?.trim()
+  return {
+    assetId: assetId != null && assetId !== '' ? assetId : seed.assetId,
+    owner: owner != null && isAddress(owner) ? owner : (seed.owner as Address),
+  }
+}
+
+const { assetId: ASSET_ID, owner: OWNER } = selectedAsset()
 
 const views = { asset: 'Asset', verify: 'Verify', tamper: 'Check a document', history: 'History' } as const
 type View = keyof typeof views

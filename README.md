@@ -15,7 +15,7 @@ npm run verify
 
 The command checks `FAIRVIEW-0031` on Avalanche Fuji and Filecoin Calibration. It prints one row per record: whether the fetched content matches its CID, whether retrieval succeeded, and whether the data set holding it has a current storage proof. The manifest's own piece is checked the same way. A failed check exits with status 1. When Avalanche cannot be read, or a document check cannot read every version, the command reports that and exits with status 2 instead of a verdict; a record that could not be fetched shows its content check as unknown, not as a mismatch.
 
-Run the browser app with `npm run dev`, then visit the local URL Vite prints. Asset shows the current record set; History reads every published version and lets you inspect its manifest and download records. Verify and Check a document use the public networks. The committed [seed output](seed-output.json) selects the browser's asset and publisher.
+The same app is hosted read-only at [sgtpooki.github.io/anchorline](https://sgtpooki.github.io/anchorline/); it holds no key. Add `?asset=ID&owner=0x…` to point it at any asset in the registry, your own fork's included. To run it locally, use `npm run dev` and visit the URL Vite prints. Asset shows the current record set; History reads every published version and lets you inspect its manifest and download records. Verify and Check a document use the public networks. The committed [seed output](seed-output.json) selects the browser's asset and publisher.
 
 Try both deeds from the terminal:
 

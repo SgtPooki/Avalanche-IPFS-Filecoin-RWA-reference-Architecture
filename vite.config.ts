@@ -8,6 +8,9 @@ import { defineConfig } from 'vite'
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
+  // GitHub Pages serves the app under /anchorline/. The workflow sets this;
+  // local dev and a root-hosted fork keep '/'.
+  base: process.env.BASE_PATH ?? '/',
   plugins: [react()],
   define: {
     global: 'globalThis',
