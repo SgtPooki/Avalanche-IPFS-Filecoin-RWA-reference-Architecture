@@ -34,6 +34,7 @@ if (verified?.verifySeconds == null) throw new Error('timeline.json has no verif
 const verifySeconds = verified.verifySeconds
 
 const REPO = 'https://github.com/SgtPooki/anchorline'
+const HOSTED = 'https://sgtpooki.github.io/anchorline/'
 
 /**
  * Explorers, checked in a real browser rather than with curl.
@@ -112,6 +113,7 @@ const CHAPTER_TEXT: Record<string, string> = {
   asset: 'The asset. Avalanche holds the pointer, Filecoin providers hold the bytes.',
   verifyStart: 'Verify runs. Reads the pointer from Avalanche, pulls five records from Filecoin, re-hashes each one.',
   verifyDone: `Verified in ${verifySeconds} seconds. Every record: the bytes hash to the CID the manifest lists, they are retrievable, and Filecoin proof state is current.`,
+  diff: 'Two deeds, side by side. One name differs; every other byte is the same.',
   deed: 'The real deed, dropped in. Hashed in the browser, found on record.',
   tampered: 'The same deed with one name changed. Different fingerprint, in no version anchored on Avalanche. Refused.',
   history: 'History. Version 1 is still there. Nothing is overwritten.',
@@ -219,12 +221,12 @@ const html = `<!doctype html>
   </div>
 
   <h1>Verifiable offchain records for an Avalanche RWA</h1>
-  <p class="lede">A forkable worked example. Documents live on Filecoin and are addressed by their IPFS CID, a manifest CID is anchored on Avalanche, and anyone can check the whole chain of custody by reading both networks directly. Every app segment is live against public testnets and uses no key. The publishing segment is labelled mockup footage. The narration is synthesized speech reading <a href="${REPO}/blob/main/docs/demo-script.md" target="_blank" rel="noopener noreferrer">the written script</a>.</p>
+  <p class="lede">A forkable worked example. Documents live on Filecoin and are addressed by their IPFS CID, a manifest CID is anchored on Avalanche, and anyone can check the whole chain of custody by reading both networks directly. Every app segment is live against public testnets and uses no key. The publishing segment is labelled mockup footage. There is no narration; the captions are <a href="${REPO}/blob/main/docs/demo-script.md" target="_blank" rel="noopener noreferrer">the written script</a>.</p>
 
   <div class="fold">
     <div class="player">
       <video controls preload="metadata" poster="poster.png" src="anchorline-demo.mp4">
-        <track kind="captions" src="captions.vtt" srclang="en" label="Narration" default>
+        <track kind="captions" src="captions.vtt" srclang="en" label="Captions">
       </video>
       <div class="chapters">
 ${chapters}
@@ -272,7 +274,7 @@ ${olderVersions}
 
   <div class="card">
     <h2>Run the same check yourself</h2>
-    <p class="fine">Verifying needs no wallet, no account, and no key. It reads two public chains and hashes bytes.</p>
+    <p class="fine">Verifying needs no wallet, no account, and no key. It reads two public chains and hashes bytes. The same app is hosted read-only at <a href="${HOSTED}" target="_blank" rel="noopener noreferrer">${escape(HOSTED.replace('https://', ''))}</a>; add <span class="mono">?asset=ID&amp;owner=0x…</span> to point it at another asset.</p>
     <pre>git clone ${REPO}
 cd anchorline
 npm ci
@@ -281,7 +283,7 @@ npm run verify</pre>
 
   <div class="card">
     <h2>About the ${verifySeconds} seconds of waiting</h2>
-    <p>Most of it is storage providers answering. The narration runs over every chain read in real time. Where a read outlasts its narration, the silent remainder plays at ${take.spedUp.factor}x under a caption saying so: ${take.spedUp.windows} such windows in this take, ${take.spedUp.removedSeconds.toFixed(1)} seconds removed in total. Every time printed on screen is unedited. Anchoring on Avalanche takes about four seconds. Storing a record on Filecoin takes about two minutes, which is why an asset is published ahead of a demo and never during one, and why the publishing segment walks the design mockup instead of the app.</p>
+    <p>Most of it is storage providers answering. The captions run over every chain read in real time. Where a read outlasts its captions, the silent remainder plays at ${take.spedUp.factor}x under a caption saying so: ${take.spedUp.windows} such windows in this take, ${take.spedUp.removedSeconds.toFixed(1)} seconds removed in total. Every time printed on screen is unedited. Anchoring on Avalanche takes about four seconds. Storing a record on Filecoin takes about two minutes, which is why an asset is published ahead of a demo and never during one, and why the publishing segment walks the design mockup instead of the app.</p>
     <p class="fine">Synthetic data throughout. There is no 123 Main Street in Fairview County and there is no Example State. The tampered deed exists only on disk; its fingerprint <span class="mono">${escape(
       short(seed.tamperedDeedCid, 10, 6)
     )}</span> appears in no version and was never uploaded anywhere.</p>
