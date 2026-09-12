@@ -258,9 +258,10 @@ try {
   await narrate('history', {
     until: async () => {
       await first.waitFor()
+      // Both manifests fetch at once; each is a provider round trip.
       await second.getByRole('button', { name: 'Inspect records' }).click()
-      await second.getByText('tax-assessment-2026.pdf', { exact: true }).waitFor()
       await first.getByRole('button', { name: 'Inspect records' }).click()
+      await second.getByText('tax-assessment-2026.pdf', { exact: true }).waitFor()
       await first.getByText('tax-assessment-2025.pdf', { exact: true }).waitFor()
     },
   })

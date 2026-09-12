@@ -444,8 +444,8 @@ export type DocumentLookup =
  * again is work for nothing.
  *
  * A version whose manifest cannot be fetched is skipped, so that one unreachable
- * old manifest does not stop the file matching a version that is reachable. But
- * a miss with versions unread is not a miss: "no version lists this" is only
+ * manifest does not stop the file matching a version that is reachable. But a
+ * miss with versions unread is not a miss: "no version lists this" is only
  * true once every version has been read. Callers get the difference and must
  * not call an incomplete lookup tampering. A registry that cannot be read at
  * all throws; there is no lookup to report.
@@ -458,20 +458,20 @@ export async function findDocumentByCid(
   cid: string
 ): Promise<DocumentLookup> {
   const versions = await manifestHistory(client, owner, assetId)
-  const unreadable: number[] = []
+
+  // Every manifest is fetched at once. A miss has to read them all anyway,
+  // and one provider round trip is 10 to 20 seconds on a slow day, so the
+  // wall time is the slowest fetch rather than the sum.
+  const reads = await Promise.allSettled(versions.map((version) => readAnchoredManifest(synapse, version, assetId)))
+  const unreadable = versions.filter((_, index) => reads[index]!.status === 'rejected').map((version) => version.version)
 
   // Newest first: a document is usually current, and the answer is the same
   // either way.
-  for (const version of [...versions].reverse()) {
-    let manifest: Manifest
-    try {
-      manifest = await readAnchoredManifest(synapse, version, assetId)
-    } catch {
-      unreadable.push(version.version)
-      continue
-    }
-    const record = manifest.records.find((entry) => entry.cid === cid)
-    if (record != null) return { outcome: 'matched', version: version.version, record, unreadable }
+  for (let index = versions.length - 1; index >= 0; index -= 1) {
+    const read = reads[index]!
+    if (read.status !== 'fulfilled') continue
+    const record = read.value.records.find((entry) => entry.cid === cid)
+    if (record != null) return { outcome: 'matched', version: versions[index]!.version, record, unreadable }
   }
   return unreadable.length === 0
     ? { outcome: 'unmatched', versions: versions.length }

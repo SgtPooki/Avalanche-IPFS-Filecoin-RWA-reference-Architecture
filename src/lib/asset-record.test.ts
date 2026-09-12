@@ -85,7 +85,7 @@ beforeEach(() => {
 })
 
 describe('findDocumentByCid', () => {
-  it('matches in an older version even when the newest manifest cannot be read, and names the skipped one', async () => {
+  it('matches in an older version even when the newest manifest cannot be read, and names the unreadable one', async () => {
     const v1 = manifestBytes(manifest([deed]))
     avalanche.manifestHistory.mockResolvedValue([await anchored(1, v1), await anchored(2, new Uint8Array([2]))])
     providerHolding({ 'piece-of-version-1': v1 })
