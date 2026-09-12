@@ -170,7 +170,23 @@ export async function getAssetRecord(
 ): Promise<AssetRecord> {
   const anchor = await currentManifest(client, owner, assetId)
   if (anchor == null) return { anchor: null, manifest: null }
+  return { anchor, manifest: await readAnchoredManifest(synapse, anchor, assetId) }
+}
 
+/**
+ * Fetch the manifest a version points at and prove it is that manifest.
+ *
+ * Every path that reads a manifest goes through here: the current record set,
+ * each version in History, and the document lookup. The bytes are re-hashed
+ * against the anchored CID before they are parsed, and the parsed manifest has
+ * to name the asset it was anchored under. A CAR whose root label is right but
+ * whose blocks are not would pass the label check alone.
+ */
+export async function readAnchoredManifest(
+  synapse: Synapse,
+  anchor: ManifestVersion,
+  assetId: string
+): Promise<Manifest> {
   const bytes = await fetchRecord(synapse, anchor.manifestPieceCid, anchor.manifestCid)
   const recomputed = await computeFileCid(bytes)
   if (recomputed !== anchor.manifestCid) {
@@ -178,8 +194,14 @@ export async function getAssetRecord(
       `the manifest fetched for ${assetId} hashes to ${recomputed}, but Avalanche points at ${anchor.manifestCid}`
     )
   }
-
-  return { anchor, manifest: parseManifest(bytes) }
+  const manifest = parseManifest(bytes)
+  if (manifest.assetId !== assetId) {
+    throw new VerificationError(`the manifest anchored under ${assetId} says it belongs to ${manifest.assetId}`)
+  }
+  if (manifest.records.length === 0) {
+    throw new VerificationError(`the manifest anchored under ${assetId} lists no records`)
+  }
+  return manifest
 }
 
 export class VerificationError extends Error {
@@ -193,8 +215,8 @@ export class VerificationError extends Error {
 export interface RecordVerdict {
   filename: string
   cid: string
-  /** The bytes fetched hash to the CID the manifest lists. */
-  contentMatches: boolean
+  /** The bytes fetched hash to the CID the manifest lists. Null when nothing was fetched to check. */
+  contentMatches: boolean | null
   /** The record could be retrieved at all. */
   retrievable: boolean
   /** Filecoin reports the data set holding it as proven and not overdue. */
@@ -206,10 +228,15 @@ export interface RecordVerdict {
 
 export interface AssetVerdict {
   verified: boolean
+  /** The registry answered. False means nothing below is known, not that nothing is anchored. */
+  avalancheRead: boolean
   /** Avalanche has a pointer for this asset. */
   anchored: boolean
   anchor: ManifestVersion | null
   manifest: Manifest | null
+  /** Proof state of the manifest's own piece. The pointer is only as good as this. */
+  manifestProof: StorageStatus | null
+  manifestStorageProven: boolean
   records: RecordVerdict[]
   problems: string[]
 }
@@ -247,70 +274,88 @@ export async function verifyAssetRecord(
   note(`reading the pointer for ${assetId} from Avalanche`)
   const problems: string[] = []
 
-  let record: AssetRecord
+  let anchor: ManifestVersion | null
   try {
-    record = await getAssetRecord(client, synapse, owner, assetId)
+    anchor = await currentManifest(client, owner, assetId)
   } catch (cause) {
-    // Avalanche may well hold a pointer; what failed is following it. Report
-    // the pointer when it can be read, so the UI can say "anchored, but the
-    // manifest could not be fetched" instead of the flatly wrong "not
-    // anchored" or the confusing "anchored" with nothing to show.
-    const anchor = await currentManifest(client, owner, assetId).catch(() => null)
+    // A registry that cannot be read says nothing about the asset. This must
+    // not surface as "not anchored".
     return {
-      verified: false,
-      anchored: anchor != null,
-      anchor,
-      manifest: null,
-      records: [],
-      problems: [(cause as Error).message],
+      ...EMPTY_VERDICT,
+      avalancheRead: false,
+      problems: [`Avalanche could not be read: ${(cause as Error).message}`],
     }
   }
+  if (anchor == null) {
+    return { ...EMPTY_VERDICT, problems: [`Avalanche has no anchored manifest for ${assetId}`] }
+  }
 
-  if (record.anchor == null || record.manifest == null) {
-    return {
-      verified: false,
-      anchored: false,
-      anchor: null,
-      manifest: null,
-      records: [],
-      problems: [`Avalanche has no anchored manifest for ${assetId}`],
-    }
+  let manifest: Manifest
+  try {
+    manifest = await readAnchoredManifest(synapse, anchor, assetId)
+  } catch (cause) {
+    // Avalanche holds a pointer; what failed is following it. Say so, rather
+    // than the flatly wrong "not anchored" or a bare "anchored" with nothing
+    // behind it.
+    return { ...EMPTY_VERDICT, anchored: true, anchor, problems: [(cause as Error).message] }
   }
 
   // One context per distinct data set, opened once and shared. Opening a
   // context costs several seconds of chain reads, and records usually share a
   // data set, so opening one per record spent that cost once per file. They do
-  // not always share one, though, so this groups rather than assuming.
-  total = record.manifest.records.length
+  // not always share one, though, so this groups rather than assuming. The
+  // manifest's own data set is in the set: the pointer is only as good as the
+  // storage behind it.
+  total = manifest.records.length
   note('opening the Filecoin data sets that prove these records')
 
   const contexts = new Map<number, Awaited<ReturnType<typeof storageContext>> | null>()
   await Promise.all(
-    [...new Set(record.manifest.records.map((entry) => entry.dataSetId))].map(async (dataSetId) => {
+    [...new Set([anchor.dataSetId, ...manifest.records.map((entry) => entry.dataSetId)])].map(async (dataSetId) => {
       contexts.set(dataSetId, await storageContext(synapse, dataSetId).catch(() => null))
     })
   )
-  const records = await Promise.all(
-    record.manifest.records.map(async (entry) => {
-      const verdict = await verifyOneRecord(synapse, entry, contexts.get(entry.dataSetId) ?? null)
-      done += 1
-      note(`checked ${entry.filename}`)
-      return verdict
-    })
-  )
+  const [manifestProof, records] = await Promise.all([
+    readProof(contexts.get(anchor.dataSetId) ?? null, anchor.manifestPieceCid),
+    Promise.all(
+      manifest.records.map(async (entry) => {
+        const verdict = await verifyOneRecord(synapse, entry, contexts.get(entry.dataSetId) ?? null)
+        done += 1
+        note(`checked ${entry.filename}`)
+        return verdict
+      })
+    ),
+  ])
 
+  const manifestStorageProven = isProven(manifestProof)
+  if (!manifestStorageProven) problems.push(`manifest: ${describeProofProblem(manifestProof)}`)
   for (const verdict of records) {
     if (verdict.problem != null) problems.push(`${verdict.filename}: ${verdict.problem}`)
   }
 
   return {
     verified: problems.length === 0,
+    avalancheRead: true,
     anchored: true,
-    anchor: record.anchor,
-    manifest: record.manifest,
+    anchor,
+    manifest,
+    manifestProof,
+    manifestStorageProven,
     records,
     problems,
   }
+}
+
+const EMPTY_VERDICT: AssetVerdict = {
+  verified: false,
+  avalancheRead: true,
+  anchored: false,
+  anchor: null,
+  manifest: null,
+  manifestProof: null,
+  manifestStorageProven: false,
+  records: [],
+  problems: [],
 }
 
 /** Proof state, or null when it cannot be read. Unreadable is not the same as unproven. */
@@ -343,9 +388,11 @@ async function verifyOneRecord(
   try {
     bytes = await fetchRecord(synapse, entry.pieceCid, entry.cid, { retrievalUrl: proof?.retrievalUrl })
   } catch (cause) {
+    // Nothing was fetched, so nothing was compared. Unknown is not a mismatch,
+    // and a mismatch is the one thing that would mean the document changed.
     return {
       ...base,
-      contentMatches: false,
+      contentMatches: null,
       retrievable: false,
       problem: `could not be retrieved (${(cause as Error).message})`,
     }
@@ -371,8 +418,23 @@ function describeProblem(
     return `the bytes retrieved hash to ${recomputed}, but the manifest lists ${entry.cid}`
   }
   if (storageProven) return undefined
-  return proof == null ? 'proof state could not be read' : 'storage proof is overdue'
+  return describeProofProblem(proof)
 }
+
+/** Why a data set does not count as proven. Unreadable, never challenged and overdue are three different things. */
+function describeProofProblem(proof: StorageStatus | null): string {
+  if (proof == null) return 'proof state could not be read'
+  if (proof.lastProven == null) return 'the data set has not been proven yet'
+  return 'storage proof is overdue'
+}
+
+/** What looking for a document in the history established. */
+export type DocumentLookup =
+  | { outcome: 'matched'; version: number; record: ManifestRecord; unreadable: number[] }
+  /** Every anchored version was read and none lists the CID. */
+  | { outcome: 'unmatched'; versions: number }
+  /** No readable version lists the CID, but some could not be read. Not a verdict. */
+  | { outcome: 'incomplete'; versions: number; unreadable: number[] }
 
 /**
  * Find a CID in any version of an asset's history.
@@ -380,6 +442,13 @@ function describeProblem(
  * Split out from `checkDocument` because a UI has already hashed the file by
  * the time it wants to know, and passing the bytes back in only to hash them
  * again is work for nothing.
+ *
+ * A version whose manifest cannot be fetched is skipped, so that one unreachable
+ * old manifest does not stop the file matching a version that is reachable. But
+ * a miss with versions unread is not a miss: "no version lists this" is only
+ * true once every version has been read. Callers get the difference and must
+ * not call an incomplete lookup tampering. A registry that cannot be read at
+ * all throws; there is no lookup to report.
  */
 export async function findDocumentByCid(
   client: PublicClient,
@@ -387,24 +456,26 @@ export async function findDocumentByCid(
   owner: Address,
   assetId: string,
   cid: string
-): Promise<{ version: number; record: ManifestRecord } | null> {
+): Promise<DocumentLookup> {
   const versions = await manifestHistory(client, owner, assetId)
+  const unreadable: number[] = []
 
   // Newest first: a document is usually current, and the answer is the same
-  // either way. A version whose manifest cannot be fetched is skipped rather
-  // than fatal, because one unreachable old manifest must not stop the file
-  // matching a version that is reachable.
+  // either way.
   for (const version of [...versions].reverse()) {
+    let manifest: Manifest
     try {
-      const manifestFile = await fetchRecord(synapse, version.manifestPieceCid, version.manifestCid)
-      const record = parseManifest(manifestFile).records.find((entry) => entry.cid === cid)
-      if (record != null) return { version: version.version, record }
+      manifest = await readAnchoredManifest(synapse, version, assetId)
     } catch {
-      // Try the others. A file matching nothing reachable reads as not on
-      // record, which is the verdict a caller would act on anyway.
+      unreadable.push(version.version)
+      continue
     }
+    const record = manifest.records.find((entry) => entry.cid === cid)
+    if (record != null) return { outcome: 'matched', version: version.version, record, unreadable }
   }
-  return null
+  return unreadable.length === 0
+    ? { outcome: 'unmatched', versions: versions.length }
+    : { outcome: 'incomplete', versions: versions.length, unreadable }
 }
 
 /**
@@ -421,7 +492,7 @@ export async function checkDocument(
   owner: Address,
   assetId: string,
   bytes: Uint8Array
-): Promise<{ cid: string; matched: { version: number; record: ManifestRecord } | null }> {
+): Promise<{ cid: string; lookup: DocumentLookup }> {
   const cid = await computeFileCid(bytes)
-  return { cid, matched: await findDocumentByCid(client, synapse, owner, assetId, cid) }
+  return { cid, lookup: await findDocumentByCid(client, synapse, owner, assetId, cid) }
 }

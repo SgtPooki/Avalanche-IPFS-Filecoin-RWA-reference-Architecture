@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Address } from 'viem'
 import seed from '../seed-output.json' with { type: 'json' }
-import { findDocumentByCid } from './lib/asset-record.js'
+import { type DocumentLookup, findDocumentByCid } from './lib/asset-record.js'
 import { type ReadClients, readOnlyClients } from './lib/read-clients.js'
-import { type DocumentMatch, TamperScreen } from './screens/tamper.js'
+import { TamperScreen } from './screens/tamper.js'
 import { VerifyScreen } from './screens/verify.js'
 import { AssetScreen } from './screens/asset.js'
 import { HistoryScreen } from './screens/history.js'
@@ -31,7 +31,7 @@ export function App() {
   }, [])
 
   const lookup = useCallback(
-    async (cid: string): Promise<DocumentMatch | null> => {
+    async (cid: string): Promise<DocumentLookup> => {
       if (clients == null) throw new Error('still connecting to Avalanche and Filecoin')
       return findDocumentByCid(clients.avalanche, clients.filecoin, OWNER, ASSET_ID, cid)
     },

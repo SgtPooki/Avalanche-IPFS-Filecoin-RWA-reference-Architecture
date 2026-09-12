@@ -15,6 +15,7 @@
  *   window.
  */
 
+import { calculate as calculatePieceCid } from '@filoz/synapse-core/piece'
 import type { Synapse } from '@filoz/synapse-sdk'
 import type { StorageContext } from '@filoz/synapse-sdk/storage'
 import { checkUploadReadiness, createCarFromFile, executeUpload } from 'filecoin-pin'
@@ -152,16 +153,28 @@ export async function fetchRecord(
     const url = options.retrievalUrl
     if (url == null || url === '') throw cause
 
-    const response = await fetch(url)
+    const response = await fetch(url, { signal: AbortSignal.timeout(FALLBACK_TIMEOUT_MS) })
     if (!response.ok) {
       throw new StorageError(
         `retrieval failed twice for ${pieceCid}: the SDK reported "${(cause as Error).message}", ` +
           `and ${url} answered ${response.status}`
       )
     }
-    return extractFileFromCar(new Uint8Array(await response.arrayBuffer()), expectedCid)
+    const car = new Uint8Array(await response.arrayBuffer())
+    // The SDK path validates the piece CID of what it downloads. This path must
+    // too, or "content matches" and "storage proven" could be about different
+    // bytes: a provider could serve a valid CAR that is not the piece whose
+    // proof state was just read.
+    const received = (await calculatePieceCid(car)).toString()
+    if (received !== pieceCid) {
+      throw new StorageError(`${url} served piece ${received}, not the ${pieceCid} the manifest lists`)
+    }
+    return extractFileFromCar(car, expectedCid)
   }
 }
+
+/** A direct provider fetch with no deadline can hold a verify run open for minutes. */
+const FALLBACK_TIMEOUT_MS = 60_000
 
 /** Proof state for one piece, in the terms the UI shows. */
 export interface StorageStatus {

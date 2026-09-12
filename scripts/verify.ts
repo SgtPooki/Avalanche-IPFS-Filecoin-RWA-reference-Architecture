@@ -14,6 +14,10 @@
  * which is the tamper case:
  *
  *   npm run verify -- FAIRVIEW-0031 --file data/deed-tampered.pdf
+ *
+ * Exit status: 0 verified or on record, 1 failed or not on record, 2 no
+ * verdict because a network could not be read. A script must never take 2 for
+ * either of the others.
  */
 
 import { readFile } from 'node:fs/promises'
@@ -36,8 +40,8 @@ const DEMO_OWNER = '0x44f08D1beFe61255b3C3A349C392C560FA333759' as Address
  * while those are alive. On macOS a piped stdout is asynchronous, so the exit
  * waits for the write queue rather than cutting the verdict off.
  */
-function finish(code: number): void {
-  process.stdout.write('', () => process.exit(code))
+function finish(code: number): Promise<never> {
+  return new Promise(() => process.stdout.write('', () => process.exit(code)))
 }
 
 const args = process.argv.slice(2)
@@ -58,16 +62,21 @@ console.log(`registry  ${registry.address} on chain ${registry.chain.id}\n`)
 
 if (filePath != null) {
   const bytes = new Uint8Array(await readFile(filePath))
-  const { cid, matched } = await checkDocument(client, synapse, owner, assetId, bytes)
+  const { cid, lookup } = await checkDocument(client, synapse, owner, assetId, bytes)
   console.log(`${filePath}`)
   console.log(`  fingerprint  ${cid}`)
-  if (matched == null) {
+  if (lookup.outcome === 'matched') {
+    console.log(`  verdict      on record as ${lookup.record.filename}, version ${lookup.version}`)
+    await finish(0)
+  } else if (lookup.outcome === 'unmatched') {
     console.log('  verdict      NOT A DOCUMENT OF RECORD')
-    console.log(`               this fingerprint appears in no version of ${assetId}`)
-    finish(1)
+    console.log(`               this fingerprint appears in none of the ${lookup.versions} versions of ${assetId}`)
+    await finish(1)
   } else {
-    console.log(`  verdict      on record as ${matched.record.filename}, version ${matched.version}`)
-    finish(0)
+    // Not a verdict either way. Exit 2 so a script cannot mistake it for one.
+    console.log('  verdict      INCOMPLETE')
+    console.log(`               version${lookup.unreadable.length === 1 ? '' : 's'} ${lookup.unreadable.join(', ')} could not be read; the rest do not list this fingerprint`)
+    await finish(2)
   }
 }
 
@@ -75,17 +84,24 @@ const started = Date.now()
 const verdict = await verifyAssetRecord(client, synapse, owner, assetId)
 const took = ((Date.now() - started) / 1000).toFixed(1)
 
+if (!verdict.avalancheRead) {
+  // Unreachable is not unanchored. Exit 2, the same "no verdict" status as an
+  // incomplete document check.
+  console.log(`COULD NOT READ AVALANCHE. ${verdict.problems.join(' ')}`)
+  await finish(2)
+}
 if (!verdict.anchored) {
   console.log(`NOT ANCHORED. ${verdict.problems.join(' ')}`)
-  process.exit(1)
+  await finish(1)
 }
 
 console.log(`version ${verdict.anchor?.version} anchored ${verdict.anchor?.publishedAt.toISOString()}`)
-console.log(`manifest ${verdict.anchor?.manifestCid}\n`)
+console.log(`manifest ${verdict.anchor?.manifestCid}`)
+console.log(`manifest storage ${verdict.manifestStorageProven ? 'proven' : 'NOT proven'}\n`)
 
 const now = new Date()
-const tick = (ok: boolean): string => (ok ? 'yes' : 'NO ')
-console.log('record                     content  fetched  proven   last proof')
+const tick = (ok: boolean | null): string => (ok == null ? '?  ' : ok ? 'yes' : 'NO ')
+console.log('record                     content  fetched  proven   data set last proven')
 for (const record of verdict.records) {
   const proof = record.proof == null ? 'unknown' : describeProof(record.proof, now).lastProven
   console.log(
@@ -100,4 +116,4 @@ if (verdict.problems.length > 0) {
 }
 
 console.log(`\n${verdict.verified ? 'VERIFIED' : 'FAILED'} in ${took}s`)
-finish(verdict.verified ? 0 : 1)
+await finish(verdict.verified ? 0 : 1)

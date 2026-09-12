@@ -87,6 +87,7 @@ export function VerifyScreen({ assetId, owner, clients }: VerifyScreenProps) {
       </div>
 
       {run.state === 'done' && <RecordTable records={run.verdict.records} />}
+      <WhatVerifiedMeans />
     </section>
   )
 }
@@ -123,6 +124,10 @@ function Verdict({ verdict, seconds }: { verdict: AssetVerdict; seconds: number 
         <dd>{verdict.anchor?.publishedAt.toLocaleString()}</dd>
         <dt>Manifest</dt>
         <dd className="mono">{verdict.anchor?.manifestCid}</dd>
+        <dt>Manifest storage</dt>
+        <dd>
+          <Mark ok={verdict.manifestStorageProven} />
+        </dd>
       </dl>
 
       {verdict.problems.length > 0 && (
@@ -150,8 +155,8 @@ function RecordTable({ records }: { records: RecordVerdict[] }) {
               <th>Record</th>
               <th>Content matches CID</th>
               <th>Retrievable</th>
-              <th>Storage proven</th>
-              <th>Last proof</th>
+              <th>Data set proof current</th>
+              <th>Data set last proven</th>
             </tr>
           </thead>
           <tbody>
@@ -184,11 +189,31 @@ function RecordTable({ records }: { records: RecordVerdict[] }) {
   )
 }
 
-function Mark({ ok }: { ok: boolean }) {
+/** Three states. "Unknown" is a check that did not run, which is not a "No". */
+function Mark({ ok }: { ok: boolean | null }) {
   return (
-    <span className={ok ? 'pill ok' : 'pill warn'}>
+    <span className={ok == null ? 'pill neutral' : ok ? 'pill ok' : 'pill warn'}>
       <span className="dot" />
-      {ok ? 'Yes' : 'No'}
+      {ok == null ? 'Unknown' : ok ? 'Yes' : 'No'}
     </span>
+  )
+}
+
+/**
+ * The claim, stated at the level the checks support. A BD conversation goes
+ * wrong when "verified" is heard as "Filecoin proved this deed", so the limits
+ * are on the same screen as the verdict.
+ */
+function WhatVerifiedMeans() {
+  return (
+    <details className="panel" style={{ marginTop: 16 }}>
+      <summary>What verified means here</summary>
+      <ul className="sub" style={{ margin: '10px 0 0', paddingLeft: 18, display: 'grid', gap: 6 }}>
+        <li>The manifest fetched from Filecoin hashes to the CID that Avalanche points at, and it names this asset.</li>
+        <li>Every record fetched from Filecoin hashes to the CID that manifest lists. Matching bytes mean the document is the one published under this account. They do not mean its contents are true.</li>
+        <li>The data set holding each piece, and the manifest's own piece, has a storage proof that is not overdue. Proof state belongs to the data set, not to each file, and the time shown is derived from the proving schedule that Filecoin reports.</li>
+        <li>Nothing here needs a key, an account, or the issuer's servers. Reading both networks is what makes this an audit anyone can run.</li>
+      </ul>
+    </details>
   )
 }

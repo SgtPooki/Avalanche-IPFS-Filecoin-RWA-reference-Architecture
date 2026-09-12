@@ -6,11 +6,7 @@ import { AnchorDetails, Records } from './records.js'
 import { useRead } from './use-read.js'
 
 export function AssetScreen({ assetId, owner, clients, onVerify }: VerifyScreenProps & { onVerify: () => void }) {
-  const load = useCallback(async () => {
-    const record = await getAssetRecord(clients!.avalanche, clients!.filecoin, owner, assetId)
-    if (record.manifest != null && record.manifest.assetId !== assetId) throw new Error('Manifest asset id does not match the registry asset')
-    return record
-  }, [clients, owner, assetId])
+  const load = useCallback(() => getAssetRecord(clients!.avalanche, clients!.filecoin, owner, assetId), [clients, owner, assetId])
   const { result, refresh } = useRead(clients == null ? null : load)
   return <section>
     <div className="screen-head"><div className="eyebrow">Asset</div><h1>{assetId}</h1></div>

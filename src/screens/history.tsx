@@ -1,8 +1,6 @@
 import { useCallback, useState } from 'react'
+import { readAnchoredManifest } from '../lib/asset-record.js'
 import { manifestHistory, type ManifestVersion } from '../lib/avalanche.js'
-import { fetchRecord } from '../lib/filecoin.js'
-import { computeFileCid } from '../lib/cid.js'
-import { parseManifest } from '../lib/manifest.js'
 import type { ReadClients } from '../lib/read-clients.js'
 import type { VerifyScreenProps } from './verify.js'
 import { AnchorDetails, Records } from './records.js'
@@ -34,13 +32,7 @@ function Version({ anchor, current, clients, assetId }: { anchor: ManifestVersio
 }
 
 function VersionRecords({ anchor, clients, assetId }: { anchor: ManifestVersion; clients: ReadClients; assetId: string }) {
-  const load = useCallback(async () => {
-    const bytes = await fetchRecord(clients.filecoin, anchor.manifestPieceCid, anchor.manifestCid)
-    if (await computeFileCid(bytes) !== anchor.manifestCid) throw new Error('Manifest content does not match the Avalanche pointer')
-    const manifest = parseManifest(bytes)
-    if (manifest.assetId !== assetId) throw new Error('Manifest asset id does not match the registry asset')
-    return manifest
-  }, [anchor, clients, assetId])
+  const load = useCallback(() => readAnchoredManifest(clients.filecoin, anchor, assetId), [anchor, clients, assetId])
   const { result, refresh } = useRead(load)
   if (result.state === 'loading') return <p role="status">Fetching version {anchor.version} manifest...</p>
   if (result.state === 'failed') return <div role="alert"><p>{result.message}</p><button className="btn" onClick={refresh}>Retry</button></div>

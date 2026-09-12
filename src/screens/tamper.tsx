@@ -1,18 +1,13 @@
 // Hash the local file, then look for its CID in the published history.
 
 import { useCallback, useRef, useState } from 'react'
+import type { DocumentLookup } from '../lib/asset-record.js'
 import { computeFileCid } from '../lib/cid.js'
-import type { ManifestRecord } from '../lib/manifest.js'
-
-export interface DocumentMatch {
-  version: number
-  record: ManifestRecord
-}
 
 export interface TamperScreenProps {
   assetId: string
-  /** Looks the CID up across every anchored version. Null when nothing matches. */
-  lookup: (cid: string) => Promise<DocumentMatch | null>
+  /** Looks the CID up across every anchored version. */
+  lookup: (cid: string) => Promise<DocumentLookup>
   /** False while the chain clients are still connecting. */
   ready: boolean
   onOpenHistory?: () => void
@@ -22,7 +17,7 @@ type Check =
   | { state: 'idle' }
   | { state: 'hashing'; filename: string; size: number }
   | { state: 'searching'; filename: string; size: number; cid: string }
-  | { state: 'done'; filename: string; size: number; cid: string; match: DocumentMatch | null }
+  | { state: 'done'; filename: string; size: number; cid: string; lookup: DocumentLookup }
   | { state: 'failed'; filename: string; message: string }
 
 export function TamperScreen({ assetId, lookup, ready, onOpenHistory }: TamperScreenProps) {
@@ -39,7 +34,7 @@ export function TamperScreen({ assetId, lookup, ready, onOpenHistory }: TamperSc
         // reading both chains is not, so there is no reason to hold back the
         // one answer already in hand.
         setCheck({ state: 'searching', filename: file.name, size: file.size, cid })
-        setCheck({ state: 'done', filename: file.name, size: file.size, cid, match: await lookup(cid) })
+        setCheck({ state: 'done', filename: file.name, size: file.size, cid, lookup: await lookup(cid) })
       } catch (cause) {
         setCheck({ state: 'failed', filename: file.name, message: (cause as Error).message })
       }
@@ -121,12 +116,16 @@ function Verdict({
   assetId: string
   onOpenHistory?: (() => void) | undefined
 }) {
-  const onRecord = check.match != null
+  const { lookup } = check
+  // Three outcomes, not two. A lookup that could not read every version is
+  // not a failure and must not be called tampering; it is asked again.
+  const headline = lookup.outcome === 'matched' ? 'On record' : lookup.outcome === 'unmatched' ? 'Failed' : 'Incomplete'
+  const tone = lookup.outcome === 'matched' ? 'big ok' : lookup.outcome === 'unmatched' ? 'big bad' : 'big'
   return (
     <>
       <div className="verdict">
         {/* Amber, never red: the brand colour must not come to mean "bad". */}
-        <div className={onRecord ? 'big ok' : 'big bad'}>{onRecord ? 'On record' : 'Failed'}</div>
+        <div className={tone}>{headline}</div>
         <div className="sub">
           {check.filename} · {check.size.toLocaleString('en-US')} bytes
         </div>
@@ -137,15 +136,16 @@ function Verdict({
         <dd className="mono">{check.cid}</dd>
       </dl>
 
-      {onRecord ? (
+      {lookup.outcome === 'matched' && (
         <p className="sub">
-          This is <strong>{check.match?.record.filename}</strong>, on record in version {check.match?.version} of{' '}
-          {assetId}.
+          This is <strong>{lookup.record.filename}</strong>, on record in version {lookup.version} of {assetId}.
+          {lookup.unreadable.length > 0 && ` Version${lookup.unreadable.length === 1 ? '' : 's'} ${lookup.unreadable.join(', ')} could not be read; the match stands without them.`}
         </p>
-      ) : (
+      )}
+      {lookup.outcome === 'unmatched' && (
         <>
           <p className="sub">
-            This fingerprint appears in no version of {assetId}. Avalanche has never pointed at these bytes.
+            This fingerprint appears in none of the {lookup.versions} version{lookup.versions === 1 ? '' : 's'} of {assetId}. Avalanche has never pointed at these bytes.
           </p>
           <div className="callout neutral">
             <strong>This is tampering, not an update.</strong> A legitimate change publishes a new version and records
@@ -157,6 +157,11 @@ function Verdict({
             )}
           </div>
         </>
+      )}
+      {lookup.outcome === 'incomplete' && (
+        <div className="callout neutral" role="alert">
+          <strong>No verdict.</strong> Version{lookup.unreadable.length === 1 ? '' : 's'} {lookup.unreadable.join(', ')} of {lookup.versions} could not be fetched from Filecoin, and the versions that could be read do not list this fingerprint. Check the file again once the network answers.
+        </div>
       )}
     </>
   )
