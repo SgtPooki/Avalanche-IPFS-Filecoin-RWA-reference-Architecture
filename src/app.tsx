@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { type Address, isAddress } from 'viem'
 import seed from '../seed-output.json' with { type: 'json' }
+import property from '../data/property.json' with { type: 'json' }
 import { type DocumentLookup, findDocumentByCid } from './lib/asset-record.js'
 import { type ReadClients, readOnlyClients } from './lib/read-clients.js'
 import { TamperScreen } from './screens/tamper.js'
@@ -17,26 +18,27 @@ import { Above, Below, REPO } from './landing.js'
  * registry, so one hosted copy serves as a verifier for every fork. Anything
  * missing or malformed falls back to the committed seed output.
  */
-function selectedAsset(): { assetId: string; label: string; owner: Address } {
+function selectedAsset(): { assetId: string; label: string; custom: boolean; owner: Address } {
   const params = new URLSearchParams(window.location.search)
   const owner = params.get('owner')
   const assetId = params.get('asset')?.trim()
   const custom = assetId != null && assetId !== ''
   return {
     assetId: custom ? assetId : seed.assetId,
-    label: custom ? assetId : '123 Main Street, Fairview',
+    label: custom ? assetId : `${property.address.street}, ${property.address.city}`,
+    custom,
     owner: owner != null && isAddress(owner) ? owner : (seed.owner as Address),
   }
 }
 
-const { assetId: ASSET_ID, label: LABEL, owner: OWNER } = selectedAsset()
+const { assetId: ASSET_ID, label: LABEL, custom: CUSTOM, owner: OWNER } = selectedAsset()
 
 const views = { asset: 'Property record', verify: 'Verify', tamper: 'Check a document', history: 'History' } as const
 const pageLinks = { '#architecture': 'Architecture', '#demo': 'Demo', '#how': 'How it works', '#build': 'Build it', [REPO]: 'GitHub' }
 type View = keyof typeof views
 
 export function App() {
-  const [view, setView] = useState<View>('verify')
+  const [view, setView] = useState<View>('asset')
   const [clients, setClients] = useState<ReadClients | null>(null)
   const [failed, setFailed] = useState<string | null>(null)
 
@@ -78,6 +80,15 @@ export function App() {
           stores them on Filecoin, and anchors the set on Avalanche. Everything below reads the live testnets. The
           property is synthetic.
         </p>
+        {!CUSTOM && (
+          <dl className="kv record-identity">
+            <dt>Property</dt><dd>{LABEL}</dd>
+            <dt>Record type</dt><dd>Property deed, survey, parcel file and tax assessments</dd>
+            <dt>Parcel ID</dt><dd className="mono">{property.assessorParcelNumber}</dd>
+            <dt>Issuer</dt><dd>{property.issuer.name}</dd>
+            <dt>Owner of record</dt><dd>{property.ownerOfRecord}</dd>
+          </dl>
+        )}
         <div className="top">
           <nav className="nav">
             {(Object.keys(views) as View[]).map((candidate) => (
