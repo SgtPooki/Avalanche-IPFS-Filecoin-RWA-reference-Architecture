@@ -66,7 +66,7 @@ export function TamperScreen({ label, lookup, ready, onOpenHistory }: TamperScre
       <div className="split">
         <div className="panel">
           {check.state === 'done' ? (
-            <Verdict check={check} assetId={label} onOpenHistory={onOpenHistory} />
+            <Verdict check={check} label={label} onOpenHistory={onOpenHistory} />
           ) : (
             <p className="sub">
               {check.state === 'hashing'
@@ -110,11 +110,11 @@ export function TamperScreen({ label, lookup, ready, onOpenHistory }: TamperScre
 
 function Verdict({
   check,
-  assetId,
+  label,
   onOpenHistory,
 }: {
   check: Extract<Check, { state: 'done' }>
-  assetId: string
+  label: string
   onOpenHistory?: (() => void) | undefined
 }) {
   const { lookup } = check
@@ -139,14 +139,14 @@ function Verdict({
 
       {lookup.outcome === 'matched' && (
         <p className="sub">
-          This is <strong>{lookup.record.filename}</strong>, on record in version {lookup.version} of {assetId}.
+          This is <strong>{lookup.record.filename}</strong>, on record in version {lookup.version} of {label}.
           {lookup.unreadable.length > 0 && ` Version${lookup.unreadable.length === 1 ? '' : 's'} ${lookup.unreadable.join(', ')} could not be read; the match stands without them.`}
         </p>
       )}
       {lookup.outcome === 'unmatched' && (
         <>
           <p className="sub">
-            This fingerprint appears in none of the {lookup.versions} version{lookup.versions === 1 ? '' : 's'} of {assetId}. Avalanche has never pointed at these bytes.
+            This fingerprint appears in none of the {lookup.versions} version{lookup.versions === 1 ? '' : 's'} of {label}. Avalanche has never pointed at these bytes.
           </p>
           <div className="callout neutral">
             <strong>This is tampering, not an update.</strong> A legitimate change publishes a new version and records

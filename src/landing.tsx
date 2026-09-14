@@ -4,7 +4,7 @@
 import type { ReactNode } from 'react'
 
 export const REPO = 'https://github.com/SgtPooki/Avalanche-IPFS-Filecoin-RWA-reference-Architecture'
-export const CONTACT = 'https://fil.org/contact'
+const CONTACT = 'https://fil.org/contact'
 
 export function Above() {
   return (
@@ -41,7 +41,7 @@ export function Above() {
 
       <Section id="architecture" title="A hybrid architecture for real-world assets" lede="Three networks, one job each. The result is a durable link between an onchain asset and the exact offchain data it represents.">
         <div className="three">
-          <Pillar tone="ipfs" name="IPFS" ask="Content-address the record" ans="A CID is derived from the bytes themselves. Change one byte and the CID changes. Output: a CID." />
+          <Pillar tone="ipfs" name="IPFS" ask="Content-address the record" ans="A CID is derived from the bytes themselves. Change one byte and the CID changes. Output: a CID, a content identifier." />
           <Pillar tone="fil" name="Filecoin" ask="Persist the underlying data" ans="Storage providers hold the bytes and post cryptographic proofs that they still do. Output: verifiable storage." />
           <Pillar tone="ava" name="Avalanche" ask="Reference the CID from the asset" ans="The application records the CID alongside the asset or transaction. Output: onchain state anyone can read." />
         </div>

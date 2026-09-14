@@ -23,7 +23,7 @@ That leaves a simple infrastructure question: how can an application reference o
 | Component | What it does | Output |
 | --- | --- | --- |
 | **RWA source record** | Deed, title, appraisal, certification, disclosure | The document |
-| **IPFS** | Content-addresses the record | A CID derived from the bytes |
+| **IPFS** | Content-addresses the record | A CID (content identifier) derived from the bytes |
 | **Filecoin** | Persists the underlying data | Verifiable storage, backed by cryptographic proofs |
 | **Avalanche** | References the CID from the onchain asset or application | Onchain state and transactions |
 
@@ -70,7 +70,7 @@ Because the CID is derived from the content, changing the underlying record prod
 | `deed.pdf` (original) | `bafkreidh5qsi5z6uo2thzvynr27ioajoviafqiveunrielhugyj65l6rzu` |
 | `deed-tampered.pdf` (one line edited) | `bafkreiausintabvl4n4hvgv2jdmazvy35bg26gku2ufu2bosxhrd7dzxqi` |
 
-In the demo, open **Check a document** and drop in either file. The file is hashed in your browser and never uploaded; the edited copy returns "not a document of record".
+In the demo, open **Check a document** and drop in either file. The file is hashed in your browser and never uploaded; the edited copy is reported as not a document of record.
 
 ## What each layer provides
 
