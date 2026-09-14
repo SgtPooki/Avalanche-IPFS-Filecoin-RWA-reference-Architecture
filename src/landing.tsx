@@ -4,7 +4,7 @@
 import type { ReactNode } from 'react'
 
 export const REPO = 'https://github.com/SgtPooki/Avalanche-IPFS-Filecoin-RWA-reference-Architecture'
-const CONTACT = 'https://fil.org/contact'
+const CONTACT = 'https://filecoin.cloud/contact'
 
 export function Above() {
   return (
