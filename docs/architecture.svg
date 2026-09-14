@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1240" height="820" viewBox="0 0 1240 820" font-family="'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="14" fill="#0F1216">
-  <title>Anchorline architecture: what is stored where, and who reads what</title>
+  <title>Reference architecture: what is stored where, and who reads what</title>
   <desc>An issuer stores record bytes with a Filecoin storage provider and anchors one manifest pointer per version on Avalanche. IPFS CIDs name the content on both sides. A verifier reads the pointer from Avalanche, fetches and re-hashes the bytes from the provider, and reads data set proof state from Filecoin. The registry never reads Filecoin.</desc>
   <defs>
     <marker id="ava" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#B32A2B"/></marker>

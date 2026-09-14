@@ -10,6 +10,7 @@ import { TamperScreen } from './screens/tamper.js'
 import { VerifyScreen } from './screens/verify.js'
 import { AssetScreen } from './screens/asset.js'
 import { HistoryScreen } from './screens/history.js'
+import { Above, Below, REPO } from './landing.js'
 
 /**
  * `?asset=ID&owner=0x…` points the same read-only app at any asset in the
@@ -28,7 +29,8 @@ function selectedAsset(): { assetId: string; owner: Address } {
 
 const { assetId: ASSET_ID, owner: OWNER } = selectedAsset()
 
-const views = { asset: 'Asset', verify: 'Verify', tamper: 'Check a document', history: 'History' } as const
+const views = { asset: 'Property record', verify: 'Verify', tamper: 'Check a document', history: 'History' } as const
+const pageLinks = { '#architecture': 'Architecture', '#demo': 'Demo', '#how': 'How it works', '#build': 'Build it', [REPO]: 'GitHub' }
 type View = keyof typeof views
 
 export function App() {
@@ -58,39 +60,55 @@ export function App() {
       <header className="top">
         <div className="brand">
           <span className="mark" />
-          Anchorline
+          <span>Filecoin × Avalanche <span className="dim">· RWA reference architecture</span></span>
         </div>
         <nav className="nav">
-          {(Object.keys(views) as View[]).map((candidate) => (
-            <button
-              key={candidate}
-              type="button"
-              onClick={() => setView(candidate)}
-              {...(view === candidate ? { 'aria-current': 'page' as const } : {})}
-            >
-              {views[candidate]}
-            </button>
+          {Object.entries(pageLinks).map(([href, label]) => (
+            <a key={href} href={href}>{label}</a>
           ))}
         </nav>
-        <div className="chains">
-          <span className="pill ava"><span className="dot" />Avalanche Fuji</span>
-          <span className="pill fil"><span className="dot" />Filecoin Calibration</span>
-          <span className="mono dim">{OWNER.slice(0, 6)}…{OWNER.slice(-4)}</span>
-        </div>
       </header>
-      <main>
-        {failed != null && (
-          <div className="callout neutral">Could not reach the networks: {failed}</div>
-        )}
-        <div hidden={view !== 'verify'}>
-          <VerifyScreen assetId={ASSET_ID} owner={OWNER} clients={clients} />
+      <Above />
+      <section className="land-sec" id="demo">
+        <h2>See it in action: property record</h2>
+        <p className="lede">
+          A synthetic deed, survey, parcel file and tax assessments for 123 Main Street, published by a county recorder
+          and referenced from Avalanche. Everything below reads the live testnets.
+        </p>
+        <div className="top">
+          <nav className="nav">
+            {(Object.keys(views) as View[]).map((candidate) => (
+              <button
+                key={candidate}
+                type="button"
+                onClick={() => setView(candidate)}
+                {...(view === candidate ? { 'aria-current': 'page' as const } : {})}
+              >
+                {views[candidate]}
+              </button>
+            ))}
+          </nav>
+          <div className="chains">
+            <span className="pill ava"><span className="dot" />Avalanche Fuji</span>
+            <span className="pill fil"><span className="dot" />Filecoin Calibration</span>
+            <span className="mono dim">{OWNER.slice(0, 6)}…{OWNER.slice(-4)}</span>
+          </div>
         </div>
-        {view === 'asset' && <AssetScreen assetId={ASSET_ID} owner={OWNER} clients={clients} onVerify={() => setView('verify')} />}
-        {view === 'history' && <HistoryScreen assetId={ASSET_ID} owner={OWNER} clients={clients} />}
-        <div hidden={view !== 'tamper'}>
-          <TamperScreen assetId={ASSET_ID} lookup={lookup} ready={clients != null} onOpenHistory={() => setView('history')} />
-        </div>
-      </main>
+        <main>
+          {failed != null && (
+            <div className="callout neutral">Could not reach the networks: {failed}</div>
+          )}
+          <div hidden={view !== 'verify'}>
+            <VerifyScreen assetId={ASSET_ID} owner={OWNER} clients={clients} />
+          </div>
+          {view === 'asset' && <AssetScreen assetId={ASSET_ID} owner={OWNER} clients={clients} onVerify={() => setView('verify')} />}
+          {view === 'history' && <HistoryScreen assetId={ASSET_ID} owner={OWNER} clients={clients} />}
+          <div hidden={view !== 'tamper'}>
+            <TamperScreen assetId={ASSET_ID} lookup={lookup} ready={clients != null} onOpenHistory={() => setView('history')} />
+          </div>
+        </main>
+      </section>
+      <Below />
     </div>
   )
 }

@@ -19,7 +19,7 @@ async function screenshot(name) {
 
 try {
   await page.goto(url)
-  await page.getByRole('button', { name: 'Asset', exact: true }).click()
+  await page.getByRole('button', { name: 'Property record', exact: true }).click()
   await page.getByRole('heading', { name: 'Record set, version 2' }).waitFor()
   assert.equal(await page.locator('tbody tr').count(), 5)
   await page.getByText('tax-assessment-2026.pdf', { exact: true }).waitFor()
@@ -46,14 +46,14 @@ try {
 
   await page.setViewportSize({ width: 390, height: 844 })
   await screenshot('history-mobile')
-  await page.getByRole('button', { name: 'Asset', exact: true }).click()
+  await page.getByRole('button', { name: 'Property record', exact: true }).click()
   await page.getByRole('heading', { name: 'Record set, version 2' }).waitFor()
   await screenshot('asset-mobile')
   await page.getByRole('button', { name: 'Verify now', exact: true }).click()
   await page.getByRole('heading', { name: 'Verify asset records' }).waitFor()
   await screenshot('verify-mobile')
   await page.route('https://api.avax-test.network/**', (route) => route.abort())
-  await page.getByRole('button', { name: 'Asset', exact: true }).click()
+  await page.getByRole('button', { name: 'Property record', exact: true }).click()
   await page.getByRole('alert').filter({ hasText: 'Could not read the asset' }).waitFor()
   await page.unroute('https://api.avax-test.network/**')
   await page.getByRole('button', { name: 'Refresh', exact: true }).click()

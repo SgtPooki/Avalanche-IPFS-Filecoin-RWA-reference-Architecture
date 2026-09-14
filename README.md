@@ -1,6 +1,10 @@
-# How to add verifiable offchain records to an Avalanche RWA
+# Verifiable offchain data for tokenized real-world assets
 
-Anchorline is a forkable worked example, built on Avalanche. An issuer publishes a record set, anchors its manifest on Avalanche, and lets anyone retrieve the documents and check their content and Filecoin storage proof state. The example uses a synthetic property; the same record format can hold inspection reports, loan documents, or equipment certificates.
+A reference architecture and working example showing how RWA issuers can use Avalanche, IPFS and Filecoin to connect onchain assets to durable, content-addressed source records. Tokenized assets depend on deeds, certifications, appraisals and disclosures that don't belong onchain; this pattern lets an application reference those records while anyone can verify the data hasn't changed and is still stored.
+
+Read the [reference architecture](docs/reference-architecture.md) or open the [live demo](https://sgtpooki.github.io/anchorline/). The rest of this README is the implementation guide.
+
+An issuer publishes a record set, anchors its manifest on Avalanche, and lets anyone retrieve the documents and check their content and Filecoin storage proof state. The example uses a synthetic property; the same record format can hold inspection reports, loan documents, or equipment certificates. Anchorline is the name of this demo application, not a product.
 
 ## Verify the example
 

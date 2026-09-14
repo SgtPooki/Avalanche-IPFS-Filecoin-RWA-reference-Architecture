@@ -52,7 +52,7 @@ const say = (text) => ({ text, seconds: Math.max(3.5, (text.split(/\s+/).length 
  */
 const SCRIPT = {
   title: [
-    say('Anchorline: verifiable offchain records for a real-world asset on Avalanche. Everything here runs live on Avalanche Fuji and Filecoin Calibration, except one labelled segment.'),
+    say('Verifiable offchain records for a real-world asset on Avalanche. Everything here runs live on Avalanche Fuji and Filecoin Calibration, except one labelled segment.'),
   ],
   asset: [
     say('This is FAIRVIEW-0031, a synthetic property record set. Avalanche holds one pointer per version: the manifest content identifier, its Filecoin piece, and a data set id. The manifest lists five records. Filecoin providers hold the bytes; Avalanche never stores a document.'),
@@ -87,7 +87,7 @@ const SCRIPT = {
     say('The manifest is stored last. One Avalanche transaction anchors its content identifier, its piece, and the data set id, in about four seconds. The registry appends a version and never overwrites.'),
   ],
   close: [
-    say('Verify it yourself from a phone: scan the code, or clone the repository and run npm run verify. No key needed. Anchorline builds on the Avalanche and Filecoin data bridge from May 2025.'),
+    say('Verify it yourself from a phone: scan the code, or clone the repository and run npm run verify. No key needed. This demo builds on the Avalanche and Filecoin data bridge from May 2025.'),
   ],
 }
 
@@ -219,9 +219,9 @@ try {
     <p class="mono">${REPO}</p>`)
   await narrate('title')
 
-  await page.goto(url)
+  await page.goto(url + '#demo')
   await overlay()
-  await nav('Asset').click()
+  await nav('Property record').click()
   await narrate('asset', { until: () => page.getByRole('heading', { name: 'Record set, version 2' }).waitFor() })
 
   await nav('Verify').click()
@@ -242,7 +242,7 @@ try {
     <p class="fine" style="margin-top:14px">Excerpts from the two PDFs on disk. One name differs; everything else is byte for byte the same.</p>`)
   await narrate('diff')
 
-  await page.goto(url)
+  await page.goto(url + '#demo')
   await overlay()
   await nav('Check a document').click()
   await page.locator('input[type=file]').setInputFiles('data/deed.pdf')
