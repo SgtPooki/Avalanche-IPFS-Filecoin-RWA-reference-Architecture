@@ -88,7 +88,7 @@ The issuer stays the record of authority. Matching bytes establish that a docume
 
 All documents here are public and synthetic. Confidential records need encryption and key management before storage. This example does not implement those controls, KYC, or production custody.
 
-Ava Labs and the Filecoin Foundation launched the [Avalanche and Filecoin data bridge in May 2025](https://www.avax.network/about/blog/avalanche-and-filecoin-launch-cross-chain-data-bridge-for-scalable-web3). This example builds on that connection. Its verifier reads both networks directly; the registry does not validate Filecoin proofs on Avalanche.
+Ava Labs and the Filecoin Foundation launched the [Avalanche and Filecoin data bridge in May 2025](https://www.avalanche.com/about/blog/avalanche-and-filecoin-launch-cross-chain-data-bridge-for-scalable-web3). This example builds on that connection. Its verifier reads both networks directly; the registry does not validate Filecoin proofs on Avalanche.
 
 ## Check your fork
 

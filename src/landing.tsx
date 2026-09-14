@@ -131,7 +131,7 @@ export function Below() {
       <Section id="about" title="About this demo">
         <p className="where-note">
           This open-source demo application was created to illustrate the reference architecture. It builds on the{' '}
-          <a href="https://www.avax.network/about/blog/avalanche-and-filecoin-launch-cross-chain-data-bridge">
+          <a href="https://www.avalanche.com/about/blog/avalanche-and-filecoin-launch-cross-chain-data-bridge-for-scalable-web3">
             Avalanche and Filecoin data bridge
           </a>{' '}
           announced in May 2025. The property in the example is synthetic.
