@@ -8,6 +8,8 @@ import { describeProof } from '../lib/filecoin.js'
 
 export interface VerifyScreenProps {
   assetId: string
+  /** How the demo names the property, e.g. its street address. */
+  label: string
   owner: Address
   clients: { avalanche: PublicClient; filecoin: Synapse } | null
 }
@@ -18,7 +20,7 @@ type Run =
   | { state: 'done'; verdict: AssetVerdict; seconds: number }
   | { state: 'failed'; message: string }
 
-export function VerifyScreen({ assetId, owner, clients }: VerifyScreenProps) {
+export function VerifyScreen({ assetId, label, owner, clients }: VerifyScreenProps) {
   const [run, setRun] = useState<Run>({ state: 'idle' })
 
   const start = useCallback(async () => {
@@ -39,10 +41,10 @@ export function VerifyScreen({ assetId, owner, clients }: VerifyScreenProps) {
     <section>
       <div className="screen-head">
         <div className="eyebrow">Verify · anyone, no wallet needed</div>
-        <h1>Verify asset records</h1>
+        <h1>Verify the records for {label}</h1>
         <p className="sub">
-          Reads the pointer from Avalanche, fetches the manifest and every record from Filecoin, re-hashes the bytes,
-          and checks the storage proofs. Nothing here trusts the issuer.
+          Reads the pointer from Avalanche, fetches the deed, survey, parcel file and tax assessment from Filecoin,
+          re-hashes the bytes, and checks the storage proofs. Nothing here trusts the county recorder.
         </p>
       </div>
 
@@ -63,9 +65,9 @@ export function VerifyScreen({ assetId, owner, clients }: VerifyScreenProps) {
 
         <div className="panel">
           <dl className="kv">
-            <dt>Asset</dt>
+            <dt>Parcel record</dt>
             <dd className="mono">{assetId}</dd>
-            <dt>Publisher</dt>
+            <dt>Recorder</dt>
             <dd className="mono">
               {owner.slice(0, 10)}…{owner.slice(-6)}
             </dd>
@@ -209,10 +211,10 @@ function WhatVerifiedMeans() {
     <details className="panel" style={{ marginTop: 16 }}>
       <summary>What verified means here</summary>
       <ul className="sub" style={{ margin: '10px 0 0', paddingLeft: 18, display: 'grid', gap: 6 }}>
-        <li>The manifest fetched from Filecoin hashes to the CID that Avalanche points at, and it names this asset.</li>
-        <li>Every record fetched from Filecoin hashes to the CID that manifest lists. Matching bytes mean the document is the one published under this account. They do not mean its contents are true.</li>
+        <li>The manifest fetched from Filecoin hashes to the CID that Avalanche points at, and it names this property.</li>
+        <li>Every record fetched from Filecoin hashes to the CID that manifest lists. Matching bytes mean the document is the one the recorder published. They do not mean its contents are true.</li>
         <li>The data set holding each piece, and the manifest's own piece, has a storage proof that is not overdue. Proof state belongs to the data set, not to each file, and the time shown is derived from the proving schedule that Filecoin reports.</li>
-        <li>Nothing here needs a key, an account, or the issuer's servers. Reading both networks is what makes this an audit anyone can run.</li>
+        <li>Nothing here needs a key, an account, or the county's servers. Reading both networks is what makes this an audit anyone can run.</li>
       </ul>
     </details>
   )

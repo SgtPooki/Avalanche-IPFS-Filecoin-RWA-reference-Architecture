@@ -30,8 +30,8 @@ const url = process.argv[2] ?? 'http://127.0.0.1:5181'
 const output = path.resolve(process.argv[3] ?? 'recording')
 const SIZE = { width: 1280, height: 720 }
 const CAPTION_HEIGHT = 96
-const REPO = 'github.com/SgtPooki/anchorline'
-const HOSTED = 'https://sgtpooki.github.io/anchorline/'
+const REPO = 'github.com/SgtPooki/Avalanche-IPFS-Filecoin-RWA-reference-Architecture'
+const HOSTED = 'https://sgtpooki.github.io/Avalanche-IPFS-Filecoin-RWA-reference-Architecture/'
 
 /** Screen labels. LIVE is the default; MOCKUP marks the one narrated segment. */
 const LIVE = 'Live: Avalanche Fuji and Filecoin Calibration'
@@ -222,7 +222,7 @@ try {
   await page.goto(url + '#demo')
   await overlay()
   await nav('Property record').click()
-  await narrate('asset', { until: () => page.getByRole('heading', { name: 'Record set, version 2' }).waitFor() })
+  await narrate('asset', { until: () => page.getByRole('heading', { name: 'Recorded documents, version 2' }).waitFor() })
 
   await nav('Verify').click()
   await nav('Verify now').click()
@@ -259,8 +259,8 @@ try {
     until: async () => {
       await first.waitFor()
       // Both manifests fetch at once; each is a provider round trip.
-      await second.getByRole('button', { name: 'Inspect records' }).click()
-      await first.getByRole('button', { name: 'Inspect records' }).click()
+      await second.getByRole('button', { name: 'Inspect documents' }).click()
+      await first.getByRole('button', { name: 'Inspect documents' }).click()
       await second.getByText('tax-assessment-2026.pdf', { exact: true }).waitFor()
       await first.getByText('tax-assessment-2025.pdf', { exact: true }).waitFor()
     },

@@ -9,8 +9,8 @@ description: >-
 
 Tokenized assets depend on deeds, certifications, appraisals, disclosures and other records that don't belong onchain. This reference architecture shows how Avalanche, IPFS and Filecoin can connect onchain assets to durable, content-addressed source records.
 
-* [Explore the working demo](https://sgtpooki.github.io/anchorline/) (runs live on Avalanche Fuji and Filecoin Calibration; no wallet needed)
-* [View the implementation on GitHub](https://github.com/SgtPooki/anchorline)
+* [Explore the working demo](https://sgtpooki.github.io/Avalanche-IPFS-Filecoin-RWA-reference-Architecture/) (runs live on Avalanche Fuji and Filecoin Calibration; no wallet needed)
+* [View the implementation on GitHub](https://github.com/SgtPooki/Avalanche-IPFS-Filecoin-RWA-reference-Architecture)
 
 ## The asset is onchain. Its source records usually aren't.
 
@@ -39,7 +39,7 @@ The result is a durable link between an onchain asset and the exact offchain dat
 
 ## See it in action: property record
 
-The [working example](https://sgtpooki.github.io/anchorline/) publishes a synthetic property record set for 123 Main Street: a deed, a survey, a parcel file and two tax assessments, issued by a county recorder. Each file is content-addressed with IPFS, stored on Filecoin, and listed in a manifest whose CID is anchored on Avalanche.
+The [working example](https://sgtpooki.github.io/Avalanche-IPFS-Filecoin-RWA-reference-Architecture/) publishes a synthetic property record set for 123 Main Street: a deed, a survey, a parcel file and two tax assessments, issued by a county recorder. Each file is content-addressed with IPFS, stored on Filecoin, and listed in a manifest whose CID is anchored on Avalanche.
 
 | Field | Value |
 | --- | --- |
@@ -55,8 +55,8 @@ The [working example](https://sgtpooki.github.io/anchorline/) publishes a synthe
 Press **Verify now** in the demo, or run it from a terminal with no key:
 
 ```sh
-git clone https://github.com/SgtPooki/anchorline.git
-cd anchorline
+git clone https://github.com/SgtPooki/Avalanche-IPFS-Filecoin-RWA-reference-Architecture.git
+cd Avalanche-IPFS-Filecoin-RWA-reference-Architecture
 npm ci
 npm run verify
 ```
@@ -101,10 +101,10 @@ This reference implementation was developed to explore architectures for real-wo
 
 Explore the implementation, run the demo, or adapt the architecture for your own RWA application.
 
-* [View on GitHub](https://github.com/SgtPooki/anchorline)
-* [Architecture: what is stored where](https://github.com/SgtPooki/anchorline#what-the-issuer-publishes)
-* [Run the demo](https://github.com/SgtPooki/anchorline#verify-the-example)
-* [Implementation guide](https://github.com/SgtPooki/anchorline#fork-map)
+* [View on GitHub](https://github.com/SgtPooki/Avalanche-IPFS-Filecoin-RWA-reference-Architecture)
+* [Architecture: what is stored where](https://github.com/SgtPooki/Avalanche-IPFS-Filecoin-RWA-reference-Architecture#what-the-issuer-publishes)
+* [Run the demo](https://github.com/SgtPooki/Avalanche-IPFS-Filecoin-RWA-reference-Architecture#verify-the-example)
+* [Implementation guide](https://github.com/SgtPooki/Avalanche-IPFS-Filecoin-RWA-reference-Architecture#fork-map)
 
 The implementation stores bytes with [Filecoin Onchain Cloud](https://docs.filecoin.cloud/) through the Synapse SDK, anchors a manifest pointer in a plain EVM registry contract on Avalanche, and verifies by re-hashing retrieved bytes and reading data set proof state. It builds on the [Avalanche and Filecoin data bridge](https://www.avax.network/about/blog/avalanche-and-filecoin-launch-cross-chain-data-bridge) announced in May 2025.
 
@@ -113,8 +113,8 @@ The implementation stores bytes with [Filecoin Onchain Cloud](https://docs.filec
 We're looking for RWA teams interested in applying this architecture to production data and helping shape the next generation of Filecoin + IPFS tooling.
 
 * [Talk to the Filecoin team](https://fil.org/contact)
-* [View the implementation](https://github.com/SgtPooki/anchorline)
+* [View the implementation](https://github.com/SgtPooki/Avalanche-IPFS-Filecoin-RWA-reference-Architecture)
 
 ### About the demo
 
-Anchorline is the open-source demo application created to illustrate this reference architecture. The property in the example is synthetic.
+This open-source demo application was created to illustrate the reference architecture. The property in the example is synthetic.

@@ -1,6 +1,6 @@
 # Handoff
 
-You are finishing anchorline, a forkable worked example for the Avalanche Summit in New York, Sept 16-17 2026. The recording must exist by the evening of Tuesday Sept 15. Repo: `/Users/sgtpooki/code/work/filoz/sgtpooki/anchorline`, public at `https://github.com/SgtPooki/anchorline`, branch `main`.
+You are finishing anchorline, a forkable worked example for the Avalanche Summit in New York, Sept 16-17 2026. The recording must exist by the evening of Tuesday Sept 15. Repo: `/Users/sgtpooki/code/work/filoz/sgtpooki/anchorline`, public at `https://github.com/SgtPooki/Avalanche-IPFS-Filecoin-RWA-reference-Architecture`, branch `main`.
 
 Read these first and treat them as settled: `docs/build-plan.md` (deliverables, architecture decisions, identity, writing rules, order of work, what changed since the plan, and a "Where it stands" section), `README.md`, `contracts/README.md`, `mockup/index.html` with its design-notes drawer, and `.research/` for local-only background that must never be quoted in public text.
 

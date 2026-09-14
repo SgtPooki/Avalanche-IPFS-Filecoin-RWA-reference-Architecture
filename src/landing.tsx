@@ -3,7 +3,7 @@
 
 import type { ReactNode } from 'react'
 
-export const REPO = 'https://github.com/SgtPooki/anchorline'
+export const REPO = 'https://github.com/SgtPooki/Avalanche-IPFS-Filecoin-RWA-reference-Architecture'
 export const CONTACT = 'https://fil.org/contact'
 
 export function Above() {
@@ -117,7 +117,7 @@ export function Below() {
           <a className="btn" href={`${REPO}#fork-map`}>Implementation guide</a>
         </div>
         <p className="where-note">
-          Verify from a terminal with no key: <code>git clone {REPO}.git && cd anchorline && npm ci && npm run verify</code>
+          Verify from a terminal with no key: <code>git clone {REPO}.git && cd Avalanche-IPFS-Filecoin-RWA-reference-Architecture && npm ci && npm run verify</code>
         </p>
       </Section>
 
@@ -130,8 +130,7 @@ export function Below() {
 
       <Section id="about" title="About this demo">
         <p className="where-note">
-          Anchorline is the open-source demo application created to illustrate this reference architecture. It builds on
-          the{' '}
+          This open-source demo application was created to illustrate the reference architecture. It builds on the{' '}
           <a href="https://www.avax.network/about/blog/avalanche-and-filecoin-launch-cross-chain-data-bridge">
             Avalanche and Filecoin data bridge
           </a>{' '}

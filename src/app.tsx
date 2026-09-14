@@ -17,17 +17,19 @@ import { Above, Below, REPO } from './landing.js'
  * registry, so one hosted copy serves as a verifier for every fork. Anything
  * missing or malformed falls back to the committed seed output.
  */
-function selectedAsset(): { assetId: string; owner: Address } {
+function selectedAsset(): { assetId: string; label: string; owner: Address } {
   const params = new URLSearchParams(window.location.search)
   const owner = params.get('owner')
   const assetId = params.get('asset')?.trim()
+  const custom = assetId != null && assetId !== ''
   return {
-    assetId: assetId != null && assetId !== '' ? assetId : seed.assetId,
+    assetId: custom ? assetId : seed.assetId,
+    label: custom ? assetId : '123 Main Street, Fairview',
     owner: owner != null && isAddress(owner) ? owner : (seed.owner as Address),
   }
 }
 
-const { assetId: ASSET_ID, owner: OWNER } = selectedAsset()
+const { assetId: ASSET_ID, label: LABEL, owner: OWNER } = selectedAsset()
 
 const views = { asset: 'Property record', verify: 'Verify', tamper: 'Check a document', history: 'History' } as const
 const pageLinks = { '#architecture': 'Architecture', '#demo': 'Demo', '#how': 'How it works', '#build': 'Build it', [REPO]: 'GitHub' }
@@ -72,8 +74,9 @@ export function App() {
       <section className="land-sec" id="demo">
         <h2>See it in action: property record</h2>
         <p className="lede">
-          A synthetic deed, survey, parcel file and tax assessments for 123 Main Street, published by a county recorder
-          and referenced from Avalanche. Everything below reads the live testnets.
+          The Fairview County Recorder publishes the deed, survey, parcel file and tax assessments for 123 Main Street,
+          stores them on Filecoin, and anchors the set on Avalanche. Everything below reads the live testnets. The
+          property is synthetic.
         </p>
         <div className="top">
           <nav className="nav">
@@ -99,12 +102,12 @@ export function App() {
             <div className="callout neutral">Could not reach the networks: {failed}</div>
           )}
           <div hidden={view !== 'verify'}>
-            <VerifyScreen assetId={ASSET_ID} owner={OWNER} clients={clients} />
+            <VerifyScreen assetId={ASSET_ID} label={LABEL} owner={OWNER} clients={clients} />
           </div>
-          {view === 'asset' && <AssetScreen assetId={ASSET_ID} owner={OWNER} clients={clients} onVerify={() => setView('verify')} />}
-          {view === 'history' && <HistoryScreen assetId={ASSET_ID} owner={OWNER} clients={clients} />}
+          {view === 'asset' && <AssetScreen assetId={ASSET_ID} label={LABEL} owner={OWNER} clients={clients} onVerify={() => setView('verify')} />}
+          {view === 'history' && <HistoryScreen assetId={ASSET_ID} label={LABEL} owner={OWNER} clients={clients} />}
           <div hidden={view !== 'tamper'}>
-            <TamperScreen assetId={ASSET_ID} lookup={lookup} ready={clients != null} onOpenHistory={() => setView('history')} />
+            <TamperScreen label={LABEL} lookup={lookup} ready={clients != null} onOpenHistory={() => setView('history')} />
           </div>
         </main>
       </section>

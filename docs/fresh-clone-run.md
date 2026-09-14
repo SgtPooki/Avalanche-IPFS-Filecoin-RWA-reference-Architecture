@@ -13,7 +13,7 @@ A forker can verify the demo asset in under a minute from a fresh clone and publ
 
 | Step | Command | Wall time |
 | --- | --- | --- |
-| Clone | `git clone https://github.com/SgtPooki/anchorline.git` | 1.3 s |
+| Clone | `git clone https://github.com/SgtPooki/Avalanche-IPFS-Filecoin-RWA-reference-Architecture.git` | 1.3 s |
 | Install | `npm ci` | 6.1 s |
 | Verify the demo asset | `npm run verify` | 44 s (printed `VERIFIED in 42.7s`) |
 | Verify again after the exit fix | `npm run verify` | 45 s (printed `VERIFIED in 43.3s`, on the published asset below) |

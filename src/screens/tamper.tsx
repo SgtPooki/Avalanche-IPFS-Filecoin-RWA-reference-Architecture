@@ -5,7 +5,8 @@ import type { DocumentLookup } from '../lib/asset-record.js'
 import { computeFileCid } from '../lib/cid.js'
 
 export interface TamperScreenProps {
-  assetId: string
+  /** How the demo names the property, e.g. its street address. */
+  label: string
   /** Looks the CID up across every anchored version. */
   lookup: (cid: string) => Promise<DocumentLookup>
   /** False while the chain clients are still connecting. */
@@ -20,7 +21,7 @@ type Check =
   | { state: 'done'; filename: string; size: number; cid: string; lookup: DocumentLookup }
   | { state: 'failed'; filename: string; message: string }
 
-export function TamperScreen({ assetId, lookup, ready, onOpenHistory }: TamperScreenProps) {
+export function TamperScreen({ label, lookup, ready, onOpenHistory }: TamperScreenProps) {
   const [check, setCheck] = useState<Check>({ state: 'idle' })
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -55,17 +56,17 @@ export function TamperScreen({ assetId, lookup, ready, onOpenHistory }: TamperSc
     <section>
       <div className="screen-head">
         <div className="eyebrow">Verify · document check</div>
-        <h1>Check a document against the asset</h1>
+        <h1>Check a document against {label}</h1>
         <p className="sub">
-          The file is hashed locally. If its fingerprint is not in a manifest anchored on Avalanche, it is not the
-          document on record.
+          Drop in a deed, survey or assessment. The file is hashed locally; if its fingerprint is not in a manifest
+          anchored on Avalanche, it is not the document on record for this property.
         </p>
       </div>
 
       <div className="split">
         <div className="panel">
           {check.state === 'done' ? (
-            <Verdict check={check} assetId={assetId} onOpenHistory={onOpenHistory} />
+            <Verdict check={check} assetId={label} onOpenHistory={onOpenHistory} />
           ) : (
             <p className="sub">
               {check.state === 'hashing'

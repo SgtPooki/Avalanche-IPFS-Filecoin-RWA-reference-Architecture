@@ -2,24 +2,24 @@
 
 A reference architecture and working example showing how RWA issuers can use Avalanche, IPFS and Filecoin to connect onchain assets to durable, content-addressed source records. Tokenized assets depend on deeds, certifications, appraisals and disclosures that don't belong onchain; this pattern lets an application reference those records while anyone can verify the data hasn't changed and is still stored.
 
-Read the [reference architecture](docs/reference-architecture.md) or open the [live demo](https://sgtpooki.github.io/anchorline/). The rest of this README is the implementation guide.
+Read the [reference architecture](docs/reference-architecture.md) or open the [live demo](https://sgtpooki.github.io/Avalanche-IPFS-Filecoin-RWA-reference-Architecture/). The rest of this README is the implementation guide.
 
-An issuer publishes a record set, anchors its manifest on Avalanche, and lets anyone retrieve the documents and check their content and Filecoin storage proof state. The example uses a synthetic property; the same record format can hold inspection reports, loan documents, or equipment certificates. Anchorline is the name of this demo application, not a product.
+An issuer publishes a record set, anchors its manifest on Avalanche, and lets anyone retrieve the documents and check their content and Filecoin storage proof state. The example uses a synthetic property; the same record format can hold inspection reports, loan documents, or equipment certificates.
 
 ## Verify the example
 
 Use Node.js 24 or later and npm. Verifying needs no private key, wallet connection, funds, or `.env` file.
 
 ```sh
-git clone https://github.com/SgtPooki/anchorline.git
-cd anchorline
+git clone https://github.com/SgtPooki/Avalanche-IPFS-Filecoin-RWA-reference-Architecture.git
+cd Avalanche-IPFS-Filecoin-RWA-reference-Architecture
 npm ci
 npm run verify
 ```
 
 The command checks `FAIRVIEW-0031` on Avalanche Fuji and Filecoin Calibration. It prints one row per record: whether the fetched content matches its CID, whether retrieval succeeded, and whether the data set holding it has a current storage proof. The manifest's own piece is checked the same way. A failed check exits with status 1. When Avalanche cannot be read, or a document check cannot read every version, the command reports that and exits with status 2 instead of a verdict; a record that could not be fetched shows its content check as unknown, not as a mismatch.
 
-The same app is hosted read-only at [sgtpooki.github.io/anchorline](https://sgtpooki.github.io/anchorline/); it holds no key. Add `?asset=ID&owner=0x…` to point it at any asset in the registry, your own fork's included. To run it locally, use `npm run dev` and visit the URL Vite prints. Asset shows the current record set; History reads every published version and lets you inspect its manifest and download records. Verify and Check a document use the public networks. The committed [seed output](seed-output.json) selects the browser's asset and publisher.
+The same app is hosted read-only at [sgtpooki.github.io/Avalanche-IPFS-Filecoin-RWA-reference-Architecture](https://sgtpooki.github.io/Avalanche-IPFS-Filecoin-RWA-reference-Architecture/); it holds no key. Add `?asset=ID&owner=0x…` to point it at any asset in the registry, your own fork's included. To run it locally, use `npm run dev` and visit the URL Vite prints. Property record shows the current documents; History reads every published version and lets you inspect its manifest and download records. Verify and Check a document use the public networks. The committed [seed output](seed-output.json) selects the browser's asset and publisher.
 
 Try both deeds from the terminal:
 
@@ -88,7 +88,7 @@ The issuer stays the record of authority. Matching bytes establish that a docume
 
 All documents here are public and synthetic. Confidential records need encryption and key management before storage. This example does not implement those controls, KYC, or production custody.
 
-Ava Labs and the Filecoin Foundation launched the [Avalanche and Filecoin data bridge in May 2025](https://www.avax.network/about/blog/avalanche-and-filecoin-launch-cross-chain-data-bridge-for-scalable-web3). Anchorline builds on that connection with an asset-record example. Its verifier reads both networks directly; the registry does not validate Filecoin proofs on Avalanche.
+Ava Labs and the Filecoin Foundation launched the [Avalanche and Filecoin data bridge in May 2025](https://www.avax.network/about/blog/avalanche-and-filecoin-launch-cross-chain-data-bridge-for-scalable-web3). This example builds on that connection. Its verifier reads both networks directly; the registry does not validate Filecoin proofs on Avalanche.
 
 ## Check your fork
 
@@ -99,6 +99,6 @@ npm run build
 
 The browser tests use headless Chromium. On a new machine, install it with `npx playwright install chromium`. Contract tests run separately with `forge test` from `contracts/`.
 
-With the dev server running, `node scripts/check-app.mjs http://127.0.0.1:5173` checks the live demo's Asset and History screens, downloads the deed, exercises an RPC failure and retry, and saves desktop and mobile screenshots under `/tmp/anchorline-qa`. This network check expects the shared demo's two versions.
+With the dev server running, `node scripts/check-app.mjs http://127.0.0.1:5173` checks the live demo's Asset and History screens, downloads the deed, exercises an RPC failure and retry, and saves desktop and mobile screenshots under `/tmp/rwa-qa`. This network check expects the shared demo's two versions.
 
 See the [build plan](docs/build-plan.md) for implementation decisions, the [fresh-clone run](docs/fresh-clone-run.md) for measured clone-to-verdict and clone-to-published timings, the [demo script](docs/demo-script.md) for the recording, and [contracts/README.md](contracts/README.md) for the registry API. AVAX and Avalanche are trademarks of Ava Labs, Inc. Filecoin and IPFS are trademarks of their respective foundations.

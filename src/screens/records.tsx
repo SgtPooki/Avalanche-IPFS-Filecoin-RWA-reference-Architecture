@@ -18,7 +18,7 @@ export function AnchorDetails({ anchor }: { anchor: ManifestVersion }) {
 export function Records({ manifest, synapse }: { manifest: Manifest; synapse: Synapse }) {
   return <>
     <div className="tbl-wrap"><table className="records-table">
-      <thead><tr><th>Record</th><th>Content CID</th><th>Bytes</th><th>Filecoin</th><th>Document</th></tr></thead>
+      <thead><tr><th>Document</th><th>Content CID</th><th>Bytes</th><th>Filecoin</th><th>Bytes on Filecoin</th></tr></thead>
       <tbody>{manifest.records.map((record) => <tr key={record.filename}>
         <td><strong>{record.filename}</strong><div className="meta">{record.type}</div></td>
         <td><span className="cid short" title={record.cid}>{record.cid}</span></td>

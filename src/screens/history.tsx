@@ -6,11 +6,11 @@ import type { VerifyScreenProps } from './verify.js'
 import { AnchorDetails, Records } from './records.js'
 import { useRead } from './use-read.js'
 
-export function HistoryScreen({ assetId, owner, clients }: VerifyScreenProps) {
+export function HistoryScreen({ assetId, label, owner, clients }: VerifyScreenProps) {
   const load = useCallback(() => manifestHistory(clients!.avalanche, owner, assetId), [clients, owner, assetId])
   const { result, refresh } = useRead(clients == null ? null : load)
   return <section>
-    <div className="screen-head"><div className="eyebrow">History</div><h1>Published versions</h1><p className="sub mono">{assetId}</p></div>
+    <div className="screen-head"><div className="eyebrow">History</div><h1>Recorded versions of {label}</h1><p className="sub mono">{assetId}</p></div>
     <div className="actions"><button className="btn" onClick={refresh} disabled={clients == null || result.state === 'loading'}>Refresh</button></div>
     {result.state === 'loading' && <p role="status">Reading version history from Avalanche...</p>}
     {result.state === 'failed' && <p role="alert">Could not read history: {result.message}</p>}
@@ -26,7 +26,7 @@ function Version({ anchor, current, clients, assetId }: { anchor: ManifestVersio
   return <article className={`ver ${current ? 'current' : ''}`}>
     <div className="head"><h2>Version {anchor.version}</h2>{current && <span className="pill neutral">Current</span>}</div>
     <AnchorDetails anchor={anchor} />
-    <button className="btn" aria-expanded={open} onClick={() => setOpen(!open)}>{open ? 'Close records' : 'Inspect records'}</button>
+    <button className="btn" aria-expanded={open} onClick={() => setOpen(!open)}>{open ? 'Close documents' : 'Inspect documents'}</button>
     {open && <VersionRecords anchor={anchor} clients={clients} assetId={assetId} />}
   </article>
 }

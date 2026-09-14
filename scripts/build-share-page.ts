@@ -33,8 +33,8 @@ const verified = take.timeline.find((entry) => entry.scene === 'verified')
 if (verified?.verifySeconds == null) throw new Error('timeline.json has no verified entry; record the demo first')
 const verifySeconds = verified.verifySeconds
 
-const REPO = 'https://github.com/SgtPooki/anchorline'
-const HOSTED = 'https://sgtpooki.github.io/anchorline/'
+const REPO = 'https://github.com/SgtPooki/Avalanche-IPFS-Filecoin-RWA-reference-Architecture'
+const HOSTED = 'https://sgtpooki.github.io/Avalanche-IPFS-Filecoin-RWA-reference-Architecture/'
 
 /**
  * Explorers, checked in a real browser rather than with curl.
@@ -217,7 +217,7 @@ const html = `<!doctype html>
     <span>anchorline</span>
     <span>recorded ${escape(take.recordedAt.slice(0, 10))}</span>
     <span>Avalanche Fuji · Filecoin Calibration</span>
-    <a href="${REPO}" target="_blank" rel="noopener noreferrer">github.com/SgtPooki/anchorline</a>
+    <a href="${REPO}" target="_blank" rel="noopener noreferrer">github.com/SgtPooki/Avalanche-IPFS-Filecoin-RWA-reference-Architecture</a>
   </div>
 
   <h1>Verifiable offchain records for an Avalanche RWA</h1>
@@ -276,7 +276,7 @@ ${olderVersions}
     <h2>Run the same check yourself</h2>
     <p class="fine">Verifying needs no wallet, no account, and no key. It reads two public chains and hashes bytes. The same app is hosted read-only at <a href="${HOSTED}" target="_blank" rel="noopener noreferrer">${escape(HOSTED.replace('https://', ''))}</a>; add <span class="mono">?asset=ID&amp;owner=0x…</span> to point it at another asset.</p>
     <pre>git clone ${REPO}
-cd anchorline
+cd Avalanche-IPFS-Filecoin-RWA-reference-Architecture
 npm ci
 npm run verify</pre>
   </div>

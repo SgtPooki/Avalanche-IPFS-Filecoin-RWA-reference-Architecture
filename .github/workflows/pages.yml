@@ -31,7 +31,7 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
-          BASE_PATH: /anchorline/
+          BASE_PATH: /Avalanche-IPFS-Filecoin-RWA-reference-Architecture/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
