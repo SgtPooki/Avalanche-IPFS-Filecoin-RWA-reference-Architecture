@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" font-family="'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif" fill="#0F1216">
+  <title>Avalanche + IPFS + Filecoin: verifiable offchain data for tokenized real-world assets</title>
+  <desc>A real-world asset source record such as a deed is content-addressed by IPFS, which outputs a CID. The bytes are persisted on Filecoin with cryptographic storage proofs. An application on Avalanche references the CID from the onchain asset. Anyone can retrieve the record and verify it against the CID.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#4B5563"/></marker>
+    <marker id="arrow-ava" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#B32A2B"/></marker>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="120%"><feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#101520" flood-opacity=".08"/></filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="#F5F6F8"/>
+
+  <!-- header -->
+  <text x="80" y="86" font-family="'IBM Plex Mono', ui-monospace, Menlo, monospace" font-size="18" letter-spacing="2" fill="#707B8F">FILECOIN × AVALANCHE · RWA REFERENCE ARCHITECTURE</text>
+  <text x="80" y="140" font-size="40" font-weight="700" letter-spacing="-.5">Verifiable offchain data for tokenized real-world assets</text>
+
+  <!-- 1. source record -->
+  <g filter="url(#shadow)">
+    <rect x="80" y="230" width="330" height="250" rx="16" fill="#FFFFFF" stroke="#DDE1E6"/>
+    <rect x="80" y="230" width="330" height="6" rx="3" fill="#B9C0C9"/>
+  </g>
+  <text x="110" y="280" font-family="'IBM Plex Mono', ui-monospace, Menlo, monospace" font-size="14" letter-spacing="1.5" fill="#707B8F">1 · RWA SOURCE RECORD</text>
+  <text x="110" y="322" font-size="26" font-weight="700">The document</text>
+  <text x="110" y="360" font-size="17" fill="#4B5563">Deed · title · appraisal</text>
+  <text x="110" y="386" font-size="17" fill="#4B5563">certification · disclosure</text>
+  <text x="110" y="446" font-size="15" fill="#707B8F">Output: the offchain record</text>
+
+  <!-- 2. IPFS -->
+  <g filter="url(#shadow)">
+    <rect x="490" y="230" width="330" height="250" rx="16" fill="#FFFFFF" stroke="#DDE1E6"/>
+    <rect x="490" y="230" width="330" height="6" rx="3" fill="#69C4CD"/>
+  </g>
+  <text x="520" y="280" font-family="'IBM Plex Mono', ui-monospace, Menlo, monospace" font-size="14" letter-spacing="1.5" fill="#378085">2 · IPFS</text>
+  <text x="520" y="322" font-size="26" font-weight="700">Content-address it</text>
+  <text x="520" y="360" font-size="17" fill="#4B5563">The CID is derived from the bytes.</text>
+  <text x="520" y="386" font-size="17" fill="#4B5563">Change one byte, the CID changes.</text>
+  <text x="520" y="446" font-size="15" fill="#707B8F">Output: a CID</text>
+  <text x="640" y="446" font-family="'IBM Plex Mono', ui-monospace, Menlo, monospace" font-size="14" fill="#378085">bafkrei…</text>
+
+  <!-- 3. Filecoin -->
+  <g filter="url(#shadow)">
+    <rect x="900" y="230" width="330" height="250" rx="16" fill="#FFFFFF" stroke="#DDE1E6"/>
+    <rect x="900" y="230" width="330" height="6" rx="3" fill="#0090FF"/>
+  </g>
+  <text x="930" y="280" font-family="'IBM Plex Mono', ui-monospace, Menlo, monospace" font-size="14" letter-spacing="1.5" fill="#0062B8">3 · FILECOIN</text>
+  <text x="930" y="322" font-size="26" font-weight="700">Persist it</text>
+  <text x="930" y="360" font-size="17" fill="#4B5563">Storage providers hold the bytes</text>
+  <text x="930" y="386" font-size="17" fill="#4B5563">and post cryptographic proofs.</text>
+  <text x="930" y="446" font-size="15" fill="#707B8F">Output: verifiable storage</text>
+
+  <!-- 4. Avalanche -->
+  <g filter="url(#shadow)">
+    <rect x="490" y="580" width="740" height="180" rx="16" fill="#FFFFFF" stroke="#DDE1E6"/>
+    <rect x="490" y="580" width="740" height="6" rx="3" fill="#E84142"/>
+  </g>
+  <text x="520" y="630" font-family="'IBM Plex Mono', ui-monospace, Menlo, monospace" font-size="14" letter-spacing="1.5" fill="#B32A2B">4 · AVALANCHE</text>
+  <text x="520" y="672" font-size="26" font-weight="700">Reference the CID from the onchain asset</text>
+  <text x="520" y="708" font-size="17" fill="#4B5563">The application records the CID alongside the asset or transaction.</text>
+  <text x="520" y="740" font-size="15" fill="#707B8F">Output: onchain state anyone can read</text>
+
+  <!-- flow arrows -->
+  <line x1="412" y1="355" x2="486" y2="355" stroke="#4B5563" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="822" y1="355" x2="896" y2="355" stroke="#4B5563" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <!-- the CID is what Avalanche holds -->
+  <line x1="655" y1="484" x2="655" y2="576" stroke="#B32A2B" stroke-width="2.5" marker-start="url(#arrow-ava)" marker-end="url(#arrow-ava)"/>
+  <text x="672" y="536" font-size="15" fill="#B32A2B">CID</text>
+
+  <!-- verifier -->
+  <g filter="url(#shadow)">
+    <rect x="1310" y="230" width="210" height="530" rx="16" fill="#FFFFFF" stroke="#DDE1E6"/>
+  </g>
+  <text x="1340" y="280" font-family="'IBM Plex Mono', ui-monospace, Menlo, monospace" font-size="14" letter-spacing="1.5" fill="#707B8F">ANYONE</text>
+  <text x="1340" y="322" font-size="26" font-weight="700">Verify</text>
+  <text x="1340" y="364" font-size="16" fill="#4B5563">Read the CID</text>
+  <text x="1340" y="388" font-size="16" fill="#4B5563">from Avalanche.</text>
+  <text x="1340" y="430" font-size="16" fill="#4B5563">Fetch the bytes</text>
+  <text x="1340" y="454" font-size="16" fill="#4B5563">from Filecoin.</text>
+  <text x="1340" y="496" font-size="16" fill="#4B5563">Re-hash. Same CID,</text>
+  <text x="1340" y="520" font-size="16" fill="#4B5563">same document.</text>
+  <text x="1340" y="562" font-size="16" fill="#4B5563">Check the storage</text>
+  <text x="1340" y="586" font-size="16" fill="#4B5563">proof is current.</text>
+  <text x="1340" y="640" font-size="15" fill="#707B8F">No wallet. No key.</text>
+  <text x="1340" y="664" font-size="15" fill="#707B8F">No trust in the issuer.</text>
+  <line x1="1236" y1="355" x2="1306" y2="355" stroke="#4B5563" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="1236" y1="670" x2="1306" y2="670" stroke="#B32A2B" stroke-width="2.5" marker-end="url(#arrow-ava)"/>
+
+  <!-- result -->
+  <text x="80" y="840" font-size="22" font-weight="600">The result: a durable link between an onchain asset and the exact offchain data it represents.</text>
+</svg>

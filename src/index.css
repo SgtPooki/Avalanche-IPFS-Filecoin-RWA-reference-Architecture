@@ -515,3 +515,4 @@ html { scroll-behavior: smooth; }
 .btn { text-decoration: none; }
 .step .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
 .land-sec main h1 { font-size: 24px; }
+.diagram { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 12px; margin-bottom: 18px; }

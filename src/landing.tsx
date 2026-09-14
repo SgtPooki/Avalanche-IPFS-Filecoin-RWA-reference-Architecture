@@ -40,6 +40,11 @@ export function Above() {
       </Section>
 
       <Section id="architecture" title="A hybrid architecture for real-world assets" lede="Three networks, one job each. The result is a durable link between an onchain asset and the exact offchain data it represents.">
+        <img
+          className="diagram"
+          src={`${import.meta.env.BASE_URL}rwa-architecture.svg`}
+          alt="A source record such as a deed goes to IPFS, which outputs a CID; the bytes are persisted on Filecoin with storage proofs; an Avalanche application references the CID; anyone reads the CID from Avalanche, fetches the bytes from Filecoin and re-hashes them."
+        />
         <div className="three">
           <Pillar tone="ipfs" name="IPFS" ask="Content-address the record" ans="A CID is derived from the bytes themselves. Change one byte and the CID changes. Output: a CID, a content identifier." />
           <Pillar tone="fil" name="Filecoin" ask="Persist the underlying data" ans="Storage providers hold the bytes and post cryptographic proofs that they still do. Output: verifiable storage." />
