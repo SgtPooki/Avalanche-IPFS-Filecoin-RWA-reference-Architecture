@@ -1,5 +1,5 @@
-// Static sections of the reference-architecture page. The live demo sits
-// between `Above` and `Below`; nothing here reads a network.
+// Static sections of the reference-architecture page. app.tsx renders the
+// live demo between `Above` and `Below`. No network reads in this file.
 
 import type { ReactNode } from 'react'
 
