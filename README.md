@@ -4,6 +4,8 @@ A reference architecture and working example showing how RWA issuers can use Ava
 
 Read the [reference architecture](docs/reference-architecture.md) or open the [live demo](https://sgtpooki.github.io/Avalanche-IPFS-Filecoin-RWA-reference-Architecture/). The rest of this README is the implementation guide.
 
+![Architecture: a source record goes to IPFS for a CID, its bytes persist on Filecoin with storage proofs, an Avalanche application references the CID, and anyone can verify by re-hashing](docs/rwa-architecture.svg)
+
 An issuer publishes a record set, anchors its manifest on Avalanche, and lets anyone retrieve the documents and check their content and Filecoin storage proof state. The example uses a synthetic property; the same record format can hold inspection reports, loan documents, or equipment certificates.
 
 ## Verify the example
@@ -99,6 +101,6 @@ npm run build
 
 The browser tests use headless Chromium. On a new machine, install it with `npx playwright install chromium`. Contract tests run separately with `forge test` from `contracts/`.
 
-With the dev server running, `node scripts/check-app.mjs http://127.0.0.1:5173` checks the live demo's Asset and History screens, downloads the deed, exercises an RPC failure and retry, and saves desktop and mobile screenshots under `/tmp/rwa-qa`. This network check expects the shared demo's two versions.
+With the dev server running, `node scripts/check-app.mjs http://127.0.0.1:5173` checks the live demo's Property record and History screens, downloads the deed, exercises an RPC failure and retry, and saves desktop and mobile screenshots under `/tmp/rwa-qa`. This network check expects the shared demo's two versions.
 
 See the [build plan](docs/build-plan.md) for implementation decisions, the [fresh-clone run](docs/fresh-clone-run.md) for measured clone-to-verdict and clone-to-published timings, the [demo script](docs/demo-script.md) for the recording, and [contracts/README.md](contracts/README.md) for the registry API. AVAX and Avalanche are trademarks of Ava Labs, Inc. Filecoin and IPFS are trademarks of their respective foundations.
