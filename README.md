@@ -1,4 +1,4 @@
-# Verifiable offchain data for tokenized real-world assets
+# Verifiable data infrastructure for tokenized assets
 
 A reference architecture and working example showing how RWA issuers can use Avalanche, IPFS and Filecoin to connect onchain assets to durable, content-addressed source records. Tokenized assets depend on deeds, certifications, appraisals and disclosures that don't belong onchain; this pattern lets an application reference those records while anyone can verify the data hasn't changed and is still stored.
 
