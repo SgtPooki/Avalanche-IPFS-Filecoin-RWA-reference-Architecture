@@ -11,7 +11,7 @@ export function Above() {
     <>
       <section className="hero" id="top">
         <div>
-          <div className="eyebrow">REAL-WORLD ASSETS</div>
+          <div className="eyebrow">Real World Assets (RWAs)</div>
           <h1>Verifiable data infrastructure for tokenized assets</h1>
           <p className="sub">
             Connect onchain assets to the offchain records they depend on. Use IPFS + Filecoin to make deeds, appraisals,
